@@ -118,12 +118,65 @@ class llynxScrape
 			//Strip any script tags
 			$content = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', ' ', $content);
 			$content = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', ' ', $content);
+			$this->images = array();
+			//Reset text variable
+			$this->text = array();
+			//Find our Open Graph content
+			$this->findOGtags($content);
 			//Extract images on the page
 			$this->findImages($content, $url);
 			//Extract a few paragraphs from the page
 			$this->findText($content);
 			//Extract the page title
 			$this->findTitle($content);
+		}
+	}
+	function parseTag($tag, $content)
+	{
+		//Match all tags, yeah we're a little greedy, but we won't get any javascript tags
+		preg_match_all('~<' . $tag . '\s+([^>]+)>~i', $content, $matches);
+		$raw = array();
+		//We want the width, height, and src
+		foreach($matches[1] as $str)
+		{
+			preg_match_all('~([a-z]([a-z0-9]*)?)=("|\')(.*?)("|\')~is', $str, $pairs);
+			if(count($pairs[1]) > 0)
+			{
+				$raw[] = array_combine($pairs[1],$pairs[4]);
+			}
+		}
+		return $raw;
+	}
+
+	function findOGtags($content)
+	{
+		$ogKeyMap = array('image' => 'og:image', 'text' => 'og:description');
+		$meta = $this->parseTag('meta', $content);
+		//Loop around the meta tags we grabbed
+		foreach($meta as $entry)
+		{
+			//If the meta tag has the property keyword, keep digging
+			if(isset($entry['property']))
+			{
+				//Loop around the known keys
+				foreach($ogKeyMap as $key=>$ogKey)
+				{
+					//If we have a match, do something
+					if($entry['property'] === $ogKey)
+					{
+						if($key === 'image')
+						{
+							$this->images[] = $entry['content'];
+						}
+						else if($key === 'text')
+						{
+							$this->text[] = $entry['content'];
+						}
+						//No need to keep looping
+						break;
+					}
+				}
+			}
 		}
 	}
 	function findEncoding($content)
@@ -144,19 +197,8 @@ class llynxScrape
 	}
 	function findImages($content, $baseURL)
 	{
-		//Match all image tags, yeah we're a little greedy, but we won't get any javascript tags
-		preg_match_all('~<img ([^>]+)>~i', $content, $matches);
-		$rawImages = array();
-		//We want the width, height, and src
-		foreach($matches[1] as $str)
-		{
-			preg_match_all('~([a-z]([a-z0-9]*)?)=("|\')(.*?)("|\')~is', $str, $pairs);
-			if(count($pairs[1]) > 0)
-			{
-				$rawImages[] = array_combine($pairs[1],$pairs[4]);
-			}
-		}
-		$this->images = array();
+		//Pars the image tags
+		$rawImages = $this->parseTag('img', $content);
 		foreach($rawImages as $image)
 		{
 			//If we've gotten our specified fill, exit early
@@ -245,8 +287,6 @@ class llynxScrape
 		preg_match_all($expression, $content, $media);
 		$stuff = $media[0];
 		$i = 0;
-		//Reset text variable
-		$this->text = array();
 		//For each paragraph we want to strip HTML tags
 		foreach($stuff as $paragraph)
 		{
