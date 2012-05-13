@@ -33,7 +33,8 @@ class llynxScrape
 		'aimg_min_y' => 50,
 		'aimg_max_range' => 256,
 		'Scurl_agent' => 'WP Links Bot',
-		'acurl_timeout' => 2
+		'acurl_timeout' => 2,
+		'bog_only' => false
 	);
 	public $error = array();
 	public $images = array();
@@ -123,10 +124,13 @@ class llynxScrape
 			$this->text = array();
 			//Find our Open Graph content
 			$this->findOGtags($content);
-			//Extract images on the page
-			$this->findImages($content, $url);
-			//Extract a few paragraphs from the page
-			$this->findText($content);
+			if(!$this->opt['bog_only'] || (count($this->images) < 1 && count($this->text) < 1))
+			{
+				//Extract images on the page
+				$this->findImages($content, $url);
+				//Extract a few paragraphs from the page
+				$this->findText($content);
+			}
 			//Extract the page title
 			$this->findTitle($content);
 		}
@@ -164,13 +168,15 @@ class llynxScrape
 					//If we have a match, do something
 					if($entry['property'] === $ogKey)
 					{
+						//Deal with the site image
 						if($key === 'image')
 						{
-							$this->images[] = $entry['content'];
+							$this->images[] = esc_url($entry['content']);
 						}
+						//Deal with the site description
 						else if($key === 'text')
 						{
-							$this->text[] = $entry['content'];
+							$this->text[] = strip_tags($entry['content']);
 						}
 						//No need to keep looping
 						break;
@@ -276,7 +282,7 @@ class llynxScrape
 			//Check the sizes
 			if($fixedURL && $size[0] >= $this->opt['aimg_min_x'] && $size[1] >= $this->opt['aimg_min_y'])
 			{
-				$this->images[] = $fixedURL;
+				$this->images[] = esc_url($fixedURL);
 			}
 		}
 	}

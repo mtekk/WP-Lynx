@@ -3,7 +3,7 @@
 Plugin Name: WP Lynx
 Plugin URI: http://mtekk.us/code/wp-lynx/
 Description: Adds Facebook-esq extended link information to your WordPress pages and posts. For details on how to use this plugin visit <a href="http://mtekk.us/code/wp-lynx/">WP Lynx</a>. 
-Version: 0.4.0
+Version: 0.4.50
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
@@ -54,7 +54,7 @@ if(!class_exists('llynxScrape'))
  */
 class linksLynx extends mtekk_adminKit
 {
-	protected $version = '0.4.0';
+	protected $version = '0.4.50';
 	protected $full_name = 'WP Lynx Settings';
 	protected $short_name = 'WP Lynx';
 	protected $access_level = 'manage_options';
@@ -82,7 +82,8 @@ class linksLynx extends mtekk_adminKit
 					'bcache_crop' => false,
 					'bshort_url' => false,
 					'Htemplate' => '<div class="llynx_print">%image%<div class="llynx_text"><a title="Go to %title%" href="%url%">%title%</a><small>%url%</small><span>%description%</span></div></div>',
-					'Himage_template' => '');
+					'Himage_template' => '',
+					'bog_only' => false);
 	protected $template_tags = array(
 					'%url%',
 					'%short_url%',
@@ -835,6 +836,7 @@ class linksLynx extends mtekk_adminKit
 				<h3><?php _e('General', 'wp_lynx'); ?></h3>
 				<table class="form-table">
 					<?php
+						$this->input_check(__('Open Graph Only Mode', 'wp_lynx'), 'bog_only', __("For sites with Open Graph metadata, only fetch that data.", 'wp_lynx'));
 						$this->input_check(__('Shorten URL', 'wp_lynx'), 'bshort_url', __('Shorten URL using a URL shortening service such as tinyurl.com.', 'wp_lynx'));
 						$this->input_check(__('Default Style', 'wp_lynx'), 'bglobal_style', __('Enable the default Lynx Prints styling on your blog.', 'wp_lynx'));
 						$this->input_text(__('Maximum Image Width', 'wp_lynx'), 'acache_max_x', '10', false, __('Maximum cached image width in pixels.', 'wp_lynx'));
