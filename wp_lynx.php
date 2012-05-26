@@ -514,6 +514,14 @@ class linksLynx extends mtekk_adminKit
 			</div>
 		</form>
 		<?php
+		  $uploadDir = wp_upload_dir();
+		  if(!isset($uploadDir['path']) || !is_writable($uploadDir['path']))
+		  {
+			  //Let the user know their directory is not writable
+			  $this->message['error'][] = __('WordPress uploads directory is not writable, thumbnails will be disabled.', 'wp_lynx');
+			  //Too late to use normal hook, directly display the message
+			  $this->message();
+		  }
 		}
 		if(isset($_POST['llynx_get_url']))
 		{
@@ -816,7 +824,7 @@ class linksLynx extends mtekk_adminKit
 		if(!isset($uploadDir['path']) || !is_writable($uploadDir['path']))
 		{
 			//Let the user know their directory is not writable
-			$this->message['error'][] = __('WordPress uploads directory is not writable, thumbnails will be dissabled.', 'wp_lynx');
+			$this->message['error'][] = __('WordPress uploads directory is not writable, thumbnails will be disabled.', 'wp_lynx');
 			//Too late to use normal hook, directly display the message
 			$this->message();
 		}
