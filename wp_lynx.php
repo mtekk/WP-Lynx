@@ -521,7 +521,7 @@ class linksLynx extends mtekk_adminKit
 			$urls = preg_split('/\s+/',$_POST['llynx_get_url']['url']);
 		?>
 		<div class="hide-if-no-js" id="sort-buttons">
-			<span><?php _e('All Tabs:'); ?><a id="showall" href="#" style="display: inline;"><?php _e('Show'); ?></a><a style="display: none;" id="hideall" href="#"><?php _e('Hide'); ?></a></span>
+			<span><?php _e('All Prints:'); ?><a id="showall" href="#" style="display: inline;"><?php _e('Show'); ?></a><a style="display: none;" id="hideall" href="#"> <?php _e('Hide'); ?></a></span>
 			<?php _e('Sort Order:'); ?><a id="asc" href="#"><?php _e('Ascending');?></a> | <a id="desc" href="#"><?php _e('Descending'); ?></a> | <a id="clear" href="#"><?php _e('Clear'); ?></a>
 		</div>
 		<form action="<?php echo $formUrl; ?>&amp;type=wp_lynx&amp;TB_iframe=true" method="post" id="llynx_insert_print" class="media-upload-form type-form validate">
@@ -594,8 +594,8 @@ class linksLynx extends mtekk_adminKit
 					<input type="hidden" value="image" id="type-of-<?php echo $key; ?>">
 					<input type="hidden" value="<?php echo $this->llynx_scrape->images[0]; ?>" id="prints<?php echo $key; ?>img" name="prints[<?php echo $key; ?>][img]">
 					<input type="hidden" value="<?php echo $url; ?>" id="prints[<?php echo $key;?>][url]" name="prints[<?php echo $key;?>][url]">
-					<a href="#" class="toggle describe-toggle-on" style="display: block;"><?php _e('Show'); ?></a>
-					<a href="#" class="toggle describe-toggle-off" style="display: none;"><?php _e('Hide'); ?></a>
+					<a href="#" class="toggle describe-toggle-on"><?php _e('Show'); ?></a>
+					<a href="#" class="toggle describe-toggle-off"><?php _e('Hide'); ?></a>
 					<div class="menu_order"> <input type="text" value="0" name="prints[<?php echo $key; ?>][menu_order]" id="prints[<?php echo $key; ?>][menu_order]" class="menu_order_input"></div>
 					<div class="filename new"><span class="title"><?php echo $this->llynx_scrape->title; ?></span></div>
 					<table class="slidetoggle describe startclosed" style="display: none;">
