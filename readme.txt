@@ -1,9 +1,9 @@
 === WP Lynx ===
 Contributors: mtekk
-Tags: Links, Facebook, post, posts
+Tags: Links, Facebook, Open Graph, post, posts
 Requires at least: 3.3
 Tested up to: 3.4
-Stable tag: 0.4.0
+Stable tag: 0.5.0
 WP Lynx allows you to mimic Facebook's wall links in your WordPress posts.
 
 == Description ==
@@ -19,6 +19,11 @@ Don't see your language on the list? Feel free to translate WP Lynx and send Joh
 Please visit [WP Lynx's](http://mtekk.us/code/wp-lynx/#installation "WP Lynx's project page's installation section.") project page for installation and usage instructions.
 
 == Changelog ==
+= 0.5.0 =
+* New feature: Support for Open Graph protocol og:image and og:description.
+* New feature: Added a warning message on the Lynx Print adding screen alerting to thumbnails being disabled due to directory permission issues.
+* Bug fix: Improved content scraping algorithms to handle newlines in odd places (mid tag).
+* Bug fix: Fixed issue with the Show/Hide links not working correctly.
 = 0.4.0 =
 * Behavior change: Improved content filtering, should reduce the chances that garbage is selected as paragraph stubs.
 * Behavior change: Included style is now a separate CSS file rather than an inline CSS file.
