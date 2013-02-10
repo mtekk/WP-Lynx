@@ -3,7 +3,7 @@
 	A small library that adds in fallbacks for some of the PHP multibyte string
 	functions. Mainly inteneded to be used with Breadcrumb NavXT
 
-	Copyright 2009-2012  John Havlik  (email : mtekkmonkey@gmail.com)
+	Copyright 2009-2013  John Havlik  (email : mtekkmonkey@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+require_once(dirname(__FILE__) . '/block_direct_access.php');
 if(!function_exists('mb_strlen'))
 {
 	/**
@@ -67,6 +68,20 @@ if(!function_exists('mb_substr'))
 		{
 			return substr($string, $start, $length);
 		}
+	}
+}
+if(!function_exists('mb_strtolower'))
+{
+	/**
+	 * Fallback for mb_strtolower for users without multibyte support
+	 * 
+	 * @param string $str the string to change to lowercase
+	 * @param string $encoding the encoding of the string
+	 * @return string the lowercase string
+	 */
+	function mb_strtolower($str, $encoding = 'UTF-8')
+	{
+		return strtolower($str);
 	}
 }
 //We need this constant to be defined, otherwise things will break

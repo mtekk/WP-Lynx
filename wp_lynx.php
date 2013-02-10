@@ -3,7 +3,7 @@
 Plugin Name: WP Lynx
 Plugin URI: http://mtekk.us/code/wp-lynx/
 Description: Adds Facebook-esq extended link information to your WordPress pages and posts. For details on how to use this plugin visit <a href="http://mtekk.us/code/wp-lynx/">WP Lynx</a>. 
-Version: 0.5.0
+Version: 0.5.80
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
@@ -11,7 +11,7 @@ TextDomain: wp_lynx
 DomainPath: /languages/
 */
 /*  
-	Copyright 2010-2012  John Havlik  (email : mtekkmonkey@gmail.com)
+	Copyright 2010-2013  John Havlik  (email : mtekkmonkey@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ if(!class_exists('llynxScrape'))
  */
 class linksLynx extends mtekk_adminKit
 {
-	protected $version = '0.5.0';
+	protected $version = '0.5.80';
 	protected $full_name = 'WP Lynx Settings';
 	protected $short_name = 'WP Lynx';
 	protected $access_level = 'manage_options';
@@ -841,6 +841,7 @@ class linksLynx extends mtekk_adminKit
 			<?php settings_fields('llynx_options');?>
 			<div id="hasadmintabs">
 			<fieldset id="general" class="llynx_options">
+				<h3 class="tab-title" title="<?php _e('A collection of settings most likely to be modified are located under this tab.', 'wp_lynx');?>"><?php _e('General', 'wp_lynx'); ?></h3>
 				<h3><?php _e('General', 'wp_lynx'); ?></h3>
 				<table class="form-table">
 					<?php
@@ -871,6 +872,7 @@ class linksLynx extends mtekk_adminKit
 				</table>
 			</fieldset>
 			<fieldset id="images" class="llynx_options">
+				<h3 class="tab-title" title="<?php _e('Settings related to identifying valid content.', 'wp_lynx');?>"><?php _e('Content', 'wp_lynx'); ?></h3>
 				<h3><?php _e('Images', 'wp_lynx'); ?></h3>
 				<table class="form-table">
 					<?php
@@ -880,8 +882,6 @@ class linksLynx extends mtekk_adminKit
 						$this->input_text(__('Maximum Image Scrape Size', 'wp_lynx'), 'aimg_max_range', '10', false, __('Maximum number of bytes to download when determining the dimensions of JPEG images.', 'wp_lynx'));
 					?>
 				</table>
-			</fieldset>
-			<fieldset id="text" class="llynx_options">
 				<h3><?php _e('Text', 'wp_lynx'); ?></h3>
 				<table class="form-table">
 					<?php
@@ -892,6 +892,7 @@ class linksLynx extends mtekk_adminKit
 				</table>
 			</fieldset>
 			<fieldset id="advanced" class="llynx_options">
+				<h3 class="tab-title" title="<?php _e('Advanced settings for the scraping engine.', 'wp_lynx');?>"><?php _e('Advanced', 'wp_lynx'); ?></h3>
 				<h3><?php _e('Advanced', 'wp_lynx'); ?></h3>
 				<table class="form-table">
 					<?php
