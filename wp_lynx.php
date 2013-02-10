@@ -848,10 +848,24 @@ class linksLynx extends mtekk_adminKit
 						$this->input_check(__('Open Graph Only Mode', 'wp_lynx'), 'bog_only', __("For sites with Open Graph metadata, only fetch that data.", 'wp_lynx'));
 						$this->input_check(__('Shorten URL', 'wp_lynx'), 'bshort_url', __('Shorten URL using a URL shortening service such as tinyurl.com.', 'wp_lynx'));
 						$this->input_check(__('Default Style', 'wp_lynx'), 'bglobal_style', __('Enable the default Lynx Prints styling on your blog.', 'wp_lynx'));
-						$this->input_text(__('Maximum Image Width', 'wp_lynx'), 'acache_max_x', '10', false, __('Maximum cached image width in pixels.', 'wp_lynx'));
-						$this->input_text(__('Maximum Image Height', 'wp_lynx'), 'acache_max_y', '10', false, __('Maximum cached image height in pixels.', 'wp_lynx'));
-						$this->input_check(__('Crop Image', 'wp_lynx'), 'bcache_crop', __('Crop images in the cache to the above dimensions.', 'wp_lynx'));
 					?>
+				</table>
+			</fieldset>
+			<fieldset id="content" class="llynx_options">
+				<h3 class="tab-title" title="<?php _e('Settings related to how Lynx Prints will display.', 'wp_lynx');?>"><?php _e('Content', 'wp_lynx'); ?></h3>
+				<h3><?php _e('Content', 'wp_lynx'); ?></h3>
+				<table class="form-table">
+				<?php
+					$this->textbox(__('Lynx Print Template', 'wp_lynx'), 'Htemplate', 3, false, __('Available tags: ', 'wp_lynx') . implode(', ', $this->template_tags));
+				?>
+				</table>
+				<h3><?php _e('Images', 'wp_lynx'); ?></h3>
+				<table class="form-table">
+				<?php
+					$this->input_text(__('Maximum Image Width', 'wp_lynx'), 'acache_max_x', '10', false, __('Maximum cached image width in pixels.', 'wp_lynx'));
+					$this->input_text(__('Maximum Image Height', 'wp_lynx'), 'acache_max_y', '10', false, __('Maximum cached image height in pixels.', 'wp_lynx'));
+					$this->input_check(__('Crop Image', 'wp_lynx'), 'bcache_crop', __('Crop images in the cache to the above dimensions.', 'wp_lynx'));
+				?>
 					<tr valign="top">
 						<th scope="row">
 							<?php _e('Cached Image Format', 'wp_lynx'); ?>
@@ -871,8 +885,16 @@ class linksLynx extends mtekk_adminKit
 					?>
 				</table>
 			</fieldset>
-			<fieldset id="images" class="llynx_options">
-				<h3 class="tab-title" title="<?php _e('Settings related to identifying valid content.', 'wp_lynx');?>"><?php _e('Content', 'wp_lynx'); ?></h3>
+			<fieldset id="advanced" class="llynx_options">
+				<h3 class="tab-title" title="<?php _e('Advanced settings for the WP Lynx content scraping engine.', 'wp_lynx');?>"><?php _e('Advanced', 'wp_lynx'); ?></h3>
+				<h3><?php _e('Advanced', 'wp_lynx'); ?></h3>
+				<table class="form-table">
+					<?php
+						$this->input_text(__('Timeout', 'wp_lynx'), 'acurl_timeout', '10', false, __('Maximum time for scrape execution in seconds.', 'wp_lynx'));
+						$this->input_text(__('Useragent', 'wp_lynx'), 'Scurl_agent', '32', $this->opt['bcurl_embrowser'], __('Useragent to use during scrape execution.', 'wp_lynx'));
+						$this->input_check(__('Emulate Browser', 'wp_lynx'), 'bcurl_embrowser', __("Useragent will be exactly as the users's browser.", 'wp_lynx'));
+					?>
+				</table>
 				<h3><?php _e('Images', 'wp_lynx'); ?></h3>
 				<table class="form-table">
 					<?php
@@ -888,18 +910,6 @@ class linksLynx extends mtekk_adminKit
 						$this->input_text(__('Minimum Paragraph Length', 'wp_lynx'), 'ap_min_length', '10', false, __('Minimum paragraph length to be scraped (in characters).', 'wp_lynx'));
 						$this->input_text(__('Maximum Paragraph Length', 'wp_lynx'), 'ap_max_length', '10', false, __('Maximum paragraph length before it is cutt off (in characters).', 'wp_lynx'));
 						$this->input_text(__('Minimum Paragraph Count', 'wp_lynx'), 'ap_max_count', '10', false, __('Maximum number of paragraphs to scrape.', 'wp_lynx'));
-					?>
-				</table>
-			</fieldset>
-			<fieldset id="advanced" class="llynx_options">
-				<h3 class="tab-title" title="<?php _e('Advanced settings for the scraping engine.', 'wp_lynx');?>"><?php _e('Advanced', 'wp_lynx'); ?></h3>
-				<h3><?php _e('Advanced', 'wp_lynx'); ?></h3>
-				<table class="form-table">
-					<?php
-						$this->textbox(__('Lynx Print Template', 'wp_lynx'), 'Htemplate', 3, false, __('Available tags: ', 'wp_lynx') . implode(', ', $this->template_tags));
-						$this->input_text(__('Timeout', 'wp_lynx'), 'acurl_timeout', '10', false, __('Maximum time for scrape execution in seconds.', 'wp_lynx'));
-						$this->input_text(__('Useragent', 'wp_lynx'), 'Scurl_agent', '32', $this->opt['bcurl_embrowser'], __('Useragent to use during scrape execution.', 'wp_lynx'));
-						$this->input_check(__('Emulate Browser', 'wp_lynx'), 'bcurl_embrowser', __("Useragent will be exactly as the users's browser.", 'wp_lynx'));
 					?>
 				</table>
 			</fieldset>
