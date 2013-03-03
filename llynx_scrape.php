@@ -1,6 +1,6 @@
 <?php
 /*  
-	Copyright 2010-2012  John Havlik  (email : mtekkmonkey@gmail.com)
+	Copyright 2010-2013  John Havlik  (email : mtekkmonkey@gmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -192,7 +192,7 @@ class llynxScrape
 		//Trim out everything we don't need
 		$matches = preg_replace('/(charset|\=|\'|\"|\s)/', '', $matches[0]);
 		//Return the charset in uppercase so that mb_convert_encoding can work it's magic
-		if(strtoupper($matches[0]) == '')
+		if(!isset($matches[0]) || strtoupper($matches[0]) == '')
 		{
 			return 'auto';
 		}

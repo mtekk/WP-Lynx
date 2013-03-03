@@ -646,7 +646,8 @@ class linksLynx extends mtekk_adminKit
 							<td>
 								<p><input type="text" aria-required="true" value="<?php echo $this->llynx_scrape->title; ?>" name="prints[<?php echo $key; ?>][title]" id="prints[<?php echo $key; ?>][title]" class="text"><br />
 								<small><?php echo $url; ?></small></p>
-								<p><textarea name="prints[<?php echo $key; ?>][content]" id="prints<?php echo $key; ?>content" type="text"><?php echo $this->llynx_scrape->text[0];?></textarea></p>
+								<p><textarea name="prints[<?php echo $key; ?>][content]" id="prints<?php echo $key; ?>content" type="text"><?php if(isset($this->llynx_scrape->text[0])){echo $this->llynx_scrape->text[0];}?></textarea>
+								</p>
 								<p>
 									<input type="button" value="&lt;" class="button disabled" disabled="disabled" onclick="prev_content(<?php echo $key; ?>)" id="contprev-btn-<?php echo $key; ?>">
 									<input type="button" value="&gt;" <?php if(count($this->llynx_scrape->text) <= 1){echo 'disabled="disabled" class="disabled button"';}else{echo 'class="button"';}?> onclick="next_content(<?php echo $key; ?>)" id="contnext-btn-<?php echo $key; ?>">
