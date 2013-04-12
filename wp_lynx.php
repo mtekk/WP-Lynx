@@ -83,7 +83,10 @@ class linksLynx extends mtekk_adminKit
 					'bshort_url' => false,
 					'Htemplate' => '<div class="llynx_print">%image%<div class="llynx_text"><a title="Go to %title%" href="%url%">%title%</a><small>%url%</small><span>%description%</span></div></div>',
 					'Himage_template' => '',
-					'bog_only' => false);
+					'bog_only' => false,
+					'bwthumbs_enable' => false,
+					'awthumbs_key' => ''
+					);
 	protected $template_tags = array(
 					'%url%',
 					'%short_url%',
@@ -863,8 +866,8 @@ class linksLynx extends mtekk_adminKit
 				<h3><?php _e('Images', 'wp_lynx'); ?></h3>
 				<table class="form-table">
 				<?php
-					$this->input_text(__('Maximum Image Width', 'wp_lynx'), 'acache_max_x', '10', false, __('Maximum cached image width in pixels.', 'wp_lynx'));
-					$this->input_text(__('Maximum Image Height', 'wp_lynx'), 'acache_max_y', '10', false, __('Maximum cached image height in pixels.', 'wp_lynx'));
+					$this->input_text(__('Maximum Image Width', 'wp_lynx'), 'acache_max_x', 'small-text', false, __('Maximum cached image width in pixels.', 'wp_lynx'));
+					$this->input_text(__('Maximum Image Height', 'wp_lynx'), 'acache_max_y', 'small-text', false, __('Maximum cached image height in pixels.', 'wp_lynx'));
 					$this->input_check(__('Crop Image', 'wp_lynx'), 'bcache_crop', __('Crop images in the cache to the above dimensions.', 'wp_lynx'));
 				?>
 					<tr valign="top">
@@ -882,7 +885,7 @@ class linksLynx extends mtekk_adminKit
 						</td>
 					</tr>
 					<?php
-						$this->input_text(__('Cache Image Quality', 'wp_lynx'), 'acache_quality', '10', false, __('Image quality when cached images are saved as JPEG.', 'wp_lynx'));
+						$this->input_text(__('Cache Image Quality', 'wp_lynx'), 'acache_quality', 'small-text', false, __('Image quality when cached images are saved as JPEG.', 'wp_lynx'));
 					?>
 				</table>
 			</fieldset>
@@ -891,26 +894,33 @@ class linksLynx extends mtekk_adminKit
 				<h3><?php _e('Advanced', 'wp_lynx'); ?></h3>
 				<table class="form-table">
 					<?php
-						$this->input_text(__('Timeout', 'wp_lynx'), 'acurl_timeout', '10', false, __('Maximum time for scrape execution in seconds.', 'wp_lynx'));
-						$this->input_text(__('Useragent', 'wp_lynx'), 'Scurl_agent', '32', $this->opt['bcurl_embrowser'], __('Useragent to use during scrape execution.', 'wp_lynx'));
+						$this->input_text(__('Timeout', 'wp_lynx'), 'acurl_timeout', 'small-text', false, __('Maximum time for scrape execution in seconds.', 'wp_lynx'));
+						$this->input_text(__('Useragent', 'wp_lynx'), 'Scurl_agent', 'large-text', $this->opt['bcurl_embrowser'], __('Useragent to use during scrape execution.', 'wp_lynx'));
 						$this->input_check(__('Emulate Browser', 'wp_lynx'), 'bcurl_embrowser', __("Useragent will be exactly as the users's browser.", 'wp_lynx'));
+					?>
+				</table>
+				<h3><?php _e('Thumbnails', 'wp_lynx'); ?></h3>
+				<table class="form-table">
+					<?php
+						$this->input_check(__('Enable Website Thumbnails', 'wp_lynx'), 'bwthumbs_enable', __('Enable generation of Website Thumbails via a 3rd party provider (snapito.com)', 'wp_lynx'));
+						$this->input_text(__('API Key', 'wp_lynx'), 'awthumbs_key', 'large-text', false, __('Your API key for the 3rd party thumbnail provider (snapito.com)', 'wp_lynx'));
 					?>
 				</table>
 				<h3><?php _e('Images', 'wp_lynx'); ?></h3>
 				<table class="form-table">
 					<?php
-						$this->input_text(__('Minimum Image Width', 'wp_lynx'), 'aimg_min_x', '10', false, __('Minimum width of images to scrape in pixels.', 'wp_lynx'));
-						$this->input_text(__('Minimum Image Height', 'wp_lynx'), 'aimg_min_y', '10', false, __('Minimum hieght of images to scrape in pixels.', 'wp_lynx'));
-						$this->input_text(__('Maximum Image Count', 'wp_lynx'), 'aimg_max_count', '10', false, __('Maximum number of images to scrape.', 'wp_lynx'));
-						$this->input_text(__('Maximum Image Scrape Size', 'wp_lynx'), 'aimg_max_range', '10', false, __('Maximum number of bytes to download when determining the dimensions of JPEG images.', 'wp_lynx'));
+						$this->input_text(__('Minimum Image Width', 'wp_lynx'), 'aimg_min_x', 'small-text', false, __('Minimum width of images to scrape in pixels.', 'wp_lynx'));
+						$this->input_text(__('Minimum Image Height', 'wp_lynx'), 'aimg_min_y', 'small-text', false, __('Minimum hieght of images to scrape in pixels.', 'wp_lynx'));
+						$this->input_text(__('Maximum Image Count', 'wp_lynx'), 'aimg_max_count', 'small-text', false, __('Maximum number of images to scrape.', 'wp_lynx'));
+						$this->input_text(__('Maximum Image Scrape Size', 'wp_lynx'), 'aimg_max_range', 'small-text', false, __('Maximum number of bytes to download when determining the dimensions of JPEG images.', 'wp_lynx'));
 					?>
 				</table>
 				<h3><?php _e('Text', 'wp_lynx'); ?></h3>
 				<table class="form-table">
 					<?php
-						$this->input_text(__('Minimum Paragraph Length', 'wp_lynx'), 'ap_min_length', '10', false, __('Minimum paragraph length to be scraped (in characters).', 'wp_lynx'));
-						$this->input_text(__('Maximum Paragraph Length', 'wp_lynx'), 'ap_max_length', '10', false, __('Maximum paragraph length before it is cutt off (in characters).', 'wp_lynx'));
-						$this->input_text(__('Minimum Paragraph Count', 'wp_lynx'), 'ap_max_count', '10', false, __('Maximum number of paragraphs to scrape.', 'wp_lynx'));
+						$this->input_text(__('Minimum Paragraph Length', 'wp_lynx'), 'ap_min_length', 'small-text', false, __('Minimum paragraph length to be scraped (in characters).', 'wp_lynx'));
+						$this->input_text(__('Maximum Paragraph Length', 'wp_lynx'), 'ap_max_length', 'small-text', false, __('Maximum paragraph length before it is cutt off (in characters).', 'wp_lynx'));
+						$this->input_text(__('Minimum Paragraph Count', 'wp_lynx'), 'ap_max_count', 'small-text', false, __('Maximum number of paragraphs to scrape.', 'wp_lynx'));
 					?>
 				</table>
 			</fieldset>
