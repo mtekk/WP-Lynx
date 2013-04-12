@@ -48,22 +48,6 @@ class llynxScrape
 			$this->scrapeContent($url);
 		}
 	}
-	/*function getContentWP($url, $referer = null, $range = null)
-	{
-		$args = array(
-		);
-		$content = wp_remote_get($url, $args);
-		//Error handler
-		if(is_wp_error($content))
-		{
-			
-			return false;
-		}
-		else
-		{
-			return $content['body'];
-		}
-	}*/
 	function getContent($url, $referer = null, $range = null)
 	{
 		if(function_exists('curl_init'))

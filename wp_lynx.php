@@ -85,7 +85,7 @@ class linksLynx extends mtekk_adminKit
 					'Himage_template' => '',
 					'bog_only' => false,
 					'bwthumbs_enable' => false,
-					'awthumbs_key' => ''
+					'swthumbs_key' => ''
 					);
 	protected $template_tags = array(
 					'%url%',
@@ -600,6 +600,19 @@ class linksLynx extends mtekk_adminKit
 					{
 						$this->llynx_scrape->images = array();
 					}
+					else if($this->opt['bwthumbs_enable'])
+					{
+						//Backup our array of images
+						$temp_array = $this->llynx_scrape->images;
+						//Clear our array of images
+						$this->llynx_scrape->images = array();
+						//Keep the #0 slot the same (respect open graph)
+						$this->llynx_scrape->images[0] = array_shift($temp_array);
+						//Splice in the screen cap of the site
+						$this->llynx_scrape->images[1] = sprintf('http://api.snapito.com/web/%s/mc?url=%s', $this->opt['swthumbs_key'], $url);
+						//Place the rest at the end
+						$this->llynx_scrape->images = array_merge($this->llynx_scrape->images, $temp_array);
+					}
 					?>
 				<div class="media-item child-of-<?php echo $curID; ?> preloaded" id="media-item-<?php echo $key; ?>">
 					<input type="hidden" value="image" id="type-of-<?php echo $key; ?>">
@@ -903,7 +916,7 @@ class linksLynx extends mtekk_adminKit
 				<table class="form-table">
 					<?php
 						$this->input_check(__('Enable Website Thumbnails', 'wp_lynx'), 'bwthumbs_enable', __('Enable generation of Website Thumbails via a 3rd party provider (snapito.com)', 'wp_lynx'));
-						$this->input_text(__('API Key', 'wp_lynx'), 'awthumbs_key', 'large-text', false, __('Your API key for the 3rd party thumbnail provider (snapito.com)', 'wp_lynx'));
+						$this->input_text(__('API Key', 'wp_lynx'), 'swthumbs_key', 'large-text', false, __('Your API key for the 3rd party thumbnail provider (snapito.com)', 'wp_lynx'));
 					?>
 				</table>
 				<h3><?php _e('Images', 'wp_lynx'); ?></h3>
