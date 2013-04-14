@@ -128,6 +128,7 @@ class linksLynx extends mtekk_adminKit
 		add_action('media_buttons_context', array($this, 'media_buttons_context'));
 		add_action('media_upload_wp_lynx', array($this, 'media_upload'));
 		add_filter('tiny_mce_before_init', array($this, 'add_editor_style'));
+		$this->allowed_html = wp_kses_allowed_html('post');
 	}
 	function wp_init()
 	{
@@ -376,14 +377,26 @@ class linksLynx extends mtekk_adminKit
 				//We need to manipulate the url to get the image name
 				$imgName = explode('/', $data['img']);
 				$imgName = end($imgName);
-				$imgExt = explode('.',$imgName);
+				$imgParts = explode('.',$imgName);
+				$imgName = $imgParts[0];
+				if($imgName == '')
+				{
+					$imgName = 'llynx-site-thumb';
+				}
 				//The extension should be the stuff after the last '.', make sure its lower case
-				$imgExt = strtolower(end($imgExt));
-				//Make sure we use a unique filename
-				$fileName = wp_unique_filename($uploadDir['path'], $imgName);
-				//Compile our image location and image URL
-				$imgLoc = $uploadDir['path'] . "/$fileName";
-				$imgURL = $uploadDir['url'] . "/$fileName";
+				$imgExt = strtolower(end($imgParts));
+				if($this->llynx_scrape->is_PNG($imgData))
+				{
+					$imgExt = 'png';
+				}
+				else if($this->llynx_scrape->is_JPEG($imgData))
+				{
+					$imgExt = 'jpg';
+				}
+				else if($this->llynx_scrape->is_GIF($imgData))
+				{
+					$imgExt = 'gif';
+				}
 				//Generate the thumbnail
 				$nH = 0;
 				$nW = 0;
@@ -392,21 +405,34 @@ class linksLynx extends mtekk_adminKit
 				//If we will be saving as jpeg
 				if($this->opt['Scache_type'] == 'jpeg' || ($this->opt['Scache_type'] == 'original' && ($imgExt == 'jpg' || $imgExt == 'jpeg')))
 				{
+					//Make sure we use a unique filename
+					$fileName = wp_unique_filename($uploadDir['path'], $imgName . '.jpg');
+					//Compile our image location and image URL
+					$imgLoc = $uploadDir['path'] . '/' . $fileName;
 					//Save as JPEG
 					$saved = imagejpeg($imgThumb, $imgLoc, $this->opt['acache_quality']);
 				}
 				//If we will be saving as png
 				else if($this->opt['Scache_type'] == 'png' || ($this->opt['Scache_type'] == 'original' && $imgExt == 'png'))
 				{
+					//Make sure we use a unique filename
+					$fileName = wp_unique_filename($uploadDir['path'], $imgName . '.png');
+					//Compile our image location and image URL
+					$imgLoc = $uploadDir['path'] . '/' . $fileName;
 					//Save as PNG
 					$saved = imagepng($imgThumb, $imgLoc);
 				}
 				//If we will be saving as gif
 				else
 				{
+					//Make sure we use a unique filename
+					$fileName = wp_unique_filename($uploadDir['path'], $imgName . '.gif');
+					//Compile our image location and image URL
+					$imgLoc = $uploadDir['path'] . '/' . $fileName;
 					//Save as GIF
 					$saved = imagegif($imgThumb, $imgLoc);
 				}
+				$imgURL = $uploadDir['url'] . '/' . $fileName;
 				//If the image was saved, we'll allow the image tag to be replaced
 				if($saved)
 				{
