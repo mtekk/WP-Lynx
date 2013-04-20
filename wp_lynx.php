@@ -3,7 +3,7 @@
 Plugin Name: WP Lynx
 Plugin URI: http://mtekk.us/code/wp-lynx/
 Description: Adds Facebook-esq extended link information to your WordPress pages and posts. For details on how to use this plugin visit <a href="http://mtekk.us/code/wp-lynx/">WP Lynx</a>. 
-Version: 0.5.90
+Version: 0.6.0
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
@@ -54,7 +54,7 @@ if(!class_exists('llynxScrape'))
  */
 class linksLynx extends mtekk_adminKit
 {
-	protected $version = '0.5.90';
+	protected $version = '0.6.0';
 	protected $full_name = 'WP Lynx Settings';
 	protected $short_name = 'WP Lynx';
 	protected $access_level = 'manage_options';
@@ -756,7 +756,7 @@ class linksLynx extends mtekk_adminKit
 				sprintf(__('%sReport a Bug%s: If you think you have found a bug, please include your WordPress version and details on how to reproduce the bug.', 'wp_lynx'),'<a title="' . __('Go to the WP Lynx support post for your version.', 'wp_lynx') . '" href="http://mtekk.us/archives/wordpress/plugins-wordpress/wp-lynx-' . $this->version . '/#respond">', '</a>') . '</li></ul>' . 
 				'<h5>' . __('Giving Back', 'wp_lynx') . '</h5><ul><li>' .
 				sprintf(__('%sDonate%s: Love WP Lynx and want to help development? Consider buying the author a beer.', 'wp_lynx'),'<a title="' . __('Go to PayPal to give a donation to WP Lynx.', 'wp_lynx') . '" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=FD5XEU783BR8U&lc=US&item_name=Breadcrumb%20NavXT%20Donation&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted">', '</a>') . '</li><li>' .
-				sprintf(__('%sTranslate%s: Is your language not available? Contact John Havlik to get translating.', 'wp_lynx'),'<a title="' . __('Go to the WP Lynx support post for your version.', 'wp_lynx') . '" href="">', '</a>') . '</li></ul>';
+				sprintf(__('%sTranslate%s: Is your language not available? Contact John Havlik to get translating.', 'wp_lynx'),'<a title="' . __('Go to the WP Lynx support post for your version.', 'wp_lynx') . '" href="http://translate.mtekk.us">', '</a>') . '</li></ul>';
 			
 			$screen->add_help_tab(
 				array(
