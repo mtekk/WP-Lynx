@@ -42,12 +42,12 @@ if(!function_exists('mb_strlen'))
 //Include admin base class
 if(!class_exists('mtekk_adminKit'))
 {
-	require_once(dirname(__FILE__) . '/includes/mtekk_adminkit.php');
+	require_once(dirname(__FILE__) . '/includes/class.mtekk_adminkit.php');
 }
 //Include llynxScrape class
 if(!class_exists('llynxScrape'))
 {
-	require_once(dirname(__FILE__) . '/llynx_scrape.php');
+	require_once(dirname(__FILE__) . '/class.llynx_scrape.php');
 }
 /**
  * The administrative interface class 
@@ -177,7 +177,7 @@ class linksLynx extends mtekk_adminKit
 				$opts['short_url'] = false;
 				$opts['template'] = '<div class="llynx_print">%image%<div class="llynx_text"><a title="Go to %title%" href="%url%">%title%</a><small>%url%</small><span>%description%</span></div></div>';
 			}
-			//Upgrading from 3.0.x
+			//Upgrading from 0.4.x
 			if(version_compare($version, '0.4.0', '<'))
 			{
 				$old = $opts;
@@ -741,232 +741,6 @@ class linksLynx extends mtekk_adminKit
 .A1B1{width:128px;float:left;}
 .llynx_thumb{height:138px;overflow:hidden;border-bottom:1px solid #dfdfdf;margin-bottom:5px;}
 </style>
-		<?php
-	}
-	function help()
-	{
-		$screen = get_current_screen();
-		//Add contextual help on current screen
-		if($screen->id == 'settings_page_' . $this->identifier)
-		{
-			$general_tab = '<p>' . __('Tips for the settings are located below select options.', 'wp_lynx') .
-				'</p><h5>' . __('Resources', 'wp_lynx') . '</h5><ul><li>' .
-				sprintf(__("%sTutorials and How Tos%s: There are several guides, tutorials, and how tos available on the author's website.", 'wp_lynx'),'<a title="' . __('Go to the WP Lynx tag archive.', 'wp_lynx') . '" href="http://mtekk.us/archives/tag/wp-lynx">', '</a>') . '</li><li>' .
-				sprintf(__('%sOnline Documentation%s: Check out the documentation for more indepth technical information.', 'wp_lynx'), '<a title="' . __('Go to the WP Lynx online documentation', 'wp_lynx') . '" href="http://mtekk.us/code/wp-lynx/wp-lynx-doc/">', '</a>') . '</li><li>' .
-				sprintf(__('%sReport a Bug%s: If you think you have found a bug, please include your WordPress version and details on how to reproduce the bug.', 'wp_lynx'),'<a title="' . __('Go to the WP Lynx support post for your version.', 'wp_lynx') . '" href="http://mtekk.us/archives/wordpress/plugins-wordpress/wp-lynx-' . $this->version . '/#respond">', '</a>') . '</li></ul>' . 
-				'<h5>' . __('Giving Back', 'wp_lynx') . '</h5><ul><li>' .
-				sprintf(__('%sDonate%s: Love WP Lynx and want to help development? Consider buying the author a beer.', 'wp_lynx'),'<a title="' . __('Go to PayPal to give a donation to WP Lynx.', 'wp_lynx') . '" href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=FD5XEU783BR8U&lc=US&item_name=WP%20Lynx%20Donation&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted">', '</a>') . '</li><li>' .
-				sprintf(__('%sTranslate%s: Is your language not available? Contact John Havlik to get translating.', 'wp_lynx'),'<a title="' . __('Go to the WP Lynx support post for your version.', 'wp_lynx') . '" href="http://translate.mtekk.us">', '</a>') . '</li></ul>';
-			
-			$screen->add_help_tab(
-				array(
-				'id' => $this->identifier . '-base',
-				'title' => __('General', 'wp_lynx'),
-				'content' => $general_tab
-				));
-			$quickstart_tab = '<p>' . __('Using WP Lynx is quite simple. Just start writing a new post (or edit an existing post) and click on the paw print next to the WordPress add media icon. After clicking the paw print button, the Add Lynx Print dialog will popup in a lightbox, just like the add media lightbox.', 'wp_lynx') . '</p><p>' . 
-			__('The Add Lynx Print dialog is simple to use. Just enter the URL to the website or page that you want to link to in to the text area. You can enter more than one link at a time, just place a space, or start a newline between each link. Then press the "Get" button. After the pages have been retrieved you should have something similar to the picture above. The pictures are changeable, just use the arrows to thumb through the available pictures. The same goes for the text field, which you may manually edit or thumb through some preselected paragraphs from the linked site.', 'wp_lynx') . '</p><p>' .
-			__('When you are ready to insert a Link Print, just click the "Insert into Post" button (or the "Insert All" button at the bottom to insert multiple Link Prints simultaneously). If you go to the HTML tab in the editor you\'ll see that WP Lynx generates pure HTML. This gives the user full control over their Lynx Prints.', 'wp_lynx') . '</p>';
-			$screen->add_help_tab(
-				array(
-				'id' => $this->identifier . '-quick-start',
-				'title' => __('Quick Start', 'wp_lynx'),
-				'content' => $quickstart_tab
-				));
-			$styling_tab = '<p>' . __('Using the default lynx print template, the following CSS can be used as base for styling your lynx prints.', 'wp_lynx') . '</p>' .
-				'<pre><code>.llynx_print
-{
-	margin:10px;
-	padding:5px;
-	display:block;
-	float:left;
-	border:1px solid #999;
-}
-.llynx_print img
-{
-	padding:5px;
-	border:none;
-	max-width:20%;
-	float:left;
-}
-.llynx_text
-{
-	float:right;
-	width:70%;
-}
-.llynx_text a
-{
-	text-decoration:none;
-	font-weight:bolder;
-	font-size:1em;
-	float:left;
-	width:100%;
-}
-.llynx_text small
-{
-	padding:3px 0;
-	float:left;
-	width:100%;
-}
-.llynx_text span
-{
-	float:left;
-	width:100%;
-}</code></pre>';
-			$screen->add_help_tab(
-				array(
-				'id' => $this->identifier . '-styling',
-				'title' => __('Styling', 'wp_lynx'),
-				'content' => $styling_tab
-				));
-			$screen->add_help_tab(
-				array(
-				'id' => $this->identifier . '-import-export-reset',
-				'title' => __('Import/Export/Reset', 'wp_lynx'),
-				'content' => $this->import_form()
-				));
-		}	
-	}
-	/**
-	 * enqueue's the tab style sheet on the settings page
-	 */
-	function admin_styles()
-	{
-		wp_enqueue_style('mtekk_adminkit_tabs');
-	}
-	/**
-	 * enqueue's the tab js and translation js on the settings page
-	 */
-	function admin_scripts()
-	{
-		//Enqueue ui-tabs
-		wp_enqueue_script('jquery-ui-tabs');
-		//Enqueue the admin tabs javascript
-		wp_enqueue_script('mtekk_adminkit_tabs');
-		//Load the translations for the tabs
-		wp_localize_script('mtekk_adminkit_tabs', 'objectL10n', array(
-			'mtad_uid' => 'llynx',
-			'mtad_import' => __('Import', $this->identifier),
-			'mtad_export' => __('Export', $this->identifier),
-			'mtad_reset' => __('Reset', $this->identifier),
-		));
-	}
-	/**
-	 * admin_page
-	 * 
-	 * The administrative page for Links Lynx
-	 * 
-	 */
-	function admin_page()
-	{
-		global $wp_taxonomies;
-		$this->security();
-		//Let's call the parent version of the page, will handle our setting stuff
-		parent::admin_page();
-		$uploadDir = wp_upload_dir();
-		if(!isset($uploadDir['path']) || !is_writable($uploadDir['path']))
-		{
-			//Let the user know their directory is not writable
-			$this->message['error'][] = __('WordPress uploads directory is not writable, thumbnails will be disabled.', 'wp_lynx');
-			//Too late to use normal hook, directly display the message
-			$this->message();
-		}
-		?>
-		<div class="wrap"><h2><?php _e('WP Lynx Settings', 'wp_lynx'); ?></h2>
-		<?php
-		//We exit after the version check if there is an action the user needs to take before saving settings
-		if(!$this->version_check(get_option($this->unique_prefix . '_version')))
-		{
-			return;
-		}
-		?>	
-		<form action="options-general.php?page=wp_lynx" method="post" id="llynx-options">
-			<?php settings_fields('llynx_options');?>
-			<div id="hasadmintabs">
-			<fieldset id="general" class="llynx_options">
-				<h3 class="tab-title" title="<?php _e('A collection of settings most likely to be modified are located under this tab.', 'wp_lynx');?>"><?php _e('General', 'wp_lynx'); ?></h3>
-				<h3><?php _e('General', 'wp_lynx'); ?></h3>
-				<table class="form-table">
-					<?php
-						$this->input_check(__('Open Graph Only Mode', 'wp_lynx'), 'bog_only', __("For sites with Open Graph metadata, only fetch that data.", 'wp_lynx'));
-						$this->input_check(__('Shorten URL', 'wp_lynx'), 'bshort_url', __('Shorten URL using a URL shortening service such as tinyurl.com.', 'wp_lynx'));
-						$this->input_check(__('Default Style', 'wp_lynx'), 'bglobal_style', __('Enable the default Lynx Prints styling on your blog.', 'wp_lynx'));
-					?>
-				</table>
-			</fieldset>
-			<fieldset id="content" class="llynx_options">
-				<h3 class="tab-title" title="<?php _e('Settings related to how Lynx Prints will display.', 'wp_lynx');?>"><?php _e('Content', 'wp_lynx'); ?></h3>
-				<h3><?php _e('Content', 'wp_lynx'); ?></h3>
-				<table class="form-table">
-				<?php
-					$this->textbox(__('Lynx Print Template', 'wp_lynx'), 'Htemplate', 3, false, __('Available tags: ', 'wp_lynx') . implode(', ', $this->template_tags));
-				?>
-				</table>
-				<h3><?php _e('Images', 'wp_lynx'); ?></h3>
-				<table class="form-table">
-				<?php
-					$this->input_text(__('Maximum Image Width', 'wp_lynx'), 'acache_max_x', 'small-text', false, __('Maximum cached image width in pixels.', 'wp_lynx'));
-					$this->input_text(__('Maximum Image Height', 'wp_lynx'), 'acache_max_y', 'small-text', false, __('Maximum cached image height in pixels.', 'wp_lynx'));
-					$this->input_check(__('Crop Image', 'wp_lynx'), 'bcache_crop', __('Crop images in the cache to the above dimensions.', 'wp_lynx'));
-				?>
-					<tr valign="top">
-						<th scope="row">
-							<?php _e('Cached Image Format', 'wp_lynx'); ?>
-						</th>
-						<td>
-							<?php
-								$this->input_radio('Scache_type', 'original', __('Same as source format', 'wp_lynx'));
-								$this->input_radio('Scache_type', 'png', __('PNG'));
-								$this->input_radio('Scache_type', 'jpeg', __('JPEG'));
-								$this->input_radio('Scache_type', 'gif', __('GIF'));
-							?>
-							<span class="setting-description"><?php _e('The image format to use in the local image cache.', 'wp_lynx'); ?></span>
-						</td>
-					</tr>
-					<?php
-						$this->input_text(__('Cache Image Quality', 'wp_lynx'), 'acache_quality', 'small-text', false, __('Image quality when cached images are saved as JPEG.', 'wp_lynx'));
-					?>
-				</table>
-			</fieldset>
-			<fieldset id="advanced" class="llynx_options">
-				<h3 class="tab-title" title="<?php _e('Advanced settings for the WP Lynx content scraping engine.', 'wp_lynx');?>"><?php _e('Advanced', 'wp_lynx'); ?></h3>
-				<h3><?php _e('Advanced', 'wp_lynx'); ?></h3>
-				<table class="form-table">
-					<?php
-						$this->input_text(__('Timeout', 'wp_lynx'), 'acurl_timeout', 'small-text', false, __('Maximum time for scrape execution in seconds.', 'wp_lynx'));
-						$this->input_text(__('Useragent', 'wp_lynx'), 'Scurl_agent', 'large-text', $this->opt['bcurl_embrowser'], __('Useragent to use during scrape execution.', 'wp_lynx'));
-						$this->input_check(__('Emulate Browser', 'wp_lynx'), 'bcurl_embrowser', __("Useragent will be exactly as the users's browser.", 'wp_lynx'));
-					?>
-				</table>
-				<h3><?php _e('Thumbnails', 'wp_lynx'); ?></h3>
-				<table class="form-table">
-					<?php
-						$this->input_check(__('Enable Website Thumbnails', 'wp_lynx'), 'bwthumbs_enable', __('Enable generation of Website Thumbails via a 3rd party provider (snapito.com)', 'wp_lynx'));
-						$this->input_text(__('API Key', 'wp_lynx'), 'swthumbs_key', 'large-text', false, __('Your API key for the 3rd party thumbnail provider (snapito.com)', 'wp_lynx'));
-					?>
-				</table>
-				<h3><?php _e('Images', 'wp_lynx'); ?></h3>
-				<table class="form-table">
-					<?php
-						$this->input_text(__('Minimum Image Width', 'wp_lynx'), 'aimg_min_x', 'small-text', false, __('Minimum width of images to scrape in pixels.', 'wp_lynx'));
-						$this->input_text(__('Minimum Image Height', 'wp_lynx'), 'aimg_min_y', 'small-text', false, __('Minimum hieght of images to scrape in pixels.', 'wp_lynx'));
-						$this->input_text(__('Maximum Image Count', 'wp_lynx'), 'aimg_max_count', 'small-text', false, __('Maximum number of images to scrape.', 'wp_lynx'));
-						$this->input_text(__('Maximum Image Scrape Size', 'wp_lynx'), 'aimg_max_range', 'small-text', false, __('Maximum number of bytes to download when determining the dimensions of JPEG images.', 'wp_lynx'));
-					?>
-				</table>
-				<h3><?php _e('Text', 'wp_lynx'); ?></h3>
-				<table class="form-table">
-					<?php
-						$this->input_text(__('Minimum Paragraph Length', 'wp_lynx'), 'ap_min_length', 'small-text', false, __('Minimum paragraph length to be scraped (in characters).', 'wp_lynx'));
-						$this->input_text(__('Maximum Paragraph Length', 'wp_lynx'), 'ap_max_length', 'small-text', false, __('Maximum paragraph length before it is cutt off (in characters).', 'wp_lynx'));
-						$this->input_text(__('Minimum Paragraph Count', 'wp_lynx'), 'ap_max_count', 'small-text', false, __('Maximum number of paragraphs to scrape.', 'wp_lynx'));
-					?>
-				</table>
-			</fieldset>
-			</div>
-			<p class="submit"><input type="submit" class="button-primary" name="llynx_admin_options" value="<?php esc_attr_e('Save Changes') ?>" /></p>
-		</form>
-		</div>
 		<?php
 	}
 }
