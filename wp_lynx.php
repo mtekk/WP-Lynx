@@ -52,17 +52,15 @@ if(!class_exists('llynxScrape'))
 /**
  * The administrative interface class 
  */
-class linksLynx extends mtekk_adminKit
+class linksLynx
 {
 	protected $version = '0.6.0';
-	protected $full_name = 'WP Lynx Settings';
-	protected $short_name = 'WP Lynx';
-	protected $access_level = 'manage_options';
+	protected $name = 'WP Lynx';
 	protected $identifier = 'wp_lynx';
 	protected $unique_prefix = 'llynx';
-	protected $plugin_basename = 'wp-lynx/wp_lynx.php';
-	protected $support_url = 'http://mtekk.us/archives/wordpress/plugins-wordpress/wp-lynx-';
-	protected $llynx_scrape;
+	protected $plugin_basename = null;
+	protected $admin = null;
+	protected $llynx_scrape = null;
 	protected $opt = array(
 					'bglobal_style' => true,
 					'ap_max_count' => 5,
@@ -99,14 +97,19 @@ class linksLynx extends mtekk_adminKit
 	 * 
 	 * Class default constructor
 	 */
-	function linksLynx()
+	function __construct()
 	{
 		$this->llynx_scrape = new llynxScrape(null);
 		//We set the plugin basename here, could manually set it, but this is for demonstration purposes
 		$this->plugin_basename = plugin_basename(__FILE__);
-		//We're going to make sure we load the parent's constructor
-		parent::__construct();
 		add_action('init', array($this, 'wp_init'));
+		//Load our main admin if in the dashboard
+		if(is_admin())
+		{
+			require_once(dirname(__FILE__) . '/class.llynx_admin.php');
+			//Instantiate our new admin object
+			$this->admin = new llynx_admin($this->opt, $this->plugin_basename);
+		}
 	}
 	/**
 	 * admin initialisation callback function
@@ -125,9 +128,8 @@ class linksLynx extends mtekk_adminKit
 		{
 			$this->llynx_scrape->opt['Scurl_agent'] = $_SERVER['HTTP_USER_AGENT'];
 		}
-		add_action('media_buttons_context', array($this, 'media_buttons_context'));
+		
 		add_action('media_upload_wp_lynx', array($this, 'media_upload'));
-		add_filter('tiny_mce_before_init', array($this, 'add_editor_style'));
 		$this->allowed_html = wp_kses_allowed_html('post');
 	}
 	function wp_init()
@@ -146,132 +148,6 @@ class linksLynx extends mtekk_adminKit
 				wp_enqueue_style('llynx_style');
 			}
 		}
-	}
-	/**
-	 * security
-	 * 
-	 * Makes sure the current user can manage options to proceed
-	 */
-	function security()
-	{
-		//If the user can not manage options we will die on them
-		if(!current_user_can($this->access_level))
-		{
-			wp_die(__('Insufficient privileges to proceed.', 'wp_lynx'));
-		}
-	}
-	/**
-	 * Upgrades input options array, sets to $this->opt
-	 * 
-	 * @param array $opts
-	 * @param string $version the version of the passed in options
-	 */
-	function opts_upgrade($opts, $version)
-	{
-		//If our version is not the same as in the db, time to update
-		if($version !== $this->version)
-		{
-			//Upgrading from 0.2.x
-			if(version_compare($version, '0.3.0', '<'))
-			{
-				$opts['short_url'] = false;
-				$opts['template'] = '<div class="llynx_print">%image%<div class="llynx_text"><a title="Go to %title%" href="%url%">%title%</a><small>%url%</small><span>%description%</span></div></div>';
-			}
-			//Upgrading from 0.4.x
-			if(version_compare($version, '0.4.0', '<'))
-			{
-				$old = $opts;
-				//Only migrate if we haven't migrated yet
-				if(isset($old['global_style']))
-				{
-					$opts = array(
-						'bglobal_style' => $old['global_style'],
-						'ap_max_count' => $old['p_max_count'],
-						'ap_min_length' => $old['p_min_length'],
-						'ap_max_length' => $old['p_max_length'],
-						'aimg_max_count' => $old['img_max_count'],
-						'aimg_min_x' => $old['img_min_x'], 
-						'aimg_min_y' => $old['img_min_y'],
-						'aimg_max_range' => $old['img_max_range'],
-						'Scurl_agent' => $old['curl_agent'],
-						'bcurl_embrowser' => $old['curl_embrowser'],
-						'acurl_timeout' => $old['curl_timeout'],
-						'Scache_type' => $old['cache_type'],
-						'acache_quality' => $old['cache_quality'],
-						'acache_max_x' => $old['cache_max_x'],
-						'acache_max_y' => $old['cache_max_y'],
-						'bcache_crop' => $old['cache_crop'],
-						'bshort_url' => $old['short_url'],
-						'Htemplate' => $old['template'],
-						'Himage_template' => $old['image_template']
-						);
-				}
-			}
-			//Save the passed in opts to the object's option array
-			$this->opt = $opts;
-		}
-	}
-	/**
-	 * Adds a style to tiny mce for Link Prints
-	 */
-	function add_editor_style($init)
-	{
-		//build out style link, needs to be http accessible
-		$style = plugins_url('/wp_lynx_style.css', dirname(__FILE__) . '/wp_lynx_style.css');
-		if(array_key_exists('content_css',$init))
-		{
-			$init['content_css'] .= ',' . $style;
-		}
-		else
-		{
-			$init['content_css'] = $style;
-		}
-		return $init;
-	}
-	/**
-	 * media_buttons_context
-	 * 
-	 * Adds a nice link button next to the Upload/Insert buttons in the edit pannel
-	 * 
-	 * @return 
-	 */
-	function media_buttons_context($context)
-	{
-		global $post_ID, $temp_ID;
-		//We may be in a temporary post, so we can't rely on post_ID
-		$curID = (int) (0 == $post_ID) ? $temp_ID : $post_ID;
-		//Assemble the link to our special uploader
-		$url = 'media-upload.php?post_id=' . $curID;
-		//Find the url for the image, use nice functions
-		$imgSrc = plugins_url('wp-lynx/llynx.png');
-		//The hyperlink title
-		$title = __('Add a Lynx Print', 'wp_lynx');
-		//Append our link to the current context
-		$context .= sprintf('<a title="%s" href="%s&amp;type=wp_lynx&amp;TB_iframe=true" id="add_link_print" class="thickbox"><img src="%s" alt="%s"/></a>', $title, $url, $imgSrc, $this->short_name);
-		return $context;
-	}
-	/**
-	 * media_upload
-	 * 
-	 * Handles all of the special media iframe stuff
-	 * 
-	 * @param object $mode [optional]
-	 * @return 
-	 */
-	function media_upload($mode = 'default')
-	{
-		//We have to manually enqueue all dependency styles as wp doens't do them in the correct order see bug #12415
-		wp_enqueue_style('global');
-		wp_enqueue_style('wp-admin');
-		//The style we're actually after
-		wp_enqueue_style('media');
-		//We're going to override some WP styles in this
-		add_action('admin_head', array($this, 'admin_head_style'));
-		//We need this to do the nice sorting and other things
-		wp_enqueue_script('admin-gallery');
-		wp_enqueue_script('llynx_javascript', plugins_url('/wp_lynx.js', dirname(__FILE__) . '/wp_lynx.js'), array('jquery'));
-		add_action('wp_lynx_media_upload_header', 'media_upload_header');
-		wp_iframe(array($this, 'url_tab'));
 	}
 	/**
 	 * resize_image
@@ -730,18 +606,6 @@ class linksLynx extends mtekk_adminKit
 			</div>
 		</form><?php
 		}
-	}
-	function admin_head_style()
-	{
-		?>
-<style type="text/css">
-/*WP Lynx Admin Styles*/
-.describe td{vertical-align:top;}
-.describe textarea{height:5em;}
-.A1B1{width:128px;float:left;}
-.llynx_thumb{height:138px;overflow:hidden;border-bottom:1px solid #dfdfdf;margin-bottom:5px;}
-</style>
-		<?php
 	}
 }
 //Let's make an instance of our object takes care of everything
