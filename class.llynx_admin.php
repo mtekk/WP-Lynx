@@ -50,16 +50,18 @@ class llynx_admin extends mtekk_adminKit
 	protected $unique_prefix = 'llynx';
 	protected $plugin_basename = 'wp-lynx/wp_lynx.php';
 	protected $support_url = 'http://mtekk.us/archives/wordpress/plugins-wordpress/wp-lynx-';
+	protected $template_tags = null;
 	/**
 	 * Administrative interface class default constructor
 	 * @param bcn_breadcrumb_trail $breadcrumb_trail a breadcrumb trail object
 	 * @param string $basename The basename of the plugin
 	 */
-	function __construct($opts, $basename)
+	function __construct($opts, $basename, $template_tags)
 	{
 		$this->plugin_basename = $basename;
 		//Grab default options that were passed in
 		$this->opt = $opts;
+		$this->template_tags = $template_tags;
 		//We're going to make sure we load the parent's constructor
 		parent::__construct();
 	}

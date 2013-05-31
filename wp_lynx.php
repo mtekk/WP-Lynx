@@ -108,7 +108,7 @@ class linksLynx
 		{
 			require_once(dirname(__FILE__) . '/class.llynx_admin.php');
 			//Instantiate our new admin object
-			$this->admin = new llynx_admin($this->opt, $this->plugin_basename);
+			$this->admin = new llynx_admin($this->opt, $this->plugin_basename, $this->template_tags);
 		}
 	}
 	/**
@@ -140,7 +140,7 @@ class linksLynx
 		if(!is_admin())
 		{
 			//Sync our options
-			$this->opt = $this->parse_args(get_option('llynx_options'), $this->opt);
+			$this->opt = mtekk_adminKit::parse_args(get_option('llynx_options'), $this->opt);
 			$this->llynx_scrape->opt = $this->opt;
 			//Only print if enabled
 			if($this->opt['bglobal_style'])
@@ -148,6 +148,29 @@ class linksLynx
 				wp_enqueue_style('llynx_style');
 			}
 		}
+	}
+	/**
+	 * media_upload
+	 *
+	 * Handles all of the special media iframe stuff
+	 *
+	 * @param object $mode [optional]
+	 * @return
+	 */
+	function media_upload($mode = 'default')
+	{
+		//We have to manually enqueue all dependency styles as wp doens't do them in the correct order see bug #12415
+		wp_enqueue_style('global');
+		wp_enqueue_style('wp-admin');
+		//The style we're actually after
+		wp_enqueue_style('media');
+		//We're going to override some WP styles in this
+		add_action('admin_head', array($this, 'admin_head_style'));
+		//We need this to do the nice sorting and other things
+		wp_enqueue_script('admin-gallery');
+		wp_enqueue_script('llynx_javascript', plugins_url('/wp_lynx.js', dirname(__FILE__) . '/wp_lynx.js'), array('jquery'));
+		//add_action('wp_lynx_media_upload_header', 'media_upload_header');
+		wp_iframe(array($this, 'url_tab'));
 	}
 	/**
 	 * resize_image
