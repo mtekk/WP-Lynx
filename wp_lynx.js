@@ -101,6 +101,9 @@ var ds = ds || {};
 
 		open: function() {
 			$( '.media-modal' ).addClass( 'smaller' );
+			jQuery("#llynx_url").change(function(){
+				jQuery(".spinner").show();
+			});
 		},
 
 		ready: function() {

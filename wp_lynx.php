@@ -163,7 +163,7 @@ class linksLynx
 	function print_media_templates() {
 		?>
 <script type="text/html" id="tmpl-llynx-print-add">
-<div class="media-embed"><label class="embed-url"><input type="text"><span class="spinner"></span></label>
+<div class="media-embed"><label class="embed-url"><input id="llynx_url" type="text" name="llynx_url" placeholder="Enter URL"><span class="spinner"></span></label>
 	<div class="embed-link-settings">
 		
 	</div>
