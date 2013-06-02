@@ -134,7 +134,8 @@ class llynx_admin extends mtekk_adminKit
 		//The hyperlink title
 		$title = __('Add a Lynx Print', 'wp_lynx');
 		//Append our link to the current context
-		$context .= sprintf('<a title="%s" href="%s&amp;type=wp_lynx&amp;TB_iframe=true" id="add_link_print" class="thickbox"><img src="%s" alt="%s"/></a>', $title, $url, $imgSrc, $this->short_name);
+		//%s&amp;type=wp_lynx&amp;TB_iframe=true
+		$context .= sprintf('<a title="%s" href="#" id="add_link_print" class="button"><img src="%s" alt="%s"/> Add Lynx Print</a>', $title, $imgSrc, $this->short_name);
 		return $context;
 	}
 	/**

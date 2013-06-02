@@ -110,6 +110,7 @@ class linksLynx
 			//Instantiate our new admin object
 			$this->admin = new llynx_admin($this->opt, $this->plugin_basename, $this->template_tags);
 		}
+		add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
 	}
 	/**
 	 * admin initialisation callback function
@@ -131,6 +132,7 @@ class linksLynx
 		
 		add_action('media_upload_wp_lynx', array($this, 'media_upload'));
 		$this->allowed_html = wp_kses_allowed_html('post');
+		wp_enqueue_script('llynx_javascript', plugins_url('/wp_lynx.js', dirname(__FILE__) . '/wp_lynx.js'), array('jquery'));
 	}
 	function wp_init()
 	{
@@ -148,7 +150,44 @@ class linksLynx
 				wp_enqueue_style('llynx_style');
 			}
 		}
+		add_action( 'print_media_templates', array( $this, 'print_media_templates' ) );
 	}
+	function enqueue_scripts()
+	{
+		//TODO: ensure we load only at the correct times
+		wp_enqueue_script('llynx_javascript', plugins_url('/wp_lynx.js', dirname(__FILE__) . '/wp_lynx.js'), array( 'media-views' ));
+	}
+	/**
+	 * Adds a new template for the HelloWorld view.
+	 */
+	function print_media_templates() {
+		?>
+<script type="text/html" id="tmpl-llynx-print-add">
+<div class="media-embed"><label class="embed-url"><input type="text"><span class="spinner"></span></label>
+	<div class="embed-link-settings">
+		
+	</div>
+</div>
+</script>
+<script type="text/html" id="tmpl-llynx-help">
+<div class="media-embed llynx-text" style="margin:1em;">
+	<p>
+		<?php _e('The Add Lynx Print dialog is simple to use. Just enter the URL to the website or page that you want to link to in to the text area. You can enter more than one link at a time, just place a space, or start a newline between each link. Then press the "Get" button. After the pages have been retrieved you should have something similar to the picture above. The pictures are changeable, just use the arrows to thumb through the available pictures. The same goes for the text field, which you may manually edit or thumb through some preselected paragraphs from the linked site.', 'wp_lynx');?>
+	</p>
+	<p>
+		<?php _e('When you are ready to insert a Link Print, just click the "Insert into Post" button (or the "Insert All" button at the bottom to insert multiple Link Prints simultaneously). If you go to the HTML tab in the editor you\'ll see that WP Lynx generates pure HTML. This gives the user full control over their Lynx Prints.', 'wp_lynx');?>
+	</p>
+	<p>
+		<?php printf(__('If you think you have found a bug, please include your WordPress version and details on how to reporduce the bug when you %sreport the issue%s.', 'wp_lynx'),'<a title="' . __('Go to the WP Lynx support post for your version.', 'wp_lynx') . '" href="http://mtekk.us/archives/wordpress/plugins-wordpress/wp-lynx-' . $this->version . '/#respond">', '</a>');?>
+	</p>
+</div>
+</script>
+		<?php
+	}
+	
+	
+	
+//TODO Old junk need to either remove or refactor	
 	/**
 	 * media_upload
 	 *
