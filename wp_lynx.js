@@ -101,11 +101,19 @@ var ds = ds || {};
 
 		open: function() {
 			$( '.media-modal' ).addClass( 'smaller' );
-			jQuery("#llynx_url").change(function(){
-				jQuery(".spinner").show();
-			});
+			/*$('#llynx_url').change(function(){
+				$('.spinner').show();
+			});*/
 		},
-
+		
+		events: {
+			'click #llynx_go' : 'save'
+		},
+		
+		save : function(e) {
+			$('.spinner').show();
+		},
+		
 		ready: function() {
 			console.log( 'Frame ready' );
 		},
