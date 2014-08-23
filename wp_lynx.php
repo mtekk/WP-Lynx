@@ -11,7 +11,7 @@ TextDomain: wp_lynx
 DomainPath: /languages/
 */
 /*  
-	Copyright 2010-2013  John Havlik  (email : mtekkmonkey@gmail.com)
+	Copyright 2010-2014  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
