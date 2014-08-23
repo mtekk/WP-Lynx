@@ -42,7 +42,7 @@ if(!class_exists('mtekk_adminKit'))
  */
 class llynx_admin extends mtekk_adminKit
 {
-	protected $version = '0.6.0';
+	protected $version = '0.9.50';
 	protected $full_name = 'WP Lynx Settings';
 	protected $short_name = 'WP Lynx';
 	protected $access_level = 'manage_options';
@@ -384,6 +384,7 @@ class llynx_admin extends mtekk_adminKit
 				<table class="form-table">
 					<?php
 						$this->input_text(__('Timeout', 'wp_lynx'), 'acurl_timeout', 'small-text', false, __('Maximum time for scrape execution in seconds.', 'wp_lynx'));
+						$this->input_text(__('Max Redirects', 'wp_lynx'), 'acurl_max_redirects', 'small-text', false, __('Maximum number of redirects to follow while scraping a URL.', 'wp_lynx'));						
 						$this->input_text(__('Useragent', 'wp_lynx'), 'Scurl_agent', 'large-text', $this->opt['bcurl_embrowser'], __('Useragent to use during scrape execution.', 'wp_lynx'));
 						$this->input_check(__('Emulate Browser', 'wp_lynx'), 'bcurl_embrowser', __("Useragent will be exactly as the users's browser.", 'wp_lynx'));
 					?>

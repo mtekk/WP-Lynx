@@ -34,7 +34,8 @@ class llynxScrape
 		'aimg_max_range' => 256,
 		'Scurl_agent' => 'WP Links Bot',
 		'acurl_timeout' => 2,
-		'bog_only' => false
+		'bog_only' => false,
+		'acurl_max_redirects' => 3
 	);
 	public $error = array();
 	public $images = array();
@@ -62,7 +63,7 @@ class llynxScrape
 				CURLOPT_FAILONERROR		=> true,		// Fail silently on HTTP error
 				CURLOPT_CONNECTTIMEOUT	=> $this->opt['acurl_timeout'],	// Timeout on connect
 				CURLOPT_TIMEOUT			=> $this->opt['acurl_timeout'],	// Timeout on response
-				CURLOPT_MAXREDIRS		=> 3,			// Stop after x redirects
+				CURLOPT_MAXREDIRS		=> $this->opt['acurl_max_redirects'],	// Stop after x redirects
 				CURLOPT_SSL_VERIFYHOST	=> 0            // Don't verify ssl
 			);
 			//Conditionally set range, if passed in
