@@ -42,13 +42,13 @@ if(!class_exists('mtekk_adminKit'))
  */
 class llynx_admin extends mtekk_adminKit
 {
-	protected $version = '0.9.50';
+	const version = '0.9.50';
 	protected $full_name = 'WP Lynx Settings';
 	protected $short_name = 'WP Lynx';
 	protected $access_level = 'manage_options';
 	protected $identifier = 'wp_lynx';
 	protected $unique_prefix = 'llynx';
-	protected $plugin_basename = 'wp-lynx/wp_lynx.php';
+	protected $plugin_basename = null;
 	protected $support_url = 'http://mtekk.us/archives/wordpress/plugins-wordpress/wp-lynx-';
 	protected $template_tags = null;
 	/**
@@ -84,7 +84,6 @@ class llynx_admin extends mtekk_adminKit
 	}
 	function wp_loaded()
 	{
-		
 		parent::wp_loaded();
 	}
 	/**
@@ -95,7 +94,7 @@ class llynx_admin extends mtekk_adminKit
 		//If the user can not manage options we will die on them
 		if(!current_user_can($this->access_level))
 		{
-			wp_die(__('Insufficient privileges to proceed.', 'breadcrumb-navxt'));
+			wp_die(__('Insufficient privileges to proceed.', 'wp-lynx'));
 		}
 	}
 	/**
@@ -147,7 +146,7 @@ class llynx_admin extends mtekk_adminKit
 	function opts_upgrade($opts, $version)
 	{
 		//If our version is not the same as in the db, time to update
-		if($version !== $this->version)
+		if(version_compare($version, $this::version, '<'))
 		{
 			//Upgrading from 0.2.x
 			if(version_compare($version, '0.3.0', '<'))

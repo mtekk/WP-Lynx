@@ -54,7 +54,7 @@ if(!class_exists('llynxScrape'))
  */
 class linksLynx
 {
-	protected $version = '0.9.50';
+	const version = '0.9.50';
 	protected $name = 'WP Lynx';
 	protected $identifier = 'wp_lynx';
 	protected $unique_prefix = 'llynx';
