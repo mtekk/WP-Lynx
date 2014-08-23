@@ -1,6 +1,6 @@
 <?php
 /*  
-	Copyright 2009-2013  John Havlik  (email : mtekkmonkey@gmail.com)
+	Copyright 2009-2014  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,8 +19,7 @@
 require_once(dirname(__FILE__) . '/block_direct_access.php');
 abstract class mtekk_adminKit
 {
-	private $__version = '1.2';
-	protected $version;
+	const version = '1.2';
 	protected $full_name;
 	protected $short_name;
 	protected $plugin_basename;
@@ -56,7 +55,7 @@ abstract class mtekk_adminKit
 	 */
 	function get_admin_class_version()
 	{
-		return $__version;
+		return mtekk_adminKit::version;
 	}
 	/**
 	 * Return the URL of the settings page for the plugin
@@ -157,7 +156,7 @@ abstract class mtekk_adminKit
 		//Register options
 		register_setting($this->unique_prefix . '_options', $this->unique_prefix . '_options', '');
 		//Synchronize up our settings with the database as we're done modifying them now
-		$this->opt = mtekk_adminKit::parse_args($this->get_option($this->unique_prefix . '_options'), $this->opt);
+		$this->opt = $this->parse_args($this->get_option($this->unique_prefix . '_options'), $this->opt);
 		//Run the opts fix filter
 		$this->opts_fix($this->opt);
 	}
@@ -245,18 +244,18 @@ abstract class mtekk_adminKit
 			$this->add_option($this->unique_prefix . '_options', $opts);
 			$this->add_option($this->unique_prefix . '_options_bk', $opts, '', 'no');
 			//Add the version, no need to autoload the db version
-			$this->add_option($this->unique_prefix . '_version', $this->version, '', 'no');
+			$this->add_option($this->unique_prefix . '_version', $this::version, '', 'no');
 		}
 		else
 		{
 			//Retrieve the database version
 			$db_version = $this->get_option($this->unique_prefix . '_version');
-			if($this->version !== $db_version)
+			if($this::version !== $db_version)
 			{
 				//Run the settings update script
 				$this->opts_upgrade($opts, $db_version);
 				//Always have to update the version
-				$this->update_option($this->unique_prefix . '_version', $this->version);
+				$this->update_option($this->unique_prefix . '_version', $this::version);
 				//Store the options
 				$this->update_option($this->unique_prefix . '_options', $this->opt);
 			}
@@ -281,21 +280,21 @@ abstract class mtekk_adminKit
 	function version_check($version)
 	{
 		//Do a quick version check
-		if(version_compare($version, $this->version, '<') && is_array($this->opt))
+		if(version_compare($version, $this::version, '<') && is_array($this->opt))
 		{
 			//Throw an error since the DB version is out of date
 			$this->message['error'][] = __('Your settings are out of date.', $this->identifier) . $this->admin_anchor('upgrade', __('Migrate the settings now.', $this->identifier), __('Migrate now.', $this->identifier));
 			//Output any messages that there may be
-			$this->message();
+			$this->messages();
 			return false;
 		}
 		//Do a quick version check
-		else if(version_compare($version, $this->version, '>') && is_array($this->opt))
+		else if(version_compare($version, $this::version, '>') && is_array($this->opt))
 		{
 			//Throw an error since the DB version is out of date
 			$this->message['error'][] = __('Your settings are for a newer version.', $this->identifier) . $this->admin_anchor('upgrade', __('Migrate the settings now.', $this->identifier), __('Migrate now.', $this->identifier));
 			//Output any messages that there may be
-			$this->message();
+			$this->messages();
 			return true;
 		}
 		else if(!is_array($this->opt))
@@ -303,7 +302,7 @@ abstract class mtekk_adminKit
 			//Throw an error since it appears the options were never registered
 			$this->message['error'][] = __('Your plugin install is incomplete.', $this->identifier) . $this->admin_anchor('upgrade', __('Load default settings now.', $this->identifier), __('Complete now.', $this->identifier));
 			//Output any messages that there may be
-			$this->message();
+			$this->messages();
 			return false;
 		}
 		else if(!$this->opts_validate($this->opt))
@@ -311,7 +310,7 @@ abstract class mtekk_adminKit
 			//Throw an error since it appears the options contain invalid data
 			$this->message['error'][] = __('Your plugin settings are invalid.', $this->identifier) . $this->admin_anchor('fix', __('Attempt to fix settings now.', $this->identifier), __('Fix now.', $this->identifier));
 			//Output any messages that there may be
-			$this->message();
+			$this->messages();
 			return false;
 		}
 		return true;
@@ -344,6 +343,7 @@ abstract class mtekk_adminKit
 	 * 
 	 * @param array $opts good, clean array
 	 * @param array $input unsanitzed input array, not trusted at all
+	 * @todo This function should probably get a filter thrown within it to be more extensible
 	 */
 	protected function opts_update_loop(&$opts, $input)
 	{
@@ -395,10 +395,13 @@ abstract class mtekk_adminKit
 							$opts[$option] = esc_html($input[$option]);
 						}
 						break;
-					//Treat everything else as a normal string
+					//Deal with strings that can be null
 					case 's':
-					default:
 						$opts[$option] = esc_html($input[$option]);
+						break;
+					//By default we have nothing to do, allows for internal settings
+					default:
+						break;
 				}
 			}
 		}
@@ -410,7 +413,7 @@ abstract class mtekk_adminKit
 	 * @param mixed $defaults (optional) The default values to validate against
 	 * @return mixed
 	 */
-	static function parse_args($args, $defaults = '')
+	function parse_args($args, $defaults = '')
 	{
 		if(is_object($args))
 		{
@@ -473,21 +476,30 @@ abstract class mtekk_adminKit
 		//Do a nonce check, prevent malicious link/form problems
 		check_admin_referer($this->unique_prefix . '_options-options');
 		//Update local options from database
-		$this->opt = mtekk_adminKit::parse_args($this->get_option($this->unique_prefix . '_options'), $this->opt);
+		$this->opt = $this->parse_args($this->get_option($this->unique_prefix . '_options'), $this->opt);
 		$this->opts_update_prebk($this->opt);
 		//Update our backup options
 		$this->update_option($this->unique_prefix . '_options_bk', $this->opt);
+		$opt_prev = $this->opt;
 		//Grab our incomming array (the data is dirty)
 		$input = $_POST[$this->unique_prefix . '_options'];
 		//Run the update loop
 		$this->opts_update_loop($this->opt, $input);
 		//Commit the option changes
-		$this->update_option($this->unique_prefix . '_options', $this->opt);
+		$updated = $this->update_option($this->unique_prefix . '_options', $this->opt);
 		//Check if known settings match attempted save
-		if(count(array_diff_key($input, $this->opt)) == 0)
+		if($updated && count(array_diff_key($input, $this->opt)) == 0)
 		{
 			//Let the user know everything went ok
 			$this->message['updated fade'][] = __('Settings successfully saved.', $this->identifier) . $this->admin_anchor('undo', __('Undo the options save.', $this->identifier), __('Undo', $this->identifier));
+		}
+		else if(!$updated && count(array_diff_key($opt_prev, $this->opt)) == 0)
+		{
+			$this->message['updated fade'][] = __('Settings did not change, nothing to save.', $this->identifier);
+		}
+		else if(!$updated)
+		{
+			$this->message['error fade'][] = __('Settings were not saved.', $this->identifier);
 		}
 		else
 		{
@@ -498,7 +510,7 @@ abstract class mtekk_adminKit
 			{
 				$temp .= '<br />' . $setting;
 			}
-			$this->message['updated fade'][] = $temp . '<br />' . sprintf(__('Please include this message in your %sbug report%s.', $this->identifier),'<a title="' . sprintf(__('Go to the %s support post for your version.', $this->identifier), $this->short_name) . '" href="' . $this->support_url . $this->version . '/#respond">', '</a>');
+			$this->message['updated fade'][] = $temp . '<br />' . sprintf(__('Please include this message in your %sbug report%s.', $this->identifier),'<a title="' . sprintf(__('Go to the %s support post for your version.', $this->identifier), $this->short_name) . '" href="' . $this->support_url . $this::version . '/#respond">', '</a>');
 		}
 		add_action('admin_notices', array($this, 'messages'));
 	}
@@ -525,7 +537,7 @@ abstract class mtekk_adminKit
 		$plugnode = $parnode->appendChild($node);
 		//Add some attributes that identify the plugin and version for the options export
 		$plugnode->setAttribute('name', $this->short_name);
-		$plugnode->setAttribute('version', $this->version);
+		$plugnode->setAttribute('version', $this::version);
 		//Change our headder to text/xml for direct save
 		header('Cache-Control: public');
 		//The next two will cause good browsers to download instead of displaying the file
@@ -583,7 +595,7 @@ abstract class mtekk_adminKit
 				if($options->getAttribute('name') === $this->short_name)
 				{
 					//Grab the file version
-					$version = explode('.', $options->getAttribute('version'));
+					$version = $options->getAttribute('version');
 					//Loop around all of the options
 					foreach($options->getelementsByTagName('option') as $child)
 					{
@@ -650,7 +662,7 @@ abstract class mtekk_adminKit
 	function opts_upgrade($opts, $version)
 	{
 		//We don't support using newer versioned option files in older releases
-		if(version_compare($this->version, $version, '>='))
+		if(version_compare($this::version, $version, '>='))
 		{
 			$this->opt = $opts;
 		}
@@ -669,7 +681,7 @@ abstract class mtekk_adminKit
 			//Feed the just read options into the upgrade function
 			$this->opts_upgrade($opts, $this->get_option($this->unique_prefix . '_version'));
 			//Always have to update the version
-			$this->update_option($this->unique_prefix . '_version', $this->version);
+			$this->update_option($this->unique_prefix . '_version', $this::version);
 			//Store the options
 			$this->update_option($this->unique_prefix . '_options', $this->opt);
 			//Send the success message
@@ -744,12 +756,7 @@ abstract class mtekk_adminKit
 	 */
 	function admin_page()
 	{
-		//Admin Options update hook
-		if(isset($_POST[$this->unique_prefix . '_admin_options']))
-		{
-			//Temporarily add update function on init if form has been submitted
-			$this->opts_update();
-		}
+	    
 	}
 	/**
 	 * Function prototype to prevent errors
