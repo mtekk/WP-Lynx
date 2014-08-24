@@ -1,46 +1,64 @@
 var ds = ds || {};
 
-/**
- * Demo 5
- */
 ( function( $ ) {
+	var lynxPrint = Backbone.Model.extend({
+		urlRoot: '/wplynx',
+		defaults: {
+			url: '',
+			title: '',
+			descriptions: '',
+			images: ''
+		}
+	});
 	var media;
-
+	var lynxPrints = [];
 	ds.media = media = {};
 
 	_.extend( media, { view: {}, controller: {} } );
 
-	media.view.llynxPrintAdd = wp.media.View.extend( {
+	media.view.llynxPrintAdd = wp.media.View.extend({
 		className: 'llynx-print-add-frame',
 		regions: ['menu', 'title', 'content', 'router'],
-		template:  wp.media.template( 'llynx-print-add' ) // <script type="text/html" id="tmpl-hello-world">
-	} );
+		template:  wp.media.template( 'llynx-print-add' ),
+		events: {
+			"click #llynx_go" : "save"
+		},
+		save : function(e) {
+			console.log( 'Fetching:' + $('input[name=llynx_url]').val() );
+			$('.spinner').show();
+			index = lynxPrints.push(new lynxPrint({url: $('input[name=llynx_url]').val()}));
+			index--;
+			lynxPrints[index].fetch({
+				success: function (lynxPrint) {
+					console.log(lynxPrint);
+				}
+			});
+		}
+	});
 
-	media.controller.llynxPrintAdd = wp.media.controller.State.extend( {
+	media.controller.llynxPrintAdd = wp.media.controller.State.extend({
 		defaults: {
 			id:       'llynx-print-add-state',
 			menu:     'default',
-			//toolbar:  'select',
+			toolbar:  'insert',
 			//router:   'browse',
 			content:  'llynx_print_add_state'
 		}
-	} );
+	});
 	
-	media.view.llynxHelp = wp.media.View.extend( {
+	media.view.llynxHelp = wp.media.View.extend({
 		className: 'llynx-help-frame',
 		regions: ['menu', 'title', 'content', 'router'],
-		template:  wp.media.template( 'llynx-help' ) // <script type="text/html" id="tmpl-hello-world">
-	} );
+		template:  wp.media.template( 'llynx-help' )
+	});
 
-	media.controller.llynxHelp = wp.media.controller.State.extend( {
+	media.controller.llynxHelp = wp.media.controller.State.extend({
 		defaults: {
 			id:       'llynx-help-state',
 			menu:     'default',
-			//toolbar:  'select',
-			//router:   'browse',
 			content:  'llynx_help_state'
 		}
-	} );
+	});
 	media.buttonId = '#add_link_print',
 
 	_.extend( media, {
@@ -101,17 +119,10 @@ var ds = ds || {};
 
 		open: function() {
 			$( '.media-modal' ).addClass( 'smaller' );
-			/*$('#llynx_url').change(function(){
-				$('.spinner').show();
-			});*/
 		},
 		
 		events: {
-			'click #llynx_go' : 'save'
-		},
-		
-		save : function(e) {
-			$('.spinner').show();
+			
 		},
 		
 		ready: function() {
