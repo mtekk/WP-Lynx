@@ -13,7 +13,6 @@ var ds = ds || {};
 	var media;
 	var lynxPrints = [];
 	ds.media = media = {};
-
 	_.extend( media, { view: {}, controller: {} } );
 
 	media.view.llynxPrintAdd = wp.media.View.extend({
@@ -21,18 +20,33 @@ var ds = ds || {};
 		regions: ['menu', 'title', 'content', 'router'],
 		template:  wp.media.template( 'llynx-print-add' ),
 		events: {
-			"click #llynx_go" : "save"
+			"click #llynx_go" : "save",
+			"keyup #llynx_url" : "keyup"
+		},
+		keyup : function(e) {
+			if(e.keyCode === 13)
+			{
+				console.log('caught enter');
+				this.save(e);
+			}
 		},
 		save : function(e) {
 			console.log( 'Fetching:' + $('input[name=llynx_url]').val() );
 			$('.spinner').show();
-			index = lynxPrints.push(new lynxPrint({url: $('input[name=llynx_url]').val()}));
-			index--;
-			lynxPrints[index].fetch({
-				success: function (lynxPrint) {
-					console.log(lynxPrint);
-				}
-			});
+			//TODO: This should not be hardcoded'
+			$.post('/wp-admin/admin-ajax.php', {
+				action: 'wp_lynx_fetch_url',
+				url: $('input[name=llynx_url]').val(),
+				nonce: '1234'
+				},
+				function(data) {
+					$('.spinner').hide();
+					console.log(data);
+				},
+				"json");
+			//index = lynxPrints.push(};
+			//index--;
+			
 		}
 	});
 
