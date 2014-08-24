@@ -130,7 +130,6 @@ class linksLynx
 		{
 			$this->llynx_scrape->opt['Scurl_agent'] = $_SERVER['HTTP_USER_AGENT'];
 		}
-		
 		add_action('media_upload_wp_lynx', array($this, 'media_upload'));
 		$this->allowed_html = wp_kses_allowed_html('post');
 		wp_enqueue_script('llynx_javascript', plugins_url('/wp_lynx.js', dirname(__FILE__) . '/wp_lynx.js'), array('jquery'));
@@ -152,6 +151,7 @@ class linksLynx
 			}
 		}
 		add_action( 'print_media_templates', array( $this, 'print_media_templates' ) );
+		add_action('wp_ajax_wp_lynx_fetch_url', array($this, 'fetch_url'));
 	}
 	function enqueue_scripts()
 	{
@@ -179,14 +179,68 @@ class linksLynx
 		<?php _e('When you are ready to insert a Link Print, just click the "Insert into Post" button (or the "Insert All" button at the bottom to insert multiple Link Prints simultaneously). If you go to the HTML tab in the editor you\'ll see that WP Lynx generates pure HTML. This gives the user full control over their Lynx Prints.', 'wp_lynx');?>
 	</p>
 	<p>
-		<?php printf(__('If you think you have found a bug, please include your WordPress version and details on how to reporduce the bug when you %sreport the issue%s.', 'wp_lynx'),'<a title="' . __('Go to the WP Lynx support post for your version.', 'wp_lynx') . '" href="http://mtekk.us/archives/wordpress/plugins-wordpress/wp-lynx-' . $this->version . '/#respond">', '</a>');?>
+		<?php printf(__('If you think you have found a bug, please include your WordPress version and details on how to reporduce the bug when you %sreport the issue%s.', 'wp_lynx'),'<a title="' . __('Go to the WP Lynx support post for your version.', 'wp_lynx') . '" href="http://mtekk.us/archives/wordpress/plugins-wordpress/wp-lynx-' . linksLynx::version . '/#respond">', '</a>');?>
 	</p>
 </div>
 </script>
 		<?php
 	}
-	
-	
+	function fetch_url()
+	{
+		//Grab the nonce and check
+		//$nonce = intval($_POST['nonce']);
+		//Clean up the URL
+		$url = esc_url_raw($_POST['url']);
+		if($url == null)
+		{
+			return json_encode(0);
+		}
+		$this->llynx_scrape->scrapeContent($url);
+		$uploadDir = wp_upload_dir();
+		if(!isset($uploadDir['path']) || !is_writable($uploadDir['path']))
+		{
+			$allow_images = false;
+		}
+		else
+		{
+			$allow_images = true;
+		}
+		if(!$allow_images)
+		{
+			$this->llynx_scrape->images = array();
+		}
+		else if($this->opt['bwthumbs_enable'])
+		{
+			//Backup our array of images
+			$temp_array = $this->llynx_scrape->images;
+			//Clear our array of images
+			$this->llynx_scrape->images = array();
+			//Keep the #0 slot the same (respect open graph)
+			$this->llynx_scrape->images[0] = array_shift($temp_array);
+			//Splice in the screen cap of the site
+			$this->llynx_scrape->images[1] = sprintf('http://api.snapito.com/web/%s/mc?url=%s', $this->opt['swthumbs_key'], $url);
+			//Place the rest at the end
+			$this->llynx_scrape->images = array_merge($this->llynx_scrape->images, $temp_array);
+		}
+		//Echo out our results
+		echo $this->json_encode($url);
+		//Nothing left to do but die
+		die();
+	}
+	function json_encode($url)
+	{
+		$descriptions = array();
+		foreach($this->llynx_scrape->text as $text)
+		{
+			$descriptions[] = addslashes(html_entity_decode($text, ENT_COMPAT, 'UTF-8'));
+		}
+		return json_encode(array(
+			'title' => $this->llynx_scrape->title,
+			'url' => $url,
+			'descriptions' => $descriptions,
+			'images' => $this->llynx_scrape->images
+			));
+	}
 	
 //TODO Old junk need to either remove or refactor	
 	/**
@@ -210,7 +264,7 @@ class linksLynx
 		wp_enqueue_script('admin-gallery');
 		wp_enqueue_script('llynx_javascript', plugins_url('/wp_lynx.js', dirname(__FILE__) . '/wp_lynx.js'), array('jquery'));
 		//add_action('wp_lynx_media_upload_header', 'media_upload_header');
-		wp_iframe(array($this, 'url_tab'));
+		//wp_iframe(array($this, 'url_tab'));
 	}
 	/**
 	 * resize_image
@@ -389,286 +443,6 @@ class linksLynx
 		}
 		//Replace the template tags with values
 		return str_replace($this->template_tags, $values, $this->opt['Htemplate']);
-	}
-	function url_tab()
-	{
-		global $post_ID, $temp_ID;
-		//We may be in a temporary post, so we can't rely on post_ID
-		$curID = (int) (0 == $post_ID) ? $temp_ID : $post_ID;
-		//Assemble the link to our special uploader
-		$formUrl = 'media-upload.php?post_id=' . $curID;
-		//Handle the case when we want to insert only one lynx print
-		if(isset($_POST['prints_send']))
-		{
-			//Grab the keys of llynx send
-			$keys = array_keys($_POST['prints_send']);
-			//Grab the first, and probably only id
-			$key = (int) array_shift($keys);
-			//Grab our dirty data badges[$key][post_content]
-			$data = $_POST['prints'][$key];
-			//Use the WP function to send this html to the editor
-			media_send_to_editor($this->url_insert_handler($data));
-		}
-		//Handle the case when we want to insert all of the lynx prints
-		if(isset($_POST['prints_send_all']))
-		{
-			$html = '';
-			//Loop through all of our prints, adding them to our compiled html
-			foreach($_POST['prints'] as $data)
-			{
-				//Grab the compiled data
-				$html .= $this->url_insert_handler($data);
-			}
-			//Use the WP function to send this html to the editor
-			media_send_to_editor($html);
-		}
-		//We want to keep the urls we've grabbed in the get field
-		$urlString = '';
-		if(isset($_POST['llynx_get_url']['url']))
-		{
-			$urlString = $_POST['llynx_get_url']['url'];
-		}
-		?>
-		<script type="text/javascript">
-		llynx_imgs = new Array();
-		llynx_cimgs = new Array();
-		llynx_cont = new Array();
-		llynx_ccont = new Array();
-		<!--
-		jQuery(function($){
-			var preloaded = $(".media-item.preloaded");
-			if ( preloaded.length > 0 ) {
-				preloaded.each(function(){prepareMediaItem({id:this.id.replace(/[^0-9]/g, '')},'');});
-				updateMediaForm();
-			}
-		});
-		-->
-		</script>
-		<div id="media-upload-header"><ul id="sidemenu"><li id="tab-type"><a href="<?php echo $formUrl; ?>&amp;type=wp_lynx&amp;TB_iframe=true" <?php if(!isset($_GET['ltab'])){echo 'class="current"';} ?>>Add Lynx Print</a></li><li><a href="<?php echo $formUrl; ?>&amp;type=wp_lynx&amp;TB_iframe=true&amp;ltab=help" <?php if(isset($_GET['ltab']) && $_GET['ltab'] == 'help'){echo 'class="current"';} ?>>Help</a></li></ul></div>
-		<?php if(isset($_GET['ltab']) && $_GET['ltab'] == 'help')
-		{?>
-			<div style="margin:1em;">
-			<h3 class="media-title"><?php _e('WP Lynx Help','wp_lynx'); ?></h3>
-			<p>
-			<?php _e('The Add Lynx Print dialog is simple to use. Just enter the URL to the website or page that you want to link to in to the text area. You can enter more than one link at a time, just place a space, or start a newline between each link. Then press the "Get" button. After the pages have been retrieved you should have something similar to the picture above. The pictures are changeable, just use the arrows to thumb through the available pictures. The same goes for the text field, which you may manually edit or thumb through some preselected paragraphs from the linked site.', 'wp_lynx');?>
-			</p>
-			<p>
-			<?php _e('When you are ready to insert a Link Print, just click the "Insert into Post" button (or the "Insert All" button at the bottom to insert multiple Link Prints simultaneously). If you go to the HTML tab in the editor you\'ll see that WP Lynx generates pure HTML. This gives the user full control over their Lynx Prints.', 'wp_lynx');?>
-			</p>
-			<p>
-			<?php printf(__('If you think you have found a bug, please include your WordPress version and details on how to reporduce the bug when you %sreport the issue%s.', 'wp_lynx'),'<a title="' . __('Go to the WP Lynx support post for your version.', 'wp_lynx') . '" href="http://mtekk.us/archives/wordpress/plugins-wordpress/wp-lynx-' . $this->version . '/#respond">', '</a>');?>
-			</p>
-			</div>
-		<?php }
-		else
-		{?>
-		<form action="<?php echo $formUrl; ?>&amp;type=wp_lynx&amp;TB_iframe=true" method="post" id="llynx_get_url" class="media-upload-form type-form validate">
-			<?php wp_nonce_field('llynx_get_url');?>
-			<h3 class="media-title"><?php _e('Add a Lynx Print','wp_lynx'); ?></h3>
-			<div class="media-blank">
-				<table class="describe">
-					<tbody>
-						<tr>
-							<th class="label" valign="top" scope="row">
-								<span class="alignleft"><?php _e('URL(s):')?></span>
-							</th>
-							<td class="field">
-								<textarea id="llynx_get_url[url]" aria-required="true" name="llynx_get_url[url]" style="height:3.5em;"><?php echo $urlString; ?></textarea>
-								<input class="button" type="submit" value="<?php _e('Get','wp_lynx');?>" name="llynx_get_url_button"/>
-							</td>
-						</tr>
-					</tbody>
-				</table>	
-			</div>
-		</form>
-		<?php
-		  $uploadDir = wp_upload_dir();
-		  if(!isset($uploadDir['path']) || !is_writable($uploadDir['path']))
-		  {
-			  //Let the user know their directory is not writable
-			  $this->message['error'][] = __('WordPress uploads directory is not writable, thumbnails will be disabled.', 'wp_lynx');
-			  //Too late to use normal hook, directly display the message
-			  $this->message();
-		  }
-		}
-		if(isset($_POST['llynx_get_url']))
-		{
-			//Get urls if any were sent
-			$urls = preg_split('/\s+/',$_POST['llynx_get_url']['url']);
-		?>
-		<div class="hide-if-no-js" id="sort-buttons">
-			<span><?php _e('All Prints:'); ?><a id="showall" href="#" style="display: inline;"><?php _e('Show'); ?></a><a style="display: none;" id="hideall" href="#"> <?php _e('Hide'); ?></a></span>
-			<?php _e('Sort Order:'); ?><a id="asc" href="#"><?php _e('Ascending');?></a> | <a id="desc" href="#"><?php _e('Descending'); ?></a> | <a id="clear" href="#"><?php _e('Clear'); ?></a>
-		</div>
-		<form action="<?php echo $formUrl; ?>&amp;type=wp_lynx&amp;TB_iframe=true" method="post" id="llynx_insert_print" class="media-upload-form type-form validate">
-			<?php wp_nonce_field('llynx_insert_print');?>
-			<table cellspacing="0" class="widefat">
-				<thead>
-					<tr>
-						<th><?php _e('Website'); ?></th>
-						<th class="order-head"><?php _e('Order'); ?></th>
-						<th class="actions-head"><?php _e('Actions'); ?></th>
-					</tr>
-				</thead>
-			</table>
-			<div id="media-items" class="ui-sortable">
-				<?php
-				$uploadDir = wp_upload_dir();
-				if(!isset($uploadDir['path']) || !is_writable($uploadDir['path']))
-				{
-					$allow_images = false;
-				}
-				else
-				{
-					$allow_images = true;
-				}
-				foreach($urls as $key => $url)
-				{
-					//If we recieve a blank URL, skip to next iteration
-					if($url == NULL)
-					{
-						continue;
-					}
-					//Let's clean up the url before using it
-					$url = html_entity_decode(esc_url($url), ENT_COMPAT, 'UTF-8');
-					//Let's get some data from that url
-					$this->llynx_scrape->scrapeContent($url);
-					//If we didn't get anything, throw error, continue on our way
-					if(count($this->llynx_scrape->images) < 1 && $this->llynx_scrape->title == '' && count($this->llynx_scrape->text) < 1)
-					{
-						?>
-						<div class="media-item child-of-<?php echo $curID; ?> preloaded" id="media-item-<?php echo $key; ?>">
-							<?php printf(__('Error while retrieving %s', 'wp_lynx'), $url);?>
-							<blockquote>
-								<?php
-									if(is_array($this->llynx_scrape->error))
-									{
-										if(count($this->llynx_scrape->error) > 0)
-										{
-											var_dump($this->llynx_scrape->error);
-										}
-										else
-										{
-											_e('cURL error, please check that you have php5-curl and libcurl installed.', 'wp_lynx');
-										}
-									}
-									else
-									{
-										echo $this->llynx_scrape->error;
-									}?>
-							</blockquote>
-						</div>
-						<?php
-						continue;
-					}
-					if(!$allow_images)
-					{
-						$this->llynx_scrape->images = array();
-					}
-					else if($this->opt['bwthumbs_enable'])
-					{
-						//Backup our array of images
-						$temp_array = $this->llynx_scrape->images;
-						//Clear our array of images
-						$this->llynx_scrape->images = array();
-						//Keep the #0 slot the same (respect open graph)
-						$this->llynx_scrape->images[0] = array_shift($temp_array);
-						//Splice in the screen cap of the site
-						$this->llynx_scrape->images[1] = sprintf('http://api.snapito.com/web/%s/mc?url=%s', $this->opt['swthumbs_key'], $url);
-						//Place the rest at the end
-						$this->llynx_scrape->images = array_merge($this->llynx_scrape->images, $temp_array);
-					}
-					?>
-				<div class="media-item child-of-<?php echo $curID; ?> preloaded" id="media-item-<?php echo $key; ?>">
-					<input type="hidden" value="image" id="type-of-<?php echo $key; ?>">
-					<input type="hidden" value="<?php echo $this->llynx_scrape->images[0]; ?>" id="prints<?php echo $key; ?>img" name="prints[<?php echo $key; ?>][img]">
-					<input type="hidden" value="<?php echo $url; ?>" id="prints[<?php echo $key;?>][url]" name="prints[<?php echo $key;?>][url]">
-					<a href="#" class="toggle describe-toggle-on"><?php _e('Show'); ?></a>
-					<a href="#" class="toggle describe-toggle-off"><?php _e('Hide'); ?></a>
-					<div class="menu_order"> <input type="text" value="0" name="prints[<?php echo $key; ?>][menu_order]" id="prints[<?php echo $key; ?>][menu_order]" class="menu_order_input"></div>
-					<div class="filename new"><span class="title"><?php echo $this->llynx_scrape->title; ?></span></div>
-					<table class="slidetoggle describe startclosed" style="display: none;">
-						<thead id="media-head-llynx<?php echo $key; ?>" class="media-item-info">
-						<tr valign="top">
-							<td id="thumbnail-head-llynx-<?php echo $key; ?>" class="A1B1">
-								<p class="llynx_thumb"><img style="margin-top: 3px;" alt="" src="<?php if($allow_images && count($this->llynx_scrape->images) > 0){echo $this->llynx_scrape->images[0];} ?>" class="thumbnail"></p>
-									<script type="text/javascript">
-										llynx_imgs[<?php echo $key; ?>] = new Array();
-										llynx_cimgs[<?php echo $key; ?>] = 0;
-									<?php
-									//Since our keys are not continuous, we need to keep track of them ourselves
-									$kId = 0;
-									//Now output all of the images, hide all of them
-									if($allow_images && count($this->llynx_scrape->images) > 0)
-									{
-										foreach($this->llynx_scrape->images as $image)
-										{
-											?>llynx_imgs[<?php echo $key; ?>][<?php echo $kId; ?>] = '<?php echo $image;?>';<?php
-											echo "\n";
-											$kId++;
-										}
-									}
-									?></script>
-								<p>
-									<input type="button" value="&lt;" class="button disabled" disabled="disabled" onclick="prev_thumb(<?php echo $key; ?>)" id="imgprev-btn-<?php echo $key; ?>" />
-									<input type="button" value="&gt;" <?php if(!$allow_images || count($this->llynx_scrape->images) <= 1){echo 'disabled="disabled" class="disabled button"';}else{echo 'class="button"';}?> onclick="next_thumb(<?php echo $key; ?>)" id="imgnext-btn-<?php echo $key; ?>" />
-									<span id="icount-<?php echo $key; ?>"><?php if(!$allow_images || count($this->llynx_scrape->images) < 1){echo '0';}else{echo '1';}?> / <?php echo count($this->llynx_scrape->images); ?></span>
-								</p>
-								<p>
-									<?php 
-									if(count($this->llynx_scrape->images) < 1)
-									{
-										?><input type="hidden" value="true" id="prints[<?php echo $key; ?>][nothumb]" name="prints[<?php echo $key; ?>][nothumb]" /><?php
-									}
-									?>
-									<input type="checkbox" <?php if(!$allow_images || count($this->llynx_scrape->images) < 1){echo 'checked="checked" disabled="disabled" class="disabled"';}?> onclick="img_toggle(<?php echo $key; ?>)" value="none" id="prints[<?php echo $key; ?>][nothumb]" name="prints[<?php echo $key; ?>][nothumb]" /><label for="prints[<?php echo $key; ?>][nothumb]"><?php _e('No Thumbnail', 'wp_lynx'); ?></label>
-								</p>
-							</td>
-							<td>
-								<p><input type="text" aria-required="true" value="<?php echo $this->llynx_scrape->title; ?>" name="prints[<?php echo $key; ?>][title]" id="prints[<?php echo $key; ?>][title]" class="text"><br />
-								<small><?php echo $url; ?></small></p>
-								<p><textarea name="prints[<?php echo $key; ?>][content]" id="prints<?php echo $key; ?>content" type="text"><?php if(isset($this->llynx_scrape->text[0])){echo $this->llynx_scrape->text[0];}?></textarea>
-								</p>
-								<p>
-									<input type="button" value="&lt;" class="button disabled" disabled="disabled" onclick="prev_content(<?php echo $key; ?>)" id="contprev-btn-<?php echo $key; ?>">
-									<input type="button" value="&gt;" <?php if(count($this->llynx_scrape->text) <= 1){echo 'disabled="disabled" class="disabled button"';}else{echo 'class="button"';}?> onclick="next_content(<?php echo $key; ?>)" id="contnext-btn-<?php echo $key; ?>">
-									<span id="ccount-<?php echo $key; ?>"><?php if(count($this->llynx_scrape->text) < 1){echo '0';}else{echo '1';}?> / <?php echo count($this->llynx_scrape->text); ?></span>
-								</p>
-								<script type="text/javascript">
-									llynx_cont[<?php echo $key; ?>] = new Array();
-									llynx_ccont[<?php echo $key; ?>] = 0;
-								<?php
-									//Since our keys are not continuous, we need to keep track of them ourselves
-									$kId = 0;
-									//Now output all of the text, hide all of them
-									foreach($this->llynx_scrape->text as $text)
-									{
-										printf("llynx_cont[%s][%s] = '%s';\n", $key, $kId, addslashes(html_entity_decode($text, ENT_COMPAT, 'UTF-8')));
-										$kId++;
-									}
-								?></script>
-							</td>
-						</tr>
-						</thead>
-						<tbody>
-						<tr class="submit">
-							<td></td>
-							<td class="savesend">
-								<input type="submit" value="<?php _e('Insert into Post');?>" name="prints_send[<?php echo $key; ?>]" class="button">  <a onclick="document.getElementById('media-items').removeChild(document.getElementById('media-item-<?php echo $key; ?>'));return false;" class="del-link" href="#"><?php _e('Delete'); ?></a>
-							</td>
-						</tr>
-					</tbody>
-					</table>
-				</div>
-				<?php } ?>
-			</div>
-			<div>
-				<p class="ml-submit">
-					<input type="submit" value="<?php _e('Insert All'); ?>" id="prints_send_all" name="prints_send_all" class="button">
-				</p>
-			</div>
-		</form><?php
-		}
 	}
 }
 //Let's make an instance of our object takes care of everything
