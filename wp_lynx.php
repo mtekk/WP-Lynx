@@ -138,6 +138,7 @@ class linksLynx
 	{
 		//Register CSS for tabs
 		wp_register_style('llynx_style', plugins_url('/wp_lynx_style.css', dirname(__FILE__) . '/wp_lynx_style.css'));
+		wp_register_style('llynx_media', plugins_url('/llynx_media.css', dirname(__FILE__) . '/llynx_media.css'));
 		//If we are not in the admin, load up our style (if told to)
 		if(!is_admin())
 		{
@@ -157,6 +158,7 @@ class linksLynx
 	{
 		//TODO: ensure we load only at the correct times
 		wp_enqueue_script('llynx_javascript', plugins_url('/wp_lynx.js', dirname(__FILE__) . '/wp_lynx.js'), array( 'media-views' ), $this::version, true);
+		wp_enqueue_style('llynx_media');
 	}
 	/**
 	 * Adds a new template for the HelloWorld view.
@@ -175,15 +177,17 @@ class linksLynx
 </div>
 </script>
 <script type="text/html" id="tmpl-llynx-print">
-<div class="llynx_print">
-	<div class="image column-image llynx_thumb left">
-		<img src="<%= images[0] %>" draggable="false" />
-	</div>
-	<div class="column-settings llynx_main">
-		<input id="llynx_title" type="text" name="llynx_title" placeholder="<?php _e('Enter Site Title', 'wp_lynx');?>" value="<%= title %>">
-		<small><%= url %></small>
-	</div>
-</div>	
+<div class="image column-image llynx_thumb left">
+	<img src="<%= images[image] %>" draggable="false" />
+	<button class="llynx_img_prev" title="<?php _e('Previous Image', 'wp-lynx');?>" <%= (image < 1) ? 'disabled' : '' %>>&lt;</button>
+	<button class="llynx_img_next" title="<?php _e('Next Image', 'wp-lynx');?>"<%= (image+1 >= images.length) ? 'disabled' : '' %>>&gt;</button>
+	<span class="llynx-img-count"><%= image+1 %>/<%= images.length %></span>
+</div>
+<div class="llynx_main">
+	<input class="llynx_title" type="text" name="llynx_title" placeholder="<?php _e('Enter Site Title', 'wp_lynx');?>" value="<%= title %>">
+	<small><%= url %></small>
+	<textarea class="llynx_description"><%= descriptions[0] %></textarea>
+</div>
 </script>
 <script type="text/html" id="tmpl-llynx-help">
 <div class="media-embed llynx-text" style="margin:1em;">
@@ -273,29 +277,6 @@ class linksLynx
 	}
 	
 //TODO Old junk need to either remove or refactor	
-	/**
-	 * media_upload
-	 *
-	 * Handles all of the special media iframe stuff
-	 *
-	 * @param object $mode [optional]
-	 * @return
-	 */
-	function media_upload($mode = 'default')
-	{
-		//We have to manually enqueue all dependency styles as wp doens't do them in the correct order see bug #12415
-		wp_enqueue_style('global');
-		wp_enqueue_style('wp-admin');
-		//The style we're actually after
-		wp_enqueue_style('media');
-		//We're going to override some WP styles in this
-		add_action('admin_head', array($this, 'admin_head_style'));
-		//We need this to do the nice sorting and other things
-		wp_enqueue_script('admin-gallery');
-		wp_enqueue_script('llynx_javascript', plugins_url('/wp_lynx.js', dirname(__FILE__) . '/wp_lynx.js'), array('jquery'));
-		//add_action('wp_lynx_media_upload_header', 'media_upload_header');
-		//wp_iframe(array($this, 'url_tab'));
-	}
 	/**
 	 * resize_image
 	 * 

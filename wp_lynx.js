@@ -7,7 +7,9 @@ var llynx = llynx || {};
 			url: '',
 			title: '',
 			descriptions: '',
-			images: ''
+			description: 0,
+			images: '',
+			image: 0
 		},
 		//We don't usse the underscores syncing since REST doesn't make sense for this app
 		sync : function () {
@@ -26,13 +28,32 @@ var llynx = llynx || {};
 		className: 'llynx-print',
 		//Have to use underscore rather than WP version as we're too generic
 		template: _.template($('#tmpl-llynx-print').html()),
-		initialize: function() {
+		events: {
+			'click .llynx_img_prev' : 'prevImg',
+			'click .llynx_img_next' : 'nextImg'
+		},
+		initialize : function() {
 			this.listenTo(this.model, 'change', this.render);
-			_.bindAll(this, 'render');
+			_.bindAll(this, 'render', 'nextImg', 'prevImg');
 		},
 		render : function() {
+			
 			this.$el.html( this.template( this.model.attributes ));
 			return this;
+		},
+		nextImg : function() {
+			curImage = this.model.attributes.image
+			if(++curImage < this.model.attributes.images.length)
+			{
+				this.model.set({image: curImage});
+			}
+		},
+		prevImg : function() {
+			curImage = this.model.attributes.image
+			if(--curImage >= 0)
+			{
+				this.model.set({image: curImage});
+			}
 		}
 	});
 	media.view.llynxPrintAdd = wp.media.View.extend({
