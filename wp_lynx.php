@@ -156,7 +156,7 @@ class linksLynx
 	function enqueue_scripts()
 	{
 		//TODO: ensure we load only at the correct times
-		wp_enqueue_script('llynx_javascript', plugins_url('/wp_lynx.js', dirname(__FILE__) . '/wp_lynx.js'), array( 'media-views' ));
+		wp_enqueue_script('llynx_javascript', plugins_url('/wp_lynx.js', dirname(__FILE__) . '/wp_lynx.js'), array( 'media-views' ), $this::version, true);
 	}
 	/**
 	 * Adds a new template for the HelloWorld view.
@@ -164,11 +164,26 @@ class linksLynx
 	function print_media_templates() {
 		?>
 <script type="text/html" id="tmpl-llynx-print-add">
-<div class="media-embed"><label class="embed-url"><input id="llynx_url" type="text" name="llynx_url" placeholder="Enter URL"><span class="spinner"></span> <button id="llynx_go" name="llynx_go">Get</button></label>
-	<div class="embed-link-settings">
+<div class="media-embed">
+	<label class="embed-url">
+		<input id="llynx_url" type="text" name="llynx_url" placeholder="<?php _e('Enter URL', 'wp_lynx');?>">
+		<span class="spinner"></span>
+	</label>
+	<div id="llynx_sites">
 		
 	</div>
 </div>
+</script>
+<script type="text/html" id="tmpl-llynx-print">
+<div class="llynx_print">
+	<div class="image column-image llynx_thumb left">
+		<img src="<%= images[0] %>" draggable="false" />
+	</div>
+	<div class="column-settings llynx_main">
+		<input id="llynx_title" type="text" name="llynx_title" placeholder="<?php _e('Enter Site Title', 'wp_lynx');?>" value="<%= title %>">
+		<small><%= url %></small>
+	</div>
+</div>	
 </script>
 <script type="text/html" id="tmpl-llynx-help">
 <div class="media-embed llynx-text" style="margin:1em;">

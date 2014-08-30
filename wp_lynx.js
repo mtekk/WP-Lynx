@@ -1,4 +1,4 @@
-var ds = ds || {};
+var llynx = llynx || {};
 
 ( function( $ ) {
 	var lynxPrint = Backbone.Model.extend({
@@ -8,19 +8,44 @@ var ds = ds || {};
 			title: '',
 			descriptions: '',
 			images: ''
+		},
+		//We don't usse the underscores syncing since REST doesn't make sense for this app
+		sync : function () {
+			return false;
 		}
 	});
 	var media;
-	var lynxPrints = [];
-	ds.media = media = {};
+	var lynxTrack = Backbone.Collection.extend({
+		model: lynxPrint	
+	});
+	llynx.sites = new lynxTrack();
+	llynx.media = media = {};
 	_.extend( media, { view: {}, controller: {} } );
-
+	llynx.view = {};
+	llynx.view.lynxPrint = Backbone.View.extend({
+		className: 'llynx-print',
+		//Have to use underscore rather than WP version as we're too generic
+		template: _.template($('#tmpl-llynx-print').html()),
+		initialize: function() {
+			this.listenTo(this.model, 'change', this.render);
+			_.bindAll(this, 'render');
+		},
+		render : function() {
+			console.log(this.model.attributes);
+			this.$el.html( this.template( this.model.attributes ));
+			return this;
+		}
+	});
 	media.view.llynxPrintAdd = wp.media.View.extend({
 		className: 'llynx-print-add-frame',
-		regions: ['menu', 'title', 'content', 'router'],
+		regions: ['menu', 'title', 'content', 'router', 'navigation'],
 		template:  wp.media.template( 'llynx-print-add' ),
+		initialize : function(){
+			this.llynxSites = this.$('.llynx_sites');
+			this.listenTo(llynx.sites, 'add', this.addSite)
+			_.bindAll(this, 'keyup', 'save', 'response', 'addSite');
+		},
 		events: {
-			"click #llynx_go" : "save",
 			"keyup #llynx_url" : "keyup"
 		},
 		keyup : function(e) {
@@ -31,22 +56,24 @@ var ds = ds || {};
 			}
 		},
 		save : function(e) {
-			console.log( 'Fetching:' + $('input[name=llynx_url]').val() );
 			$('.spinner').show();
-			//TODO: This should not be hardcoded'
-			$.post('/wp-admin/admin-ajax.php', {
+			//TODO: need to ensure ajaxurl is always available (when we move out of wp-admin)
+			$.post(ajaxurl, {
 				action: 'wp_lynx_fetch_url',
 				url: $('input[name=llynx_url]').val(),
 				nonce: '1234'
 				},
-				function(data) {
-					$('.spinner').hide();
-					console.log(data);
-				},
+				this.response,
 				"json");
-			//index = lynxPrints.push(};
-			//index--;
-			
+		},
+		response : function(data) {
+			$('.spinner').hide();
+			llynx.sites.create({url: data.url, title: data.title, descriptions: data.descriptions, images: data.images});
+		},
+		addSite : function( site ) {
+			var view = new llynx.view.lynxPrint({model: site});
+			$('#llynx_sites').append( view.render().el );
+			$('input[name=llynx_url]').val('');
 		}
 	});
 
@@ -102,7 +129,7 @@ var ds = ds || {};
 			} );
 
 			this._frame.on( 'content:create:llynx_print_add_state', function() {
-				var view = new ds.media.view.llynxPrintAdd( {
+				var view = new llynx.media.view.llynxPrintAdd( {
 					controller: media.frame(),
 					model:      media.frame().state()
 				} );
@@ -110,7 +137,7 @@ var ds = ds || {};
 			} );
 			
 			this._frame.on( 'content:create:llynx_help_state', function() {
-				var view = new ds.media.view.llynxHelp( {
+				var view = new llynx.media.view.llynxHelp( {
 					controller: media.frame(),
 					model:      media.frame().state()
 				} );
@@ -124,10 +151,7 @@ var ds = ds || {};
 			this._frame.on( 'close', this.close );
 
 			this._frame.on( 'menu:render:default', this.menuRender );
-
-			this._frame.state( 'library' ).on( 'select', this.select );
-			this._frame.state( 'image' ).on( 'select', this.select );
-
+			
 			return this._frame;
 		},
 
@@ -149,10 +173,6 @@ var ds = ds || {};
 
 		menuRender: function( view ) {
 			
-			/*view.unset( 'library-separator' );
-			view.unset( 'embed' );
-			view.unset( 'gallery' );
-			*/
 		},
 
 		select: function() {
@@ -194,93 +214,3 @@ var ds = ds || {};
 
 	$( media.init );
 } )( jQuery );
-
-function next_thumb(id)
-{
-	jQuery("#imgprev-btn-" + id).removeAttr("disabled");
-	jQuery("#imgprev-btn-" + id).removeClass("disabled");
-	llynx_cimgs[id]++;
-	if(llynx_cimgs[id] == llynx_imgs[id].length - 1)
-	{
-		jQuery("#imgnext-btn-" + id).attr("disabled","disabled");
-		jQuery("#imgnext-btn-" + id).addClass("disabled");
-	}
-	jQuery("#icount-" + id).text((llynx_cimgs[id] + 1) + " / " + llynx_imgs[id].length);
-	jQuery("#prints" + id + "img").val(llynx_imgs[id][llynx_cimgs[id]]);
-	jQuery("#thumbnail-head-llynx-" + id + " > p > .thumbnail").attr("src", llynx_imgs[id][llynx_cimgs[id]]);
-}
-function prev_thumb(id)
-{
-	jQuery("#imgnext-btn-" + id).removeAttr("disabled");
-	jQuery("#imgnext-btn-" + id).removeClass("disabled");
-	llynx_cimgs[id]--;
-	if(llynx_cimgs[id] == 0)
-	{
-		jQuery("#imgprev-btn-" + id).attr("disabled","disabled");
-		jQuery("#imgprev-btn-" + id).addClass("disabled");
-	}
-	jQuery("#icount-" + id).text((llynx_cimgs[id] + 1) + " / " + llynx_imgs[id].length);
-	jQuery("#prints" + id + "img").val(llynx_imgs[id][llynx_cimgs[id]]);
-	jQuery("#thumbnail-head-llynx-" + id + " > p > .thumbnail").attr("src", llynx_imgs[id][llynx_cimgs[id]]);
-}
-function img_toggle(id)
-{
-	if(jQuery("#thumbnail-head-llynx-" + id + " > p > input:checked").length > 0)
-	{
-		jQuery("#thumbnail-head-llynx-" + id + " > p > .thumbnail").fadeOut();
-		jQuery("#imgprev-btn-" + id).attr("disabled","disabled");
-		jQuery("#imgprev-btn-" + id).addClass("disabled");
-		jQuery("#imgnext-btn-" + id).attr("disabled","disabled");
-		jQuery("#imgnext-btn-" + id).addClass("disabled");
-	}
-	else
-	{
-		jQuery("#thumbnail-head-llynx-" + id + " > p > .thumbnail").fadeIn();
-		if(llynx_cimgs[id] == 0)
-		{
-			jQuery("#imgprev-btn-" + id).attr("disabled","disabled");
-			jQuery("#imgprev-btn-" + id).addClass("disabled");
-		}
-		else
-		{
-			jQuery("#imgprev-btn-" + id).removeAttr("disabled");
-			jQuery("#imgprev-btn-" + id).removeClass("disabled");
-		}
-		if(llynx_cimgs[id] == llynx_imgs[id].length - 1)
-		{
-			jQuery("#imgnext-btn-" + id).attr("disabled","disabled");
-			jQuery("#imgnext-btn-" + id).addClass("disabled");
-		}
-		else
-		{
-			jQuery("#imgnext-btn-" + id).removeAttr("disabled");
-			jQuery("#imgnext-btn-" + id).removeClass("disabled");
-		}
-	}
-}
-function next_content(id)
-{
-	jQuery("#contprev-btn-" + id).removeAttr("disabled");
-	jQuery("#contprev-btn-" + id).removeClass("disabled");
-	llynx_ccont[id]++;
-	if(llynx_ccont[id] == llynx_cont[id].length - 1)
-	{
-		jQuery("#contnext-btn-" + id).attr("disabled","disabled");
-		jQuery("#contnext-btn-" + id).addClass("disabled");
-	}
-	jQuery("#ccount-" + id).text((llynx_ccont[id] + 1) + " / " + llynx_cont[id].length);
-	jQuery("#prints" + id + "content").text(llynx_cont[id][llynx_ccont[id]]);
-}
-function prev_content(id)
-{
-	jQuery("#contnext-btn-" + id).removeAttr("disabled");
-	jQuery("#contnext-btn-" + id).removeClass("disabled");
-	llynx_ccont[id]--;
-	if(llynx_ccont[id] == 0)
-	{
-		jQuery("#contprev-btn-" + id).attr("disabled","disabled");
-		jQuery("#contprev-btn-" + id).addClass("disabled");
-	}
-	jQuery("#ccount-" + id).text((llynx_ccont[id] + 1) + " / " + llynx_cont[id].length);
-	jQuery("#prints" + id + "content").text(llynx_cont[id][llynx_ccont[id]]);
-}
