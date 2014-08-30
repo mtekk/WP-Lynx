@@ -31,7 +31,6 @@ var llynx = llynx || {};
 			_.bindAll(this, 'render');
 		},
 		render : function() {
-			console.log(this.model.attributes);
 			this.$el.html( this.template( this.model.attributes ));
 			return this;
 		}
@@ -68,7 +67,15 @@ var llynx = llynx || {};
 		},
 		response : function(data) {
 			$('.spinner').hide();
-			llynx.sites.create({url: data.url, title: data.title, descriptions: data.descriptions, images: data.images});
+			if(data.hasOwnProperty('error'))
+			{
+				//TODO error message
+				console.log(data.error_msg);
+			}
+			else
+			{
+				llynx.sites.create({url: data.url, title: data.title, descriptions: data.descriptions, images: data.images});
+			}
 		},
 		addSite : function( site ) {
 			var view = new llynx.view.lynxPrint({model: site});

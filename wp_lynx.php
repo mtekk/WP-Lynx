@@ -202,15 +202,30 @@ class linksLynx
 	}
 	function fetch_url()
 	{
+		error_reporting(E_ALL);
 		//Grab the nonce and check
 		//$nonce = intval($_POST['nonce']);
 		//Clean up the URL
 		$url = esc_url_raw($_POST['url']);
+		//Don't bother to scrape if the URL isn't valid
 		if($url == null)
 		{
-			return json_encode(0);
+			echo json_encode(array(
+				'error' => 'url',
+				'error_msg' => __('Invalid URL', 'wp-lynx')
+				));
+			die();
 		}
 		$this->llynx_scrape->scrapeContent($url);
+		//Check if llynx_scrape found errors
+		if((count($this->llynx_scrape->images) < 1 && $this->llynx_scrape->title == '' && count($this->llynx_scrape->text) < 1))
+		{
+			echo json_encode(array(
+				'error' => 'scrape',
+				'error_msg' => $this->llynx_scrape->error
+				));
+			die();
+		}
 		$uploadDir = wp_upload_dir();
 		if(!isset($uploadDir['path']) || !is_writable($uploadDir['path']))
 		{
