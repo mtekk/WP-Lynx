@@ -30,10 +30,14 @@ var llynx = llynx || {};
 		template: _.template($('#tmpl-llynx-print').html()),
 		events: {
 			'click .llynx_img_prev' : 'prevImg',
-			'click .llynx_img_next' : 'nextImg'
+			'click .llynx_img_next' : 'nextImg',
+			'click .llynx_desc_prev' : 'prevDesc',
+			'click .llynx_desc_next' : 'nextDesc',
+			'click .llynx_del' : 'del'
 		},
 		initialize : function() {
 			this.listenTo(this.model, 'change', this.render);
+			this.listenTo(this.model, 'destroy', this.remove);
 			_.bindAll(this, 'render', 'nextImg', 'prevImg');
 		},
 		render : function() {
@@ -54,6 +58,23 @@ var llynx = llynx || {};
 			{
 				this.model.set({image: curImage});
 			}
+		},
+		nextDesc : function() {
+			curDesc = this.model.attributes.description
+			if(++curDesc < this.model.attributes.descriptions.length)
+			{
+				this.model.set({description: curDesc});
+			}
+		},
+		prevDesc : function() {
+			curDesc = this.model.attributes.description
+			if(--curDesc >= 0)
+			{
+				this.model.set({description: curDesc});
+			}
+		},
+		del : function() {
+			this.model.destroy();
 		}
 	});
 	media.view.llynxPrintAdd = wp.media.View.extend({
