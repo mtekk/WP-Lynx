@@ -3,23 +3,30 @@
 	float: left;
 	width: 100%;
 	box-sizing: border-box;
+	padding-bottom: 16px;
 }
-.llynx_thumb{
+.llynx_col_img{
 	float: left;
 	width: 30%;
 	min-width: 60px;
-	padding: 12px 14px;
+	padding: 16px;
 	box-sizing: border-box;
+}
+.llynx_thumb{
+	width: 100%;
+	height: 100%;
+	padding-bottom: 16px;
 }
 .llynx_thumb img{
 	width: 100%;
 	height: auto;
+	vertical-align: middle;
 }
 .llynx_main{
 	float: left;
 	width: 70%;
 	min-width: 140px;
-	padding: 12px 14px;
+	padding: 16px;
 	box-sizing: border-box;
 }
 .llynx_main input, .llynx_main textarea{
