@@ -180,6 +180,10 @@ var llynx = llynx || {};
 		},
 		save : function(e) {
 			$('.embed-url .spinner').show();
+			//Clear messages before running again
+			llynx.messages.each(function(message){
+				message.destroy();
+			});
 			//TODO: Enable nonces
 			$.post(llynx.ajaxurl, {
 				action: 'wp_lynx_fetch_url',
@@ -193,7 +197,6 @@ var llynx = llynx || {};
 			$('.embed-url .spinner').hide();
 			if(data.hasOwnProperty('error'))
 			{
-				//TODO error message
 				console.log(data.error_msg);
 				llynx.messages.create({type: 'error', message: data.error_msg});
 			}
