@@ -20,6 +20,7 @@ var llynx = llynx || {};
 	var lynxTrack = Backbone.Collection.extend({
 		model: lynxPrint	
 	});
+	llynx.ajaxurl = ajaxurl;
 	llynx.sites = new lynxTrack();
 	llynx.media = media = {};
 	_.extend( media, { view: {}, controller: {} } );
@@ -33,16 +34,17 @@ var llynx = llynx || {};
 			'click .llynx_img_next' : 'nextImg',
 			'click .llynx_desc_prev' : 'prevDesc',
 			'click .llynx_desc_next' : 'nextDesc',
-			'click .llynx_del' : 'del'
+			'click .llynx_del' : 'del',
+			'click .llynx_insert' : 'insertPre',
+			'keyup textarea' : 'keyupDescription'
 		},
 		initialize : function() {
 			this.listenTo(this.model, 'change', this.render);
 			this.listenTo(this.model, 'destroy', this.remove);
-			_.bindAll(this, 'render', 'nextImg', 'prevImg');
+			_.bindAll(this, 'render', 'nextImg', 'prevImg', 'sendToPost', 'del', 'keyupDescription');
 		},
 		render : function() {
-			
-			this.$el.html( this.template( this.model.attributes ));
+			this.$el.html(this.template(this.model.attributes));
 			return this;
 		},
 		nextImg : function() {
@@ -75,6 +77,41 @@ var llynx = llynx || {};
 		},
 		del : function() {
 			this.model.destroy();
+		},
+		insertPre : function() {
+			var tempTitle = $('.llynx_title', this.$el).val().trim();
+			this.model.set({title: tempTitle});
+			$('.spinner', this.$el).show();
+			//TODO: need to ensure ajaxurl is always available (when we move out of wp-admin)
+			$.post(llynx.ajaxurl, {
+				action: 'wp_lynx_fetch_print',
+				title: this.model.attributes.title,
+				url: this.model.attributes.url,
+				image: this.model.attributes.images[this.model.attributes.image],
+				description: this.model.attributes.descriptions[this.model.attributes.description],
+				nonce: '1234'
+				},
+				this.sendToPost,
+				"html");
+		},
+		sendToPost : function(data) {
+			//In the future this may be more intellegent, but for now the server gives us ready to use HTML
+			var htmlContent = data;
+			window.send_to_editor(htmlContent);
+			//All done, remove the view/model
+			this.del();
+		},
+		/*keyupTitle : function(e) {
+			var tempTitle = e.target.value.trim();
+			this.model.set({title: tempTitle});
+		},*/
+		keyupDescription : function(e) {
+			//Retrieve our descriptions, make temporary copy
+			var tempDesc = this.model.attributes.descriptions;
+			//Update our temporary copy
+			tempDesc[this.model.attributes.description] = e.target.value.trim();
+			//Update the model
+			this.model.set({descriptions: tempDesc});
 		}
 	});
 	media.view.llynxPrintAdd = wp.media.View.extend({
@@ -92,14 +129,13 @@ var llynx = llynx || {};
 		keyup : function(e) {
 			if(e.keyCode === 13)
 			{
-				console.log('caught enter');
 				this.save(e);
 			}
 		},
 		save : function(e) {
-			$('.spinner').show();
+			$('.embed-url .spinner').show();
 			//TODO: need to ensure ajaxurl is always available (when we move out of wp-admin)
-			$.post(ajaxurl, {
+			$.post(llynx.ajaxurl, {
 				action: 'wp_lynx_fetch_url',
 				url: $('input[name=llynx_url]').val(),
 				nonce: '1234'
@@ -108,7 +144,7 @@ var llynx = llynx || {};
 				"json");
 		},
 		response : function(data) {
-			$('.spinner').hide();
+			$('.embed-url .spinner').hide();
 			if(data.hasOwnProperty('error'))
 			{
 				//TODO error message
@@ -119,9 +155,9 @@ var llynx = llynx || {};
 				llynx.sites.create({url: data.url, title: data.title, descriptions: data.descriptions, images: data.images});
 			}
 		},
-		addSite : function( site ) {
+		addSite : function(site) {
 			var view = new llynx.view.lynxPrint({model: site});
-			$('#llynx_sites').append( view.render().el );
+			$('#llynx_sites').append(view.render().el);
 			$('input[name=llynx_url]').val('');
 		}
 	});

@@ -151,8 +151,9 @@ class linksLynx
 				wp_enqueue_style('llynx_style');
 			}
 		}
-		add_action( 'print_media_templates', array( $this, 'print_media_templates' ) );
+		add_action('print_media_templates', array($this, 'print_media_templates'));
 		add_action('wp_ajax_wp_lynx_fetch_url', array($this, 'fetch_url'));
+		add_action('wp_ajax_wp_lynx_fetch_print', array($this, 'fetch_print'));
 	}
 	function enqueue_scripts()
 	{
@@ -195,6 +196,7 @@ class linksLynx
 	<p>
 		<button class="llynx_insert" title="<?php _e('Insert this Lynx Print into the post', 'wp-lynx');?>"><?php _e('Insert Into Post', 'wp-lynx');?></button>
 		<button class="llynx_del" title="<?php _e('Delete this Lynx Print', 'wp-lynx');?>"><?php _e('Delete', 'wp-lynx');?></button>
+		<span class="spinner"></span>
 	</p>
 </div>
 </script>
@@ -275,7 +277,7 @@ class linksLynx
 		$descriptions = array();
 		foreach($this->llynx_scrape->text as $text)
 		{
-			$descriptions[] = addslashes(html_entity_decode($text, ENT_COMPAT, 'UTF-8'));
+			$descriptions[] = html_entity_decode($text, ENT_COMPAT, 'UTF-8');
 		}
 		return json_encode(array(
 			'title' => $this->llynx_scrape->title,
@@ -284,8 +286,23 @@ class linksLynx
 			'images' => $this->llynx_scrape->images
 			));
 	}
-	
-//TODO Old junk need to either remove or refactor	
+	function fetch_print()
+	{
+		//Grab the nonce and check
+		//$nonce = intval($_POST['nonce']);
+		//Clean up the URL
+		$url = esc_url_raw($_POST['url']);
+		//Clean the title
+		$title = esc_attr($_POST['title']);
+		//Clean the image
+		$image = esc_url_raw($_POST['image']);
+		//Clean the description
+		$description = wp_kses($_POST['description'], wp_kses_allowed_html('post'));
+		//Assemble the lynx print and echo
+		echo $this->url_insert_handler($url, $title, $description, $image, false);
+		die();
+	}
+//TODO Old junk need to refactor	
 	/**
 	 * resize_image
 	 * 
@@ -349,16 +366,20 @@ class linksLynx
 	 * url_insert_handler
 	 * 
 	 * Handles inserting a link print into the current post editor screen
-	 * @param array $data array of $_POST data
+	 * @param string $url
+	 * @param string $title
+	 * @param string $description
+	 * @param string $image
+	 * @param bool $no_image
 	 * @return string compiled HTML
 	 */
-	function url_insert_handler($data)
+	function url_insert_handler($url, $title, $description, $image = NULL, $no_image = false)
 	{
-		$values = array('url' => $data['url'],
+		$values = array('url' => $url,
 					'short_url' => '',
 					'image' => '',
-					'title' => stripslashes($data['title']),
-					'description' => stripslashes($data['content']));
+					'title' => stripslashes($title),
+					'description' => stripslashes($description));
 		//If the user has enabled short_urls
 		if($this->opt['bshort_url'])
 		{
@@ -379,16 +400,16 @@ class linksLynx
 			$values['short_url'] = $values['url'];
 		}
 		//Built the image component, if needed
-		if(!isset($data['nothumb']) && $data['img'] !== NULL)
+		if(!$no_image && $image !== NULL)
 		{
 			//Get the upload location
 			$uploadDir = wp_upload_dir();
 			//Grab the image (raw data), use a referrer to avoid issues with anti-hotlinking scripts
 			//If we recieved an error, then we have no image
-			if(isset($uploadDir['path']) && $uploadDir['url'] != NULL && $imgData = $this->llynx_scrape->getContent($data['img'], $data['url']))
+			if(isset($uploadDir['path']) && $uploadDir['url'] != NULL && $imgData = $this->llynx_scrape->getContent($image, $url))
 			{
 				//We need to manipulate the url to get the image name
-				$imgName = explode('/', $data['img']);
+				$imgName = explode('/', $image);
 				$imgName = end($imgName);
 				$imgParts = explode('.',$imgName);
 				$imgName = $imgParts[0];
@@ -454,10 +475,8 @@ class linksLynx
 					$perms = $stat['mode'] & 0007777;
 					$perms = $perms & 0000666;
 					@chmod($imgLoc, $perms);
-					//Remove %image% tag from image template, if there is one
-					//$this->opt['Himg_template'] = str_replace('%image%', '', $this->opt['Himg_template']);
 					//Assemble the image and link it, if it exists
-					$values['image'] = sprintf('<a title="Go to %s" href="%s"><img alt="%s" src="%s" width="%s" height="%s" /></a>', stripslashes($data['title']), $values['short_url'], stripslashes($data['title']), $imgURL, $nW, $nH);
+					$values['image'] = sprintf('<a title="Go to %1$s" href="%2$s"><img alt="%1$s" src="%3$s" width="%4$s" height="%5$s" /></a>', esc_attr($values['title']), $values['short_url'], $imgURL, $nW, $nH);
 				}
 			}
 		}
