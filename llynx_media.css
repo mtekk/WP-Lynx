@@ -41,6 +41,8 @@
 .llynx-message{
 	float: left;
 	width: 100%;
+	padding: 1px;
+	box-sizing: border-box;
 }
 .llynx-message div{
 	font-size: 1.3em;
