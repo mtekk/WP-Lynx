@@ -32,3 +32,21 @@
 .llynx_main input, .llynx_main textarea{
 	width: 100%;
 }
+.llynx_close_icon:before{
+	content: "";
+	font: 20px/1 "dashicons";
+	vertical-align: middle;
+	color: #666;
+}
+.llynx-message{
+	float: left;
+	width: 100%;
+}
+.llynx-message div{
+	font-size: 1.3em;
+	line-height: 1.4em;
+}
+.llynx-message a{
+	text-decoration: none;
+	float: right;
+}

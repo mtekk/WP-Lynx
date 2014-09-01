@@ -200,6 +200,16 @@ class linksLynx
 	</p>
 </div>
 </script>
+<script type="text/html" id="tmpl-llynx-message">
+	<div class="<%= type %>">
+		<span><%= message %></span>
+		<a class="llynx_message_close" href="#" title="<?php _e('Dismiss Message','wp-lynx')?>">
+			<span class="llynx_close_icon">
+				<span class="screen-reader-text"><?php _e('Dismiss Message', 'wp-lyxn');?></span>
+			</span>
+		</a>
+	</div>
+</script>
 <script type="text/html" id="tmpl-llynx-help">
 <div class="media-embed llynx-text" style="margin:1em;">
 	<p>

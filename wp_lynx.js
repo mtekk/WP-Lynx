@@ -1,6 +1,10 @@
 var llynx = llynx || {};
 
 ( function( $ ) {
+	//TODO: need to ensure ajaxurl is always available (when we move out of wp-admin)
+	llynx.ajaxurl = ajaxurl;
+	//Begin with our model and collection definitions
+	//LynxPrint stuff
 	var lynxPrint = Backbone.Model.extend({
 		urlRoot: '/wplynx',
 		defaults: {
@@ -16,15 +20,34 @@ var llynx = llynx || {};
 			return false;
 		}
 	});
-	var media;
 	var lynxTrack = Backbone.Collection.extend({
 		model: lynxPrint	
 	});
-	llynx.ajaxurl = ajaxurl;
 	llynx.sites = new lynxTrack();
+	//Messages stuff
+	var lynxMessage = Backbone.Model.extend({
+		urlRoot: '/wplynx',
+		defaults: {
+			type: '',
+			message: ''
+		},
+		//We don't usse the underscores syncing since REST doesn't make sense for this app
+		sync : function () {
+			return false;
+		}
+	});
+	var lynxMessages = Backbone.Collection.extend({
+		model: lynxMessage
+	});
+	llynx.messages = new lynxMessages();
+	//WP Media Modal stuff
+	var media;
 	llynx.media = media = {};
 	_.extend( media, { view: {}, controller: {} } );
+	
+	//Our Views
 	llynx.view = {};
+	//LynxPrint view
 	llynx.view.lynxPrint = Backbone.View.extend({
 		className: 'llynx-print',
 		//Have to use underscore rather than WP version as we're too generic
@@ -82,7 +105,7 @@ var llynx = llynx || {};
 			var tempTitle = $('.llynx_title', this.$el).val().trim();
 			this.model.set({title: tempTitle});
 			$('.spinner', this.$el).show();
-			//TODO: need to ensure ajaxurl is always available (when we move out of wp-admin)
+			//TODO: Enable nonces
 			$.post(llynx.ajaxurl, {
 				action: 'wp_lynx_fetch_print',
 				title: this.model.attributes.title,
@@ -114,14 +137,37 @@ var llynx = llynx || {};
 			this.model.set({descriptions: tempDesc});
 		}
 	});
+	//LynxMessage
+	llynx.view.message = Backbone.View.extend({
+		className: 'llynx-message',
+		//Have to use underscore rather than WP version as we're too generic
+		template: _.template($('#tmpl-llynx-message').html()),
+		events: {
+			'click .llynx_message_close' : 'del'
+		},
+		initialize : function() {
+			this.listenTo(this.model, 'change', this.render);
+			this.listenTo(this.model, 'destroy', this.remove);
+			_.bindAll(this, 'render', 'del');
+		},
+		render : function() {
+			this.$el.html(this.template(this.model.attributes));
+			return this;
+		},
+		del : function() {
+			this.model.destroy();
+		}
+	});
+	//lynxPrintAdd
 	media.view.llynxPrintAdd = wp.media.View.extend({
 		className: 'llynx-print-add-frame',
 		regions: ['menu', 'title', 'content', 'router', 'navigation'],
 		template:  wp.media.template( 'llynx-print-add' ),
 		initialize : function(){
 			this.llynxSites = this.$('.llynx_sites');
-			this.listenTo(llynx.sites, 'add', this.addSite)
-			_.bindAll(this, 'keyup', 'save', 'response', 'addSite');
+			this.listenTo(llynx.sites, 'add', this.addSite);
+			this.listenTo(llynx.messages, 'add', this.addMessage);
+			_.bindAll(this, 'keyup', 'save', 'response', 'addSite', 'addMessage');
 		},
 		events: {
 			"keyup #llynx_url" : "keyup"
@@ -134,7 +180,7 @@ var llynx = llynx || {};
 		},
 		save : function(e) {
 			$('.embed-url .spinner').show();
-			//TODO: need to ensure ajaxurl is always available (when we move out of wp-admin)
+			//TODO: Enable nonces
 			$.post(llynx.ajaxurl, {
 				action: 'wp_lynx_fetch_url',
 				url: $('input[name=llynx_url]').val(),
@@ -149,6 +195,7 @@ var llynx = llynx || {};
 			{
 				//TODO error message
 				console.log(data.error_msg);
+				llynx.messages.create({type: 'error', message: data.error_msg});
 			}
 			else
 			{
@@ -157,6 +204,11 @@ var llynx = llynx || {};
 		},
 		addSite : function(site) {
 			var view = new llynx.view.lynxPrint({model: site});
+			$('#llynx_sites').append(view.render().el);
+			$('input[name=llynx_url]').val('');
+		},
+		addMessage : function(message) {
+			var view = new llynx.view.message({model: message});
 			$('#llynx_sites').append(view.render().el);
 			$('input[name=llynx_url]').val('');
 		}
