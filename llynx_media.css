@@ -41,12 +41,13 @@
 .llynx-message{
 	float: left;
 	width: 100%;
-	padding: 1px;
+	padding: 16px;
 	box-sizing: border-box;
 }
 .llynx-message div{
 	font-size: 1.3em;
 	line-height: 1.4em;
+	margin: 0;
 }
 .llynx-message a{
 	text-decoration: none;

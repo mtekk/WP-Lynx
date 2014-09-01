@@ -121,6 +121,8 @@ var llynx = llynx || {};
 			//In the future this may be more intellegent, but for now the server gives us ready to use HTML
 			var htmlContent = data;
 			window.send_to_editor(htmlContent);
+			//TODO need translation string for this
+			llynx.messages.create({type: 'notice', message: "Lynx Print inserted into post successfully"});
 			//All done, remove the view/model
 			this.del();
 		},
