@@ -182,16 +182,16 @@ class linksLynx
 	<div class="llynx_thumb">
 		<img src="<%= images[image] %>" draggable="false" />
 	</div>
-	<button class="llynx_img_prev" title="<?php _e('Previous Image', 'wp-lynx');?>" <%= (image < 1) ? 'disabled' : '' %>>&lt;</button>
-	<button class="llynx_img_next" title="<?php _e('Next Image', 'wp-lynx');?>"<%= (image+1 >= images.length) ? 'disabled' : '' %>>&gt;</button>
+	<button class="llynx_img_prev" title="<?php _e('Previous Image', 'wp-lynx');?>" <%= (image < 1) ? 'disabled="disabled"' : '' %>>&lt;</button>
+	<button class="llynx_img_next" title="<?php _e('Next Image', 'wp-lynx');?>"<%= (image+1 >= images.length) ? 'disabled="disabled"' : '' %>>&gt;</button>
 	<span class="llynx-img-count"><%= image+1 %>/<%= images.length %></span>
 </div>
 <div class="llynx_main">
 	<input class="llynx_title" type="text" name="llynx_title" placeholder="<?php _e('Enter Site Title', 'wp_lynx');?>" value="<%= title %>">
 	<small><%= url %></small>
 	<textarea class="llynx_description"><%= descriptions[description] %></textarea>
-	<button class="llynx_desc_prev" title="<?php _e('Previous Description', 'wp-lynx');?>" <%= (description < 1) ? 'disabled' : '' %>>&lt;</button>
-	<button class="llynx_desc_next" title="<?php _e('Next Description', 'wp-lynx');?>"<%= (description+1 >= descriptions.length) ? 'disabled' : '' %>>&gt;</button>
+	<button class="llynx_desc_prev" title="<?php _e('Previous Description', 'wp-lynx');?>" <%= (description < 1) ? 'disabled="disabled"' : '' %>>&lt;</button>
+	<button class="llynx_desc_next" title="<?php _e('Next Description', 'wp-lynx');?>"<%= (description+1 >= descriptions.length) ? 'disabled="disabled"' : '' %>>&gt;</button>
 	<span class="llynx-desc-count"><%= description+1 %>/<%= descriptions.length %></span>
 	<p>
 		<button class="llynx_insert" title="<?php _e('Insert this Lynx Print into the post', 'wp-lynx');?>"><?php _e('Insert Into Post', 'wp-lynx');?></button>
@@ -212,7 +212,7 @@ class linksLynx
 </script>
 <script type="text/html" id="tmpl-llynx-print-insert">
 	<div class="media-toolbar-primary search-form">
-		<a class="button media-button button-primary button-large media-button-insert llynx-print-add" href="#"><?php _e('Insert into post', 'wp-lynx');?></a>
+		<a <%= (length < 1 ) ? 'disabled="disabled"' : ''%> class="button media-button button-primary button-large media-button-insert llynx-print-add" href="#"><?php _e('Insert into post', 'wp-lynx');?></a>
 	</div>
 </script>
 <script type="text/html" id="tmpl-llynx-help">

@@ -162,15 +162,19 @@ var llynx = llynx || {};
 	});
 	llynx.media.view.llynxPrintInsert = wp.media.View.extend({
 		className: 'llynx-print-insert-toolbar',
-		template:  wp.media.template( 'llynx-print-insert' ),
+		template:  _.template($('#tmpl-llynx-print-insert').html()),
 		initialize : function(){
-			/*this.llynxSites = this.$('.llynx_sites');
-			this.listenTo(llynx.sites, 'add', this.addSite);
-			this.listenTo(llynx.messages, 'add', this.addMessage);
-			_.bindAll(this, 'keyup', 'save', 'response', 'addSite', 'addMessage');*/
+			this.listenTo(llynx.sites, 'add', this.render);
+			this.listenTo(llynx.sites, 'destroy', this.render);
+			_.bindAll(this, 'render');
 		},
 		events: {
 		},
+		render : function() {
+			console.log(llynx.sites);
+			this.$el.html(this.template({length : llynx.sites.length}));
+			return this;
+		}
 	});
 	//lynxPrintAdd
 	media.view.llynxPrintAdd = wp.media.View.extend({
