@@ -210,6 +210,11 @@ class linksLynx
 		</a>
 	</div>
 </script>
+<script type="text/html" id="tmpl-llynx-print-insert">
+	<div class="media-toolbar-primary search-form">
+		<a class="button media-button button-primary button-large media-button-insert llynx-print-add" href="#"><?php _e('Insert into post', 'wp-lynx');?></a>
+	</div>
+</script>
 <script type="text/html" id="tmpl-llynx-help">
 <div class="media-embed llynx-text" style="margin:1em;">
 	<p>

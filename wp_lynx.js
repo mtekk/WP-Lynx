@@ -160,6 +160,18 @@ var llynx = llynx || {};
 			this.model.destroy();
 		}
 	});
+	llynx.media.view.llynxPrintInsert = wp.media.View.extend({
+		className: 'llynx-print-insert-toolbar',
+		template:  wp.media.template( 'llynx-print-insert' ),
+		initialize : function(){
+			/*this.llynxSites = this.$('.llynx_sites');
+			this.listenTo(llynx.sites, 'add', this.addSite);
+			this.listenTo(llynx.messages, 'add', this.addMessage);
+			_.bindAll(this, 'keyup', 'save', 'response', 'addSite', 'addMessage');*/
+		},
+		events: {
+		},
+	});
 	//lynxPrintAdd
 	media.view.llynxPrintAdd = wp.media.View.extend({
 		className: 'llynx-print-add-frame',
@@ -223,8 +235,6 @@ var llynx = llynx || {};
 		defaults: {
 			id:       'llynx-print-add-state',
 			menu:     'default',
-			toolbar:  'insert',
-			//router:   'browse',
 			content:  'llynx_print_add_state'
 		}
 	});
@@ -251,13 +261,14 @@ var llynx = llynx || {};
 
 			var states = [
 				new media.controller.llynxPrintAdd( {
-					title:    'Add Lynx Print',
-					id:       'llynx-print-add-state',
-					priority: 10
+					title: 'Add Lynx Print',
+					id: 'llynx-print-add-state',
+					priority: 10,
+					toolbar: 'llynx_print_insert'
 				} ),
 				new media.controller.llynxHelp( {
-					title:    'Help',
-					id:       'llynx-help-state',
+					title: 'Help',
+					id: 'llynx-help-state',
 					priority: 20
 				} )
 			];
@@ -265,9 +276,7 @@ var llynx = llynx || {};
 			this._frame = wp.media( {
 				className: 'media-frame no-sidebar',
 				state: 'llynx-print-add-state',
-				states: states//,
-				//multiple: false
-				//frame: 'post'
+				states: states
 			} );
 
 			this._frame.on( 'content:create:llynx_print_add_state', function() {
@@ -275,7 +284,12 @@ var llynx = llynx || {};
 					controller: media.frame(),
 					model:      media.frame().state()
 				} );
+				var toolbar = new llynx.media.view.llynxPrintInsert( {
+					controller: media.frame(),
+					model:      media.frame().state()
+				});
 				media.frame().content.set( view );
+				media.frame().toolbar.set( toolbar );
 			} );
 			
 			this._frame.on( 'content:create:llynx_help_state', function() {
@@ -285,15 +299,10 @@ var llynx = llynx || {};
 				} );
 				media.frame().content.set( view );
 			} );
-			
 			this._frame.on( 'open', this.open );
-
 			this._frame.on( 'ready', this.ready );
-
 			this._frame.on( 'close', this.close );
-
 			this._frame.on( 'menu:render:default', this.menuRender );
-			
 			return this._frame;
 		},
 
