@@ -212,7 +212,7 @@ class linksLynx
 </script>
 <script type="text/html" id="tmpl-llynx-print-insert">
 	<div class="media-toolbar-primary search-form">
-		<a <%= (length < 1 ) ? 'disabled="disabled"' : ''%> class="button media-button button-primary button-large media-button-insert llynx-print-add" href="#"><?php _e('Insert into post', 'wp-lynx');?></a>
+		<a title="<?php _e('Insert all of the Lynx Prints into the post.', 'wp-lynx');?>" <%= (length < 1 ) ? 'disabled="disabled"' : ''%> class="button media-button button-primary button-large media-button-insert llynx-print-insert-all" href="#"><?php _e('Insert into post', 'wp-lynx');?></a>
 	</div>
 </script>
 <script type="text/html" id="tmpl-llynx-help">
