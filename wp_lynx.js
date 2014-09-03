@@ -160,32 +160,35 @@ var llynx = llynx || {};
 			this.model.destroy();
 		}
 	});
-	llynx.media.view.llynxPrintInsert = wp.media.View.extend({
+	//Our toolbar
+	llynx.media.view.llynxPrintInsert = Backbone.View.extend({
 		className: 'llynx-print-insert-toolbar',
 		template:  _.template($('#tmpl-llynx-print-insert').html()),
 		initialize : function(){
-			this.listenTo(llynx.sites, 'add', this.render);
-			this.listenTo(llynx.sites, 'remove', this.render);
-			_.bindAll(this, 'render');
+			this.listenTo(llynx.sites, 'all', this.render);
+			_.bindAll(this, 'render', 'insertPrints');
 		},
 		events: {
+			'click .llynx-print-insert-all' : 'insertPrints'
+		},
+		insertPrints : function() {
+			
 		},
 		render : function() {
-			console.log(llynx.sites);
 			this.$el.html(this.template({length : llynx.sites.length}));
 			return this;
 		}
 	});
 	//lynxPrintAdd
-	media.view.llynxPrintAdd = wp.media.View.extend({
+	media.view.llynxPrintAdd = Backbone.View.extend({
 		className: 'llynx-print-add-frame',
-		regions: ['menu', 'title', 'content', 'router', 'navigation'],
-		template:  wp.media.template( 'llynx-print-add' ),
+		template:  _.template($('#tmpl-llynx-print-add').html()),
 		initialize : function(){
-			this.llynxSites = this.$('.llynx_sites');
+			//this.llynxSites = this.$('.llynx_sites');
+			this.listenTo(llynx.sites, 'reset', this.addAll);
 			this.listenTo(llynx.sites, 'add', this.addSite);
 			this.listenTo(llynx.messages, 'add', this.addMessage);
-			_.bindAll(this, 'keyup', 'save', 'response', 'addSite', 'addMessage');
+			_.bindAll(this, 'keyup', 'save', 'response', 'addSite', 'addMessage', 'addAll');
 		},
 		events: {
 			"keyup #llynx_url" : "keyup"
@@ -225,13 +228,24 @@ var llynx = llynx || {};
 		},
 		addSite : function(site) {
 			var view = new llynx.view.lynxPrint({model: site});
-			$('#llynx_sites').append(view.render().el);
-			$('input[name=llynx_url]').val('');
+			this.$('#llynx_sites').append(view.render().el);
+			this.$('input[name=llynx_url]').val('');
 		},
 		addMessage : function(message) {
 			var view = new llynx.view.message({model: message});
-			$('#llynx_sites').append(view.render().el);
-			$('input[name=llynx_url]').val('');
+			this.$('#llynx_sites').append(view.render().el);
+			this.$('input[name=llynx_url]').val('');
+		},
+		addAll : function() {
+			//Clear our html before adding in everything
+			this.$('#llynx_sites').html('');
+			llynx.sites.each(this.addSite, this);
+			llynx.messages.each(this.addMessage, this);
+		},
+		render : function() {
+			this.$el.html(this.template({}));
+			this.addAll();
+			return this;
 		}
 	});
 
@@ -328,35 +342,6 @@ var llynx = llynx || {};
 
 		menuRender: function( view ) {
 			
-		},
-
-		select: function() {
-			var settings = wp.media.view.settings,
-				selection = this.get( 'selection' );
-
-			$( '.added' ).remove();
-			selection.map( media.showAttachmentDetails );
-		},
-
-		showAttachmentDetails: function( attachment ) {
-			var details_tmpl = $( '#attachment-details-tmpl' ),
-				details = details_tmpl.clone();
-
-			details.addClass( 'added' );
-
-			$( 'input', details ).each( function() {
-				var key = $( this ).attr( 'id' ).replace( 'attachment-', '' );
-				$( this ).val( attachment.get( key ) );
-			} );
-
-			details.attr( 'id', 'attachment-details-' + attachment.get( 'id' ) );
-
-			var sizes = attachment.get( 'sizes' );
-			$( 'img', details ).attr( 'src', sizes.thumbnail.url );
-
-			$( 'textarea', details ).val( JSON.stringify( attachment, null, 2 ) );
-
-			details_tmpl.after( details );
 		},
 
 		init: function() {
