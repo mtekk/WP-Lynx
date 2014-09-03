@@ -165,7 +165,7 @@ var llynx = llynx || {};
 		template:  _.template($('#tmpl-llynx-print-insert').html()),
 		initialize : function(){
 			this.listenTo(llynx.sites, 'add', this.render);
-			this.listenTo(llynx.sites, 'destroy', this.render);
+			this.listenTo(llynx.sites, 'remove', this.render);
 			_.bindAll(this, 'render');
 		},
 		events: {
