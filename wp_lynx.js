@@ -171,8 +171,29 @@ var llynx = llynx || {};
 		events: {
 			'click .llynx-print-insert-all' : 'insertPrints'
 		},
+		insertPre : function(site) {
+			//TODO: Enable nonces
+			$.post(llynx.ajaxurl, {
+				action: 'wp_lynx_fetch_print',
+				title: site.attributes.title,
+				url: site.attributes.url,
+				image: site.attributes.images[site.attributes.image],
+				description: site.attributes.descriptions[site.attributes.description],
+				nonce: '1234'
+				},
+				this.sendToPost,
+				"html");
+		},
+		sendToPost : function(data) {
+			//In the future this may be more intellegent, but for now the server gives us ready to use HTML
+			var htmlContent = data;
+			window.send_to_editor(htmlContent);
+		},
 		insertPrints : function() {
-			
+			$('.spinner', this.$el).show();
+			console.log('adding all the things');
+			llynx.sites.each(this.insertPre, this);
+			$('.spinner', this.$el).hide();
 		},
 		render : function() {
 			this.$el.html(this.template({length : llynx.sites.length}));
@@ -259,7 +280,6 @@ var llynx = llynx || {};
 	
 	media.view.llynxHelp = wp.media.View.extend({
 		className: 'llynx-help-frame',
-		regions: ['menu', 'title', 'content', 'router'],
 		template:  wp.media.template( 'llynx-help' )
 	});
 
