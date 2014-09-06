@@ -209,6 +209,8 @@ var llynx = llynx || {};
 			$('.spinner', this.$el).show();
 			console.log('adding all the things');
 			llynx.sites.each(this.insertPre, this);
+			//Cleanup
+			_.invoke(llynx.sites.toArray(), 'destroy');
 			$('.spinner', this.$el).hide();
 		},
 		render : function() {
@@ -238,9 +240,7 @@ var llynx = llynx || {};
 		save : function(e) {
 			$('.embed-url .spinner').show();
 			//Clear messages before running again
-			llynx.messages.each(function(message){
-				message.destroy();
-			}, this);
+			_.invoke(llynx.messages.toArray(), 'destroy');
 			//TODO: Enable nonces
 			$.post(llynx.ajaxurl, {
 				action: 'wp_lynx_fetch_url',
