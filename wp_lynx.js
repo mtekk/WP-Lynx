@@ -182,7 +182,7 @@ var llynx = llynx || {};
 		template:  _.template($('#tmpl-llynx-print-insert').html()),
 		initialize : function(){
 			this.listenTo(llynx.sites, 'all', this.render);
-			this.listenTo(llynx.media._frame.states, 'all', this.render);
+			this.listenTo(llynx.media._frame.states, 'activate', this.render);
 			_.bindAll(this, 'render', 'insertPrints');
 		},
 		events: {
@@ -218,7 +218,6 @@ var llynx = llynx || {};
 			llynx.media._frame.close();
 		},
 		render : function() {
-			console.log('rendering toolbar');
 			var lengthTemp;
 			if(llynx.media._frame._state == 'llynx-print-add-state') {
 				lengthTemp = llynx.sites.length;
