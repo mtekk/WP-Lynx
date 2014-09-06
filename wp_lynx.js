@@ -3,6 +3,7 @@ var llynx = llynx || {};
 ( function( $ ) {
 	//TODO: need to ensure ajaxurl is always available (when we move out of wp-admin)
 	llynx.ajaxurl = ajaxurl;
+	llynx.l10n = llynx_l10n;
 	llynx.send_to_editor = function(html) {
 		var editor, node,
 			hasTinymce = typeof tinymce !== 'undefined';
@@ -138,7 +139,7 @@ var llynx = llynx || {};
 			var htmlContent = data;
 			llynx.send_to_editor(htmlContent);
 			//TODO need translation string for this
-			llynx.messages.create({type: 'notice', message: "Lynx Print inserted into post successfully"});
+			llynx.messages.create({type: 'notice', message: llynx.l10n.insertSuccessMsg});
 			//All done, remove the view/model
 			this.del();
 		},
@@ -207,7 +208,7 @@ var llynx = llynx || {};
 			llynx.send_to_editor(htmlContent);
 		},
 		insertPrints : function(e) {
-			if($(e.target).attr('disabled') != 'undefined') {
+			if($(e.target).attr('disabled') != undefined) {
 				return 0;
 			}
 			//Insert the prints
