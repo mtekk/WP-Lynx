@@ -182,6 +182,7 @@ var llynx = llynx || {};
 		template:  _.template($('#tmpl-llynx-print-insert').html()),
 		initialize : function(){
 			this.listenTo(llynx.sites, 'all', this.render);
+			this.listenTo(llynx.media._frame.states, 'all', this.render);
 			_.bindAll(this, 'render', 'insertPrints');
 		},
 		events: {
@@ -205,7 +206,10 @@ var llynx = llynx || {};
 			var htmlContent = data;
 			llynx.send_to_editor(htmlContent);
 		},
-		insertPrints : function() {
+		insertPrints : function(e) {
+			if($(e.target).attr('disabled') != 'undefined') {
+				return 0;
+			}
 			//Insert the prints
 			llynx.sites.each(this.insertPre, this);
 			//Cleanup
@@ -214,7 +218,15 @@ var llynx = llynx || {};
 			llynx.media._frame.close();
 		},
 		render : function() {
-			this.$el.html(this.template({length : llynx.sites.length}));
+			console.log('rendering toolbar');
+			var lengthTemp;
+			if(llynx.media._frame._state == 'llynx-print-add-state') {
+				lengthTemp = llynx.sites.length;
+			}
+			else {
+				lengthTemp = 0;
+			}
+			this.$el.html(this.template({length : lengthTemp}));
 			return this;
 		}
 	});
