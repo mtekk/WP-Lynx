@@ -206,12 +206,12 @@ var llynx = llynx || {};
 			llynx.send_to_editor(htmlContent);
 		},
 		insertPrints : function() {
-			$('.spinner', this.$el).show();
-			console.log('adding all the things');
+			//Insert the prints
 			llynx.sites.each(this.insertPre, this);
 			//Cleanup
 			_.invoke(llynx.sites.toArray(), 'destroy');
-			$('.spinner', this.$el).hide();
+			//Close the frame
+			llynx.media._frame.close();
 		},
 		render : function() {
 			this.$el.html(this.template({length : llynx.sites.length}));
@@ -368,7 +368,6 @@ var llynx = llynx || {};
 		},
 		
 		ready: function() {
-			console.log( 'Frame ready' );
 		},
 
 		close: function() {
