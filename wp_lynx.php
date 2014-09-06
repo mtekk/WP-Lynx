@@ -159,6 +159,9 @@ class linksLynx
 	{
 		//TODO: ensure we load only at the correct times
 		wp_enqueue_script('llynx_javascript', plugins_url('/wp_lynx.js', dirname(__FILE__) . '/wp_lynx.js'), array( 'media-views' ), $this::version, true);
+		wp_localize_script('llynx_javascript', 'llynx_l10n', array(
+			'insertSuccessMsg' => __('Lynx Print inserted into post successfully', 'wp-lynx')
+			));
 		wp_enqueue_style('llynx_media');
 	}
 	/**
