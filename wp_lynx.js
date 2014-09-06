@@ -3,6 +3,22 @@ var llynx = llynx || {};
 ( function( $ ) {
 	//TODO: need to ensure ajaxurl is always available (when we move out of wp-admin)
 	llynx.ajaxurl = ajaxurl;
+	llynx.send_to_editor = function(html) {
+		var editor, node,
+			hasTinymce = typeof tinymce !== 'undefined';
+		if(hasTinymce)
+		{
+			editor = tinymce.get(wpActiveEditor);
+			//If we find ourselves in a llynx div, append to end of it to prevent llynx printception
+			if(node = editor.dom.getParent(editor.selection.getNode(), 'div.llynx_print'))
+			{
+				$(node).after(html);
+				return 0;
+			}
+		}
+		//Fall back to the normal WordPress method
+		window.send_to_editor(html);
+	};
 	//Begin with our model and collection definitions
 	//LynxPrint stuff
 	var lynxPrint = Backbone.Model.extend({
@@ -120,7 +136,7 @@ var llynx = llynx || {};
 		sendToPost : function(data) {
 			//In the future this may be more intellegent, but for now the server gives us ready to use HTML
 			var htmlContent = data;
-			window.send_to_editor(htmlContent);
+			llynx.send_to_editor(htmlContent);
 			//TODO need translation string for this
 			llynx.messages.create({type: 'notice', message: "Lynx Print inserted into post successfully"});
 			//All done, remove the view/model
@@ -187,7 +203,7 @@ var llynx = llynx || {};
 		sendToPost : function(data) {
 			//In the future this may be more intellegent, but for now the server gives us ready to use HTML
 			var htmlContent = data;
-			window.send_to_editor(htmlContent);
+			llynx.send_to_editor(htmlContent);
 		},
 		insertPrints : function() {
 			$('.spinner', this.$el).show();
@@ -205,7 +221,6 @@ var llynx = llynx || {};
 		className: 'llynx-print-add-frame',
 		template:  _.template($('#tmpl-llynx-print-add').html()),
 		initialize : function(){
-			//this.llynxSites = this.$('.llynx_sites');
 			this.listenTo(llynx.sites, 'reset', this.addAll);
 			this.listenTo(llynx.sites, 'add', this.addSite);
 			this.listenTo(llynx.messages, 'add', this.addMessage);
@@ -225,7 +240,7 @@ var llynx = llynx || {};
 			//Clear messages before running again
 			llynx.messages.each(function(message){
 				message.destroy();
-			});
+			}, this);
 			//TODO: Enable nonces
 			$.post(llynx.ajaxurl, {
 				action: 'wp_lynx_fetch_url',
