@@ -76,6 +76,7 @@ var llynx = llynx || {};
 			'click .llynx_desc_next' : 'nextDesc',
 			'click .llynx_del' : 'del',
 			'click .llynx_insert' : 'insertPre',
+			'change input' : 'changeTitle',
 			'keyup textarea' : 'keyupDescription'
 		},
 		initialize : function() {
@@ -119,8 +120,6 @@ var llynx = llynx || {};
 			this.model.destroy();
 		},
 		insertPre : function() {
-			var tempTitle = $('.llynx_title', this.$el).val().trim();
-			this.model.set({title: tempTitle});
 			$('.spinner', this.$el).show();
 			//TODO: Enable nonces
 			$.post(llynx.ajaxurl, {
@@ -138,15 +137,14 @@ var llynx = llynx || {};
 			//In the future this may be more intellegent, but for now the server gives us ready to use HTML
 			var htmlContent = data;
 			llynx.send_to_editor(htmlContent);
-			//TODO need translation string for this
 			llynx.messages.create({type: 'notice', message: llynx.l10n.insertSuccessMsg});
 			//All done, remove the view/model
 			this.del();
 		},
-		/*keyupTitle : function(e) {
+		changeTitle : function(e) {
 			var tempTitle = e.target.value.trim();
 			this.model.set({title: tempTitle});
-		},*/
+		},
 		keyupDescription : function(e) {
 			//Retrieve our descriptions, make temporary copy
 			var tempDesc = this.model.attributes.descriptions;
