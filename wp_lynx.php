@@ -136,9 +136,18 @@ class linksLynx
 	}
 	function wp_init()
 	{
-		//Register CSS for tabs
-		wp_register_style('llynx_style', plugins_url('/wp_lynx_style.css', dirname(__FILE__) . '/wp_lynx_style.css'));
-		wp_register_style('llynx_media', plugins_url('/llynx_media.css', dirname(__FILE__) . '/llynx_media.css'));
+		if(defined('SCRIPT_DEBUG') && SCRIPT_DEBUG)
+		{
+			$suffix = '';
+		}
+		else
+		{
+			$suffix = '.min';
+		}
+		//Register our styles and scripts, pick the correct one depending on if we have script debug enabled
+		wp_register_style('llynx_style', plugins_url('/wp_lynx_style' . $suffix . '.css', dirname(__FILE__) . '/wp_lynx_style' . $suffix . '.css'));
+		wp_register_style('llynx_media', plugins_url('/llynx_media' . $suffix . '.css', dirname(__FILE__) . '/llynx_media' . $suffix . '.css'));
+		wp_register_script('llynx_javascript', plugins_url('/wp_lynx' . $suffix . '.js', dirname(__FILE__) . '/wp_lynx' . $suffix . '.js'), array( 'media-views' ), $this::version, true);
 		//If we are not in the admin, load up our style (if told to)
 		if(!is_admin())
 		{
@@ -158,7 +167,7 @@ class linksLynx
 	function enqueue_scripts()
 	{
 		//TODO: ensure we load only at the correct times
-		wp_enqueue_script('llynx_javascript', plugins_url('/wp_lynx.js', dirname(__FILE__) . '/wp_lynx.js'), array( 'media-views' ), $this::version, true);
+		wp_enqueue_script('llynx_javascript');
 		wp_localize_script('llynx_javascript', 'llynx_l10n', array(
 			'insertSuccessMsg' => __('Lynx Print inserted into post successfully', 'wp-lynx')
 			));
