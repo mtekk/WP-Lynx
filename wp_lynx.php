@@ -164,14 +164,36 @@ class linksLynx
 		add_action('wp_ajax_wp_lynx_fetch_url', array($this, 'fetch_url'));
 		add_action('wp_ajax_wp_lynx_fetch_print', array($this, 'fetch_print'));
 	}
+	/**
+	 * Checks if the current resource is in the dashboard and a post*.php page
+	 */
+	function is_admin_edit()
+	{
+		global $pagenow;
+		if(!is_admin())
+		{
+			return false;
+		}
+		if($pagenow == 'post-new.php' || $pagenow == 'post.php')
+		{
+			return true;
+		}
+		return false;
+	}
+	/**
+	 * Enqueue our scripts
+	 */
 	function enqueue_scripts()
 	{
-		//TODO: ensure we load only at the correct times
-		wp_enqueue_script('llynx_javascript');
-		wp_localize_script('llynx_javascript', 'llynx_l10n', array(
-			'insertSuccessMsg' => __('Lynx Print inserted into post successfully', 'wp-lynx')
-			));
-		wp_enqueue_style('llynx_media');
+		//Only do things if this is an "edit" opage
+		if($this->is_admin_edit())
+		{
+			wp_enqueue_script('llynx_javascript');
+			wp_localize_script('llynx_javascript', 'llynx_l10n', array(
+				'insertSuccessMsg' => __('Lynx Print inserted into post successfully', 'wp-lynx')
+				));
+			wp_enqueue_style('llynx_media');
+		}
 	}
 	/**
 	 * Adds a new template for the HelloWorld view.
