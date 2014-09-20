@@ -24,7 +24,7 @@ if(!function_exists('url_to_absolute'))
 }
 class llynxScrape
 {
-	const version = '0.9.50';
+	const version = '1.0.0';
 	public $opt = array(
 		'ap_max_count' => 5,
 		'ap_min_length' => 120,

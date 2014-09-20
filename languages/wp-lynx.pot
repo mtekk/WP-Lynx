@@ -1,168 +1,104 @@
-# Copyright (C) 2012 
+# Copyright (C) 2014 
 # This file is distributed under the same license as the  package.
 msgid ""
 msgstr ""
 "Project-Id-Version:  \n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/wp-lynx\n"
-"POT-Creation-Date: 2012-05-28 15:35:04+00:00\n"
+"POT-Creation-Date: 2014-09-17 02:44:24+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2012-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2014-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: includes/mtekk_adminkit.php:201
-msgid "Settings"
-msgstr ""
-
-#: includes/mtekk_adminkit.php:271
-msgid "Your settings are out of date."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:271
-msgid "Migrate the settings now."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:271
-msgid "Migrate now."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:279
-msgid "Your plugin install is incomplete."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:279
-msgid "Load default settings now."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:279
-msgid "Complete now."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:287
-msgid "Your plugin settings are invalid."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:287
-msgid "Attempt to fix settings now."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:287
-msgid "Fix now."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:463
-msgid "Settings successfully saved."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:463 includes/mtekk_adminkit.php:468
-msgid "Undo the options save."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:463 includes/mtekk_adminkit.php:468
-#: includes/mtekk_adminkit.php:573 includes/mtekk_adminkit.php:597
-#: includes/mtekk_adminkit.php:614
-msgid "Undo"
-msgstr ""
-
-#: includes/mtekk_adminkit.php:468
-msgid "Some settings were not saved."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:469
-msgid "The following settings were not saved:"
-msgstr ""
-
-#: includes/mtekk_adminkit.php:474
-msgid "Please include this message in your %sbug report%s."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:474
-msgid "Go to the %s support post for your version."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:573
-msgid "Settings successfully imported from the uploaded file."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:573
-msgid "Undo the options import."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:578
-msgid "Importing settings from file failed."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:597
-msgid "Settings successfully reset to the default values."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:597
-msgid "Undo the options reset."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:614
-msgid "Settings successfully undid the last operation."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:614
-msgid "Undo the last undo operation."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:649
-msgid "Settings successfully migrated."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:656
-msgid "Default settings successfully installed."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:757
-msgid ""
-"Import settings from a XML file, export the current settings to a XML file, "
-"or reset to the default settings."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:760
-msgid "Settings File"
-msgstr ""
-
-#: includes/mtekk_adminkit.php:763
-msgid "Select a XML settings file to upload and import settings from."
-msgstr ""
-
-#: includes/mtekk_adminkit.php:765 wp_lynx.php:806
-msgid "Import"
-msgstr ""
-
-#: includes/mtekk_adminkit.php:766 wp_lynx.php:807
-msgid "Export"
-msgstr ""
-
-#: includes/mtekk_adminkit.php:767 wp_lynx.php:808
-msgid "Reset"
-msgstr ""
-
-#: wp_lynx.php:36
+#: class.llynx_admin.php:25 wp_lynx.php:36
 msgid ""
 "Your PHP version is too old, please upgrade to a newer version. Your version "
 "is %s, this plugin requires %s"
 msgstr ""
 
-#: wp_lynx.php:156
+#: class.llynx_admin.php:97
 msgid "Insufficient privileges to proceed."
 msgstr ""
 
-#: wp_lynx.php:244 wp_lynx.php:499
+#: class.llynx_admin.php:134
 msgid "Add a Lynx Print"
 msgstr ""
 
-#: wp_lynx.php:483
-msgid "WP Lynx Help"
+#: class.llynx_admin.php:203
+msgid "Tips for the settings are located below select options."
 msgstr ""
 
-#: wp_lynx.php:485 wp_lynx.php:725
+#: class.llynx_admin.php:204
+msgid "Resources"
+msgstr ""
+
+#: class.llynx_admin.php:205
+msgid ""
+"%sTutorials and How Tos%s: There are several guides, tutorials, and how tos "
+"available on the author's website."
+msgstr ""
+
+#: class.llynx_admin.php:205
+msgid "Go to the WP Lynx tag archive."
+msgstr ""
+
+#: class.llynx_admin.php:206
+msgid ""
+"%sOnline Documentation%s: Check out the documentation for more indepth "
+"technical information."
+msgstr ""
+
+#: class.llynx_admin.php:206
+msgid "Go to the WP Lynx online documentation"
+msgstr ""
+
+#: class.llynx_admin.php:207
+msgid ""
+"%sReport a Bug%s: If you think you have found a bug, please include your "
+"WordPress version and details on how to reproduce the bug."
+msgstr ""
+
+#: class.llynx_admin.php:207 class.llynx_admin.php:210
+#: template.llynx_views.php:78
+msgid "Go to the WP Lynx support post for your version."
+msgstr ""
+
+#: class.llynx_admin.php:208
+msgid "Giving Back"
+msgstr ""
+
+#: class.llynx_admin.php:209
+msgid ""
+"%sDonate%s: Love WP Lynx and want to help development? Consider buying the "
+"author a beer."
+msgstr ""
+
+#: class.llynx_admin.php:209
+msgid "Go to PayPal to give a donation to WP Lynx."
+msgstr ""
+
+#: class.llynx_admin.php:210
+msgid ""
+"%sTranslate%s: Is your language not available? Contact John Havlik to get "
+"translating."
+msgstr ""
+
+#: class.llynx_admin.php:215 class.llynx_admin.php:336
+#: class.llynx_admin.php:337
+msgid "General"
+msgstr ""
+
+#: class.llynx_admin.php:218
+msgid ""
+"Using WP Lynx is quite simple. Just start writing a new post (or edit an "
+"existing post) and click on the paw print next to the WordPress add media "
+"icon. After clicking the paw print button, the Add Lynx Print dialog will "
+"popup in a lightbox, just like the add media lightbox."
+msgstr ""
+
+#: class.llynx_admin.php:219 template.llynx_views.php:72
 msgid ""
 "The Add Lynx Print dialog is simple to use. Just enter the URL to the "
 "website or page that you want to link to in to the text area. You can enter "
@@ -174,7 +110,7 @@ msgid ""
 "thumb through some preselected paragraphs from the linked site."
 msgstr ""
 
-#: wp_lynx.php:488 wp_lynx.php:726
+#: class.llynx_admin.php:220 template.llynx_views.php:75
 msgid ""
 "When you are ready to insert a Link Print, just click the \"Insert into Post"
 "\" button (or the \"Insert All\" button at the bottom to insert multiple "
@@ -183,363 +119,480 @@ msgid ""
 "their Lynx Prints."
 msgstr ""
 
-#: wp_lynx.php:491
-msgid ""
-"If you think you have found a bug, please include your WordPress version and "
-"details on how to reporduce the bug when you %sreport the issue%s."
-msgstr ""
-
-#: wp_lynx.php:491 wp_lynx.php:713 wp_lynx.php:716
-msgid "Go to the WP Lynx support post for your version."
-msgstr ""
-
-#: wp_lynx.php:505
-msgid "URL(s):"
-msgstr ""
-
-#: wp_lynx.php:509
-msgid "Get"
-msgstr ""
-
-#: wp_lynx.php:521 wp_lynx.php:827
-msgid ""
-"WordPress uploads directory is not writable, thumbnails will be disabled."
-msgstr ""
-
-#: wp_lynx.php:532
-msgid "All Prints:"
-msgstr ""
-
-#: wp_lynx.php:532 wp_lynx.php:605
-msgid "Show"
-msgstr ""
-
-#: wp_lynx.php:532 wp_lynx.php:606
-msgid "Hide"
-msgstr ""
-
-#: wp_lynx.php:533
-msgid "Sort Order:"
-msgstr ""
-
-#: wp_lynx.php:533
-msgid "Ascending"
-msgstr ""
-
-#: wp_lynx.php:533
-msgid "Descending"
-msgstr ""
-
-#: wp_lynx.php:533
-msgid "Clear"
-msgstr ""
-
-#: wp_lynx.php:540
-msgid "Website"
-msgstr ""
-
-#: wp_lynx.php:541
-msgid "Order"
-msgstr ""
-
-#: wp_lynx.php:542
-msgid "Actions"
-msgstr ""
-
-#: wp_lynx.php:573
-msgid "Error while retrieving %s"
-msgstr ""
-
-#: wp_lynx.php:584
-msgid "cURL error, please check that you have php5-curl and libcurl installed."
-msgstr ""
-
-#: wp_lynx.php:643
-msgid "No Thumbnail"
-msgstr ""
-
-#: wp_lynx.php:675
-msgid "Insert into Post"
-msgstr ""
-
-#: wp_lynx.php:675
-msgid "Delete"
-msgstr ""
-
-#: wp_lynx.php:685
-msgid "Insert All"
-msgstr ""
-
-#: wp_lynx.php:709
-msgid "Tips for the settings are located below select options."
-msgstr ""
-
-#: wp_lynx.php:710
-msgid "Resources"
-msgstr ""
-
-#: wp_lynx.php:711
-msgid ""
-"%sTutorials and How Tos%s: There are several guides, tutorials, and how tos "
-"available on the author's website."
-msgstr ""
-
-#: wp_lynx.php:711
-msgid "Go to the WP Lynx tag archive."
-msgstr ""
-
-#: wp_lynx.php:712
-msgid ""
-"%sOnline Documentation%s: Check out the documentation for more indepth "
-"technical information."
-msgstr ""
-
-#: wp_lynx.php:712
-msgid "Go to the WP Lynx online documentation"
-msgstr ""
-
-#: wp_lynx.php:713
-msgid ""
-"%sReport a Bug%s: If you think you have found a bug, please include your "
-"WordPress version and details on how to reproduce the bug."
-msgstr ""
-
-#: wp_lynx.php:714
-msgid "Giving Back"
-msgstr ""
-
-#: wp_lynx.php:715
-msgid ""
-"%sDonate%s: Love WP Lynx and want to help development? Consider buying the "
-"author a beer."
-msgstr ""
-
-#: wp_lynx.php:715
-msgid "Go to PayPal to give a donation to WP Lynx."
-msgstr ""
-
-#: wp_lynx.php:716
-msgid ""
-"%sTranslate%s: Is your language not available? Contact John Havlik to get "
-"translating."
-msgstr ""
-
-#: wp_lynx.php:721 wp_lynx.php:844
-msgid "General"
-msgstr ""
-
-#: wp_lynx.php:724
-msgid ""
-"Using WP Lynx is quite simple. Just start writing a new post (or edit an "
-"existing post) and click on the paw print next to the WordPress add media "
-"icon. After clicking the paw print button, the Add Lynx Print dialog will "
-"popup in a lightbox, just like the add media lightbox."
-msgstr ""
-
-#: wp_lynx.php:730
+#: class.llynx_admin.php:224
 msgid "Quick Start"
 msgstr ""
 
-#: wp_lynx.php:733
+#: class.llynx_admin.php:227
 msgid ""
 "Using the default lynx print template, the following CSS can be used as base "
 "for styling your lynx prints."
 msgstr ""
 
-#: wp_lynx.php:776
+#: class.llynx_admin.php:270
 msgid "Styling"
 msgstr ""
 
-#: wp_lynx.php:782
+#: class.llynx_admin.php:276
 msgid "Import/Export/Reset"
 msgstr ""
 
-#: wp_lynx.php:832
+#: class.llynx_admin.php:300 includes/class.mtekk_adminkit.php:799
+#: includes/mtekk_adminkit.php:809
+msgid "Import"
+msgstr ""
+
+#: class.llynx_admin.php:301 includes/class.mtekk_adminkit.php:800
+#: includes/mtekk_adminkit.php:810
+msgid "Export"
+msgstr ""
+
+#: class.llynx_admin.php:302 includes/class.mtekk_adminkit.php:801
+#: includes/mtekk_adminkit.php:811
+msgid "Reset"
+msgstr ""
+
+#: class.llynx_admin.php:319
+msgid ""
+"WordPress uploads directory is not writable, thumbnails will be disabled."
+msgstr ""
+
+#: class.llynx_admin.php:324
 msgid "WP Lynx Settings"
 msgstr ""
 
-#: wp_lynx.php:847
+#: class.llynx_admin.php:336
+msgid ""
+"A collection of settings most likely to be modified are located under this "
+"tab."
+msgstr ""
+
+#: class.llynx_admin.php:340
 msgid "Open Graph Only Mode"
 msgstr ""
 
-#: wp_lynx.php:847
+#: class.llynx_admin.php:340
 msgid "For sites with Open Graph metadata, only fetch that data."
 msgstr ""
 
-#: wp_lynx.php:848
+#: class.llynx_admin.php:341
 msgid "Shorten URL"
 msgstr ""
 
-#: wp_lynx.php:848
+#: class.llynx_admin.php:341
 msgid "Shorten URL using a URL shortening service such as tinyurl.com."
 msgstr ""
 
-#: wp_lynx.php:849
+#: class.llynx_admin.php:342
 msgid "Default Style"
 msgstr ""
 
-#: wp_lynx.php:849
+#: class.llynx_admin.php:342
 msgid "Enable the default Lynx Prints styling on your blog."
 msgstr ""
 
-#: wp_lynx.php:850
-msgid "Maximum Image Width"
+#: class.llynx_admin.php:347
+msgid "Settings related to how Lynx Prints will display."
 msgstr ""
 
-#: wp_lynx.php:850
-msgid "Maximum cached image width in pixels."
+#: class.llynx_admin.php:347 class.llynx_admin.php:348
+msgid "Content"
 msgstr ""
 
-#: wp_lynx.php:851
-msgid "Maximum Image Height"
+#: class.llynx_admin.php:351
+msgid "Lynx Print Template"
 msgstr ""
 
-#: wp_lynx.php:851
-msgid "Maximum cached image height in pixels."
+#: class.llynx_admin.php:351
+msgid "Available tags: "
 msgstr ""
 
-#: wp_lynx.php:852
-msgid "Crop Image"
-msgstr ""
-
-#: wp_lynx.php:852
-msgid "Crop images in the cache to the above dimensions."
-msgstr ""
-
-#: wp_lynx.php:856
-msgid "Cached Image Format"
-msgstr ""
-
-#: wp_lynx.php:860
-msgid "Same as source format"
-msgstr ""
-
-#: wp_lynx.php:861
-msgid "PNG"
-msgstr ""
-
-#: wp_lynx.php:862
-msgid "JPEG"
-msgstr ""
-
-#: wp_lynx.php:863
-msgid "GIF"
-msgstr ""
-
-#: wp_lynx.php:865
-msgid "The image format to use in the local image cache."
-msgstr ""
-
-#: wp_lynx.php:869
-msgid "Cache Image Quality"
-msgstr ""
-
-#: wp_lynx.php:869
-msgid "Image quality when cached images are saved as JPEG."
-msgstr ""
-
-#: wp_lynx.php:874
+#: class.llynx_admin.php:354 class.llynx_admin.php:398
 msgid "Images"
 msgstr ""
 
-#: wp_lynx.php:877
+#: class.llynx_admin.php:357
+msgid "Maximum Image Width"
+msgstr ""
+
+#: class.llynx_admin.php:357
+msgid "Maximum cached image width in pixels."
+msgstr ""
+
+#: class.llynx_admin.php:358
+msgid "Maximum Image Height"
+msgstr ""
+
+#: class.llynx_admin.php:358
+msgid "Maximum cached image height in pixels."
+msgstr ""
+
+#: class.llynx_admin.php:359
+msgid "Crop Image"
+msgstr ""
+
+#: class.llynx_admin.php:359
+msgid "Crop images in the cache to the above dimensions."
+msgstr ""
+
+#: class.llynx_admin.php:363
+msgid "Cached Image Format"
+msgstr ""
+
+#: class.llynx_admin.php:367
+msgid "Same as source format"
+msgstr ""
+
+#: class.llynx_admin.php:368
+msgid "PNG"
+msgstr ""
+
+#: class.llynx_admin.php:369
+msgid "JPEG"
+msgstr ""
+
+#: class.llynx_admin.php:370
+msgid "GIF"
+msgstr ""
+
+#: class.llynx_admin.php:372
+msgid "The image format to use in the local image cache."
+msgstr ""
+
+#: class.llynx_admin.php:376
+msgid "Cache Image Quality"
+msgstr ""
+
+#: class.llynx_admin.php:376
+msgid "Image quality when cached images are saved as JPEG."
+msgstr ""
+
+#: class.llynx_admin.php:381
+msgid "Advanced settings for the WP Lynx content scraping engine."
+msgstr ""
+
+#: class.llynx_admin.php:381 class.llynx_admin.php:382
+msgid "Advanced"
+msgstr ""
+
+#: class.llynx_admin.php:385
+msgid "Timeout"
+msgstr ""
+
+#: class.llynx_admin.php:385
+msgid "Maximum time for scrape execution in seconds."
+msgstr ""
+
+#: class.llynx_admin.php:386
+msgid "Max Redirects"
+msgstr ""
+
+#: class.llynx_admin.php:386
+msgid "Maximum number of redirects to follow while scraping a URL."
+msgstr ""
+
+#: class.llynx_admin.php:387
+msgid "Useragent"
+msgstr ""
+
+#: class.llynx_admin.php:387
+msgid "Useragent to use during scrape execution."
+msgstr ""
+
+#: class.llynx_admin.php:388
+msgid "Emulate Browser"
+msgstr ""
+
+#: class.llynx_admin.php:388
+msgid "Useragent will be exactly as the users's browser."
+msgstr ""
+
+#: class.llynx_admin.php:391
+msgid "Thumbnails"
+msgstr ""
+
+#: class.llynx_admin.php:394
+msgid "Enable Website Thumbnails"
+msgstr ""
+
+#: class.llynx_admin.php:394
+msgid ""
+"Enable generation of Website Thumbails via a 3rd party provider (snapito.com)"
+msgstr ""
+
+#: class.llynx_admin.php:395
+msgid "API Key"
+msgstr ""
+
+#: class.llynx_admin.php:395
+msgid "Your API key for the 3rd party thumbnail provider (snapito.com)"
+msgstr ""
+
+#: class.llynx_admin.php:401
 msgid "Minimum Image Width"
 msgstr ""
 
-#: wp_lynx.php:877
+#: class.llynx_admin.php:401
 msgid "Minimum width of images to scrape in pixels."
 msgstr ""
 
-#: wp_lynx.php:878
+#: class.llynx_admin.php:402
 msgid "Minimum Image Height"
 msgstr ""
 
-#: wp_lynx.php:878
+#: class.llynx_admin.php:402
 msgid "Minimum hieght of images to scrape in pixels."
 msgstr ""
 
-#: wp_lynx.php:879
+#: class.llynx_admin.php:403
 msgid "Maximum Image Count"
 msgstr ""
 
-#: wp_lynx.php:879
+#: class.llynx_admin.php:403
 msgid "Maximum number of images to scrape."
 msgstr ""
 
-#: wp_lynx.php:880
+#: class.llynx_admin.php:404
 msgid "Maximum Image Scrape Size"
 msgstr ""
 
-#: wp_lynx.php:880
+#: class.llynx_admin.php:404
 msgid ""
 "Maximum number of bytes to download when determining the dimensions of JPEG "
 "images."
 msgstr ""
 
-#: wp_lynx.php:885
+#: class.llynx_admin.php:407
 msgid "Text"
 msgstr ""
 
-#: wp_lynx.php:888
+#: class.llynx_admin.php:410
 msgid "Minimum Paragraph Length"
 msgstr ""
 
-#: wp_lynx.php:888
+#: class.llynx_admin.php:410
 msgid "Minimum paragraph length to be scraped (in characters)."
 msgstr ""
 
-#: wp_lynx.php:889
+#: class.llynx_admin.php:411
 msgid "Maximum Paragraph Length"
 msgstr ""
 
-#: wp_lynx.php:889
+#: class.llynx_admin.php:411
 msgid "Maximum paragraph length before it is cutt off (in characters)."
 msgstr ""
 
-#: wp_lynx.php:890
+#: class.llynx_admin.php:412
 msgid "Minimum Paragraph Count"
 msgstr ""
 
-#: wp_lynx.php:890
+#: class.llynx_admin.php:412
 msgid "Maximum number of paragraphs to scrape."
 msgstr ""
 
-#: wp_lynx.php:895
-msgid "Advanced"
-msgstr ""
-
-#: wp_lynx.php:898
-msgid "Lynx Print Template"
-msgstr ""
-
-#: wp_lynx.php:898
-msgid "Available tags: "
-msgstr ""
-
-#: wp_lynx.php:899
-msgid "Timeout"
-msgstr ""
-
-#: wp_lynx.php:899
-msgid "Maximum time for scrape execution in seconds."
-msgstr ""
-
-#: wp_lynx.php:900
-msgid "Useragent"
-msgstr ""
-
-#: wp_lynx.php:900
-msgid "Useragent to use during scrape execution."
-msgstr ""
-
-#: wp_lynx.php:901
-msgid "Emulate Browser"
-msgstr ""
-
-#: wp_lynx.php:901
-msgid "Useragent will be exactly as the users's browser."
-msgstr ""
-
-#: wp_lynx.php:906
+#: class.llynx_admin.php:417
 msgid "Save Changes"
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:216 includes/mtekk_adminkit.php:234
+msgid "Settings"
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:286 includes/mtekk_adminkit.php:304
+msgid "Your settings are out of date."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:286 includes/class.mtekk_adminkit.php:295
+#: includes/mtekk_adminkit.php:304 includes/mtekk_adminkit.php:313
+msgid "Migrate the settings now."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:286 includes/class.mtekk_adminkit.php:295
+#: includes/mtekk_adminkit.php:304 includes/mtekk_adminkit.php:313
+msgid "Migrate now."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:295 includes/mtekk_adminkit.php:313
+msgid "Your settings are for a newer version."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:303 includes/mtekk_adminkit.php:321
+msgid "Your plugin install is incomplete."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:303 includes/mtekk_adminkit.php:321
+msgid "Load default settings now."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:303 includes/mtekk_adminkit.php:321
+msgid "Complete now."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:311 includes/mtekk_adminkit.php:329
+msgid "Your plugin settings are invalid."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:311 includes/mtekk_adminkit.php:329
+msgid "Attempt to fix settings now."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:311 includes/mtekk_adminkit.php:329
+msgid "Fix now."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:494 includes/mtekk_adminkit.php:507
+msgid "Settings successfully saved."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:494 includes/class.mtekk_adminkit.php:507
+#: includes/mtekk_adminkit.php:507 includes/mtekk_adminkit.php:512
+msgid "Undo the options save."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:494 includes/class.mtekk_adminkit.php:507
+#: includes/class.mtekk_adminkit.php:612 includes/class.mtekk_adminkit.php:636
+#: includes/class.mtekk_adminkit.php:653 includes/mtekk_adminkit.php:507
+#: includes/mtekk_adminkit.php:512 includes/mtekk_adminkit.php:617
+#: includes/mtekk_adminkit.php:641 includes/mtekk_adminkit.php:658
+msgid "Undo"
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:498
+msgid "Settings did not change, nothing to save."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:502
+msgid "Settings were not saved."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:507 includes/mtekk_adminkit.php:512
+msgid "Some settings were not saved."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:508 includes/mtekk_adminkit.php:513
+msgid "The following settings were not saved:"
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:513 includes/mtekk_adminkit.php:518
+msgid "Please include this message in your %sbug report%s."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:513 includes/mtekk_adminkit.php:518
+msgid "Go to the %s support post for your version."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:612 includes/mtekk_adminkit.php:617
+msgid "Settings successfully imported from the uploaded file."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:612 includes/mtekk_adminkit.php:617
+msgid "Undo the options import."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:617 includes/mtekk_adminkit.php:622
+msgid "Importing settings from file failed."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:636 includes/mtekk_adminkit.php:641
+msgid "Settings successfully reset to the default values."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:636 includes/mtekk_adminkit.php:641
+msgid "Undo the options reset."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:653 includes/mtekk_adminkit.php:658
+msgid "Settings successfully undid the last operation."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:653 includes/mtekk_adminkit.php:658
+msgid "Undo the last undo operation."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:688 includes/mtekk_adminkit.php:693
+msgid "Settings successfully migrated."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:695 includes/mtekk_adminkit.php:700
+msgid "Default settings successfully installed."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:791 includes/mtekk_adminkit.php:801
+msgid ""
+"Import settings from a XML file, export the current settings to a XML file, "
+"or reset to the default settings."
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:794 includes/mtekk_adminkit.php:804
+msgid "Settings File"
+msgstr ""
+
+#: includes/class.mtekk_adminkit.php:797 includes/mtekk_adminkit.php:807
+msgid "Select a XML settings file to upload and import settings from."
+msgstr ""
+
+#: template.llynx_views.php:23
+msgid "Enter URL"
+msgstr ""
+
+#: template.llynx_views.php:36
+msgid "Previous Image"
+msgstr ""
+
+#: template.llynx_views.php:37
+msgid "Next Image"
+msgstr ""
+
+#: template.llynx_views.php:41
+msgid "Enter Site Title"
+msgstr ""
+
+#: template.llynx_views.php:44
+msgid "Previous Description"
+msgstr ""
+
+#: template.llynx_views.php:45
+msgid "Next Description"
+msgstr ""
+
+#: template.llynx_views.php:48
+msgid "Insert this Lynx Print into the post"
+msgstr ""
+
+#: template.llynx_views.php:48
+msgid "Insert Into Post"
+msgstr ""
+
+#: template.llynx_views.php:49
+msgid "Delete this Lynx Print"
+msgstr ""
+
+#: template.llynx_views.php:49
+msgid "Delete"
+msgstr ""
+
+#: template.llynx_views.php:57 template.llynx_views.php:59
+msgid "Dismiss Message"
+msgstr ""
+
+#: template.llynx_views.php:66
+msgid "Insert all of the Lynx Prints into the post."
+msgstr ""
+
+#: template.llynx_views.php:66
+msgid "Insert into post"
+msgstr ""
+
+#: template.llynx_views.php:78
+msgid ""
+"If you think you have found a bug, please include your WordPress version and "
+"details on how to reporduce the bug when you %sreport the issue%s."
+msgstr ""
+
+#: wp_lynx.php:193
+msgid "Lynx Print inserted into post successfully"
+msgstr ""
+
+#: wp_lynx.php:217
+msgid "Invalid URL"
 msgstr ""

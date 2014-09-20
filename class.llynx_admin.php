@@ -16,13 +16,13 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 require_once(dirname(__FILE__) . '/includes/block_direct_access.php');
-//Do a PHP version check, require 5.2 or newer
-if(version_compare(phpversion(), '5.2.0', '<'))
+//Do a PHP version check, require 5.3 or newer
+if(version_compare(phpversion(), '5.3.0', '<'))
 {
 	//Only purpose of this function is to echo out the PHP version error
 	function llynx_phpold()
 	{
-		printf('<div class="error"><p>' . __('Your PHP version is too old, please upgrade to a newer version. Your version is %s, this plugin requires %s', 'llynx') . '</p></div>', phpversion(), '5.2.0');
+		printf('<div class="error"><p>' . __('Your PHP version is too old, please upgrade to a newer version. Your version is %s, this plugin requires %s', 'wp_lynx') . '</p></div>', phpversion(), '5.3.0');
 	}
 	//If we are in the admin, let's print a warning then return
 	if(is_admin())
@@ -42,7 +42,7 @@ if(!class_exists('mtekk_adminKit'))
  */
 class llynx_admin extends mtekk_adminKit
 {
-	const version = '0.9.80';
+	const version = '1.0.0';
 	protected $full_name = 'WP Lynx Settings';
 	protected $short_name = 'WP Lynx';
 	protected $access_level = 'manage_options';
@@ -134,7 +134,7 @@ class llynx_admin extends mtekk_adminKit
 		$title = __('Add a Lynx Print', 'wp_lynx');
 		//Append our link to the current context
 		//%s&amp;type=wp_lynx&amp;TB_iframe=true
-		$context .= sprintf('<a title="%s" href="#" id="add_link_print" class="button"><img src="%s" alt="%s"/> Add Lynx Print</a>', $title, $imgSrc, $this->short_name);
+		$context .= sprintf('<a title="%s" href="#" id="add_link_print" class="button"><img src="%s" alt="%s"/>%s</a>', $title, $imgSrc, $this->short_name, __('Add Lynx Print', 'wp_lynx'));
 		return $context;
 	}
 	/**

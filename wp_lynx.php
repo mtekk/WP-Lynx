@@ -3,7 +3,7 @@
 Plugin Name: WP Lynx
 Plugin URI: http://mtekk.us/code/wp-lynx/
 Description: Adds Facebook-esq extended link information to your WordPress pages and posts. For details on how to use this plugin visit <a href="http://mtekk.us/code/wp-lynx/">WP Lynx</a>. 
-Version: 0.9.80
+Version: 1.0.0
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
@@ -27,13 +27,13 @@ DomainPath: /languages/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-//Do a PHP version check, require 5.2 or newer
-if(version_compare(PHP_VERSION, '5.2.0', '<'))
+//Do a PHP version check, require 5.3 or newer
+if(version_compare(PHP_VERSION, '5.3.0', '<'))
 {
 	//Silently deactivate plugin, keeps admin usable
 	deactivate_plugins(plugin_basename(__FILE__), true);
 	//Spit out die messages
-	wp_die(sprintf(__('Your PHP version is too old, please upgrade to a newer version. Your version is %s, this plugin requires %s', 'wp_lynx'), phpversion(), '5.2.0'));
+	wp_die(sprintf(__('Your PHP version is too old, please upgrade to a newer version. Your version is %s, this plugin requires %s', 'wp_lynx'), phpversion(), '5.3.0'));
 }
 if(!function_exists('mb_strlen'))
 {
@@ -54,7 +54,7 @@ if(!class_exists('llynxScrape'))
  */
 class linksLynx
 {
-	const version = '0.9.80';
+	const version = '1.0.0';
 	protected $name = 'WP Lynx';
 	protected $identifier = 'wp_lynx';
 	protected $unique_prefix = 'llynx';
