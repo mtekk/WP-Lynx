@@ -184,6 +184,10 @@ class llynx_admin extends mtekk_adminKit
 						);
 				}
 			}
+			if(version_compare($version, '1.0.0', '<'))
+			{
+				$opts['acurl_max_redirects'] = 3;
+			}
 		}
 		//Save the passed in opts to the object's option array
 		$this->opt = $opts;
