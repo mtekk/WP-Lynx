@@ -7,8 +7,8 @@ Version: 1.0.0
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
-TextDomain: wp_lynx
-DomainPath: /languages/
+Text Domain: wp_lynx
+Domain Path: /languages/
 */
 /*  
 	Copyright 2010-2014  John Havlik  (email : john.havlik@mtekk.us)

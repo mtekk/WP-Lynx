@@ -184,6 +184,7 @@ class llynx_admin extends mtekk_adminKit
 						);
 				}
 			}
+			//Upgrading to 1.0.0 
 			if(version_compare($version, '1.0.0', '<'))
 			{
 				$opts['acurl_max_redirects'] = 3;
