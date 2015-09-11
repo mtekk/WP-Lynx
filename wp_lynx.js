@@ -120,7 +120,7 @@ var llynx = llynx || {};
 			this.model.destroy();
 		},
 		insertPre : function() {
-			$('.spinner', this.$el).show();
+			$('.spinner', this.$el).css('visibility', 'visible');
 			//TODO: Enable nonces
 			$.post(llynx.ajaxurl, {
 				action: 'wp_lynx_fetch_print',
@@ -248,7 +248,7 @@ var llynx = llynx || {};
 			}
 		},
 		save : function(e) {
-			$('.embed-url .spinner').show();
+			$('.embed-url .spinner').css('visibility', 'visible');
 			//Clear messages before running again
 			_.invoke(llynx.messages.toArray(), 'destroy');
 			//TODO: Enable nonces
@@ -261,7 +261,7 @@ var llynx = llynx || {};
 				"json");
 		},
 		response : function(data) {
-			$('.embed-url .spinner').hide();
+			$('.embed-url .spinner').css('visibility', 'hidden');
 			if(data.hasOwnProperty('error'))
 			{
 				console.log(data.error_msg);
