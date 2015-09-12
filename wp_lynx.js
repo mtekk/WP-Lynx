@@ -239,7 +239,8 @@ var llynx = llynx || {};
 			_.bindAll(this, 'keyup', 'save', 'response', 'addSite', 'addMessage', 'addAll');
 		},
 		events: {
-			"keyup #llynx_url" : "keyup"
+			'keyup #llynx_url' : 'keyup',
+			'click .llynx_save' : 'save'
 		},
 		keyup : function(e) {
 			if(e.keyCode === 13)

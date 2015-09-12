@@ -20,7 +20,8 @@ require_once(dirname(__FILE__) . '/includes/block_direct_access.php');
 <script type="text/html" id="tmpl-llynx-print-add">
 <div class="media-embed">
 	<label class="embed-url">
-		<input id="llynx_url" type="text" name="llynx_url" placeholder="<?php _e('Enter URL', 'wp_lynx');?>">
+		<input id="llynx_url" type="text" name="llynx_url" placeholder="<?php _e('Enter URL', 'wp-lynx');?>">
+		<button class="llynx_save" title="<?php _e("Fetch the URL's Lynx Print", 'wp-lynx');?>"><?php _e('Get', 'wp-lynx');?></button>
 		<span class="spinner"></span>
 	</label>
 	<div id="llynx_sites">
@@ -38,7 +39,7 @@ require_once(dirname(__FILE__) . '/includes/block_direct_access.php');
 	<span class="llynx-img-count"><%= image+1 %>/<%= images.length %></span>
 </div>
 <div class="llynx_main">
-	<input class="llynx_title" type="text" name="llynx_title" placeholder="<?php _e('Enter Site Title', 'wp_lynx');?>" value="<%= title %>">
+	<input class="llynx_title" type="text" name="llynx_title" placeholder="<?php _e('Enter Site Title', 'wp-lynx');?>" value="<%= title %>">
 	<small><%= url %></small>
 	<textarea class="llynx_description"><%= descriptions[description] %></textarea>
 	<button class="llynx_desc_prev" title="<?php _e('Previous Description', 'wp-lynx');?>" <%= (description < 1) ? 'disabled="disabled"' : '' %>>&lt;</button>
@@ -69,13 +70,13 @@ require_once(dirname(__FILE__) . '/includes/block_direct_access.php');
 <script type="text/html" id="tmpl-llynx-help">
 <div class="media-embed llynx-text" style="margin:1em;">
 	<p>
-		<?php _e('The Add Lynx Print dialog is simple to use. Just enter the URL to the website or page that you want to link to in to the text area. You can enter more than one link at a time, just place a space, or start a newline between each link. Then press the "Get" button. After the pages have been retrieved you should have something similar to the picture above. The pictures are changeable, just use the arrows to thumb through the available pictures. The same goes for the text field, which you may manually edit or thumb through some preselected paragraphs from the linked site.', 'wp_lynx');?>
+		<?php _e('The Add Lynx Print dialog is simple to use. Just enter the URL to the website or page that you want to link to in to the text area. You can enter more than one link at a time, just place a space, or start a newline between each link. Then press the "Get" button. After the pages have been retrieved you should have something similar to the picture above. The pictures are changeable, just use the arrows to thumb through the available pictures. The same goes for the text field, which you may manually edit or thumb through some preselected paragraphs from the linked site.', 'wp-lynx');?>
 	</p>
 	<p>
-		<?php _e('When you are ready to insert a Link Print, just click the "Insert into Post" button (or the "Insert All" button at the bottom to insert multiple Link Prints simultaneously). If you go to the HTML tab in the editor you\'ll see that WP Lynx generates pure HTML. This gives the user full control over their Lynx Prints.', 'wp_lynx');?>
+		<?php _e('When you are ready to insert a Link Print, just click the "Insert into Post" button (or the "Insert All" button at the bottom to insert multiple Link Prints simultaneously). If you go to the HTML tab in the editor you\'ll see that WP Lynx generates pure HTML. This gives the user full control over their Lynx Prints.', 'wp-lynx');?>
 	</p>
 	<p>
-		<?php printf(__('If you think you have found a bug, please include your WordPress version and details on how to reporduce the bug when you %sreport the issue%s.', 'wp_lynx'),'<a title="' . __('Go to the WP Lynx support post for your version.', 'wp_lynx') . '" href="http://mtekk.us/archives/wordpress/plugins-wordpress/wp-lynx-' . linksLynx::version . '/#respond">', '</a>');?>
+		<?php printf(__('If you think you have found a bug, please include your WordPress version and details on how to reporduce the bug when you %sreport the issue%s.', 'wp-lynx'),'<a title="' . __('Go to the WP Lynx support post for your version.', 'wp-lynx') . '" href="http://mtekk.us/archives/wordpress/plugins-wordpress/wp-lynx-' . linksLynx::version . '/#respond">', '</a>');?>
 	</p>
 </div>
 </script>
