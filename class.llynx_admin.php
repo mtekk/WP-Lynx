@@ -78,7 +78,7 @@ class llynx_admin extends mtekk_adminKit
 		//Add tiny mce style
 		add_filter('tiny_mce_before_init', array($this, 'add_editor_style'));
 		//Add in our media button
-		add_action('media_buttons_context', array($this, 'media_buttons_context'));
+		add_action('media_buttons', array($this, 'media_buttons'));
 		//We're going to make sure we run the parent's version of this function as well
 		parent::init();
 	}
@@ -115,27 +115,20 @@ class llynx_admin extends mtekk_adminKit
 		return $init;
 	}
 	/**
-	 * media_buttons_context
+	 * media_buttons
 	 * 
 	 * Adds a nice link button next to the Upload/Insert buttons in the edit pannel
 	 * 
-	 * @return 
 	 */
-	function media_buttons_context($context)
+	function media_buttons($id)
 	{
-		global $post_ID, $temp_ID;
-		//We may be in a temporary post, so we can't rely on post_ID
-		$curID = (int) (0 == $post_ID) ? $temp_ID : $post_ID;
-		//Assemble the link to our special uploader
-		$url = 'media-upload.php?post_id=' . $curID;
 		//Find the url for the image, use nice functions
 		$imgSrc = plugins_url('wp-lynx/llynx.png');
 		//The hyperlink title
 		$title = __('Add a Lynx Print', 'wp_lynx');
 		//Append our link to the current context
 		//%s&amp;type=wp_lynx&amp;TB_iframe=true
-		$context .= sprintf('<a title="%s" href="#" id="add_link_print" class="button"><img src="%s" alt="%s"/>%s</a>', $title, $imgSrc, $this->short_name, __('Add Lynx Print', 'wp_lynx'));
-		return $context;
+		printf('<a title="%s" href="#" id="add_link_print" class="button"><img src="%s" alt="%s"/>%s</a>', $title, $imgSrc, $this->short_name, __('Add Lynx Print', 'wp_lynx'));
 	}
 	/**
 	 * Upgrades input options array, sets to $this->opt
