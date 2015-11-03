@@ -33,7 +33,7 @@ if(version_compare(PHP_VERSION, '5.3.0', '<'))
 	//Silently deactivate plugin, keeps admin usable
 	deactivate_plugins(plugin_basename(__FILE__), true);
 	//Spit out die messages
-	wp_die(sprintf(__('Your PHP version is too old, please upgrade to a newer version. Your version is %s, this plugin requires %s', 'wp_lynx'), phpversion(), '5.3.0'));
+	wp_die(sprintf(__('Your PHP version is too old, please upgrade to a newer version. Your version is %s, this plugin requires %s', 'wp-lynx'), phpversion(), '5.3.0'));
 }
 if(!function_exists('mb_strlen'))
 {
