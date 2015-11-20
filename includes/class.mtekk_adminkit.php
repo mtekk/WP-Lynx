@@ -1,6 +1,6 @@
 <?php
 /*  
-	Copyright 2009-2014  John Havlik  (email : john.havlik@mtekk.us)
+	Copyright 2009-2015  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 require_once(dirname(__FILE__) . '/block_direct_access.php');
 abstract class mtekk_adminKit
 {
-	const version = '1.3';
+	const version = '1.4';
 	protected $full_name;
 	protected $short_name;
 	protected $plugin_basename;
@@ -37,7 +37,6 @@ abstract class mtekk_adminKit
 		//WordPress Admin interface hook
 		add_action('admin_menu', array($this, 'add_page'));
 		//Installation Script hook
-		//register_activation_hook($this->plugin_basename, array($this, 'install'));
 		add_action('activate_' . $this->plugin_basename, array($this, 'install'));
 		//Initilizes l10n domain
 		$this->local();
@@ -84,15 +83,15 @@ abstract class mtekk_adminKit
 	 * @param mixed $value (optional) The value to place in the query string 
 	 * @param string $title (optional) The text to use in the title portion of the anchor
 	 * @param string $text (optional) The text that will be surrounded by the anchor tags
-	 * @param string $extras (optional) This text is placed within the opening anchor tag, good for adding id, classe, rel field
+	 * @param string $anchor_extras (optional) This text is placed within the opening anchor tag, good for adding id, classe, rel field
 	 * @return string the assembled anchor
 	 */
-	function nonced_anchor($uri, $mode, $value = 'true', $title = '', $text = '', $extras = '')
+	function nonced_anchor($uri, $mode, $value = 'true', $title = '', $text = '', $anchor_extras = '')
 	{
 		//Assemble our url, nonce and all
-		$url = wp_nonce_url($uri . '&' . $this->unique_prefix . '_' . $mode . '=' . $value, $this->unique_prefix . '_' . $mode);
+		$url = wp_nonce_url(add_query_arg($this->unique_prefix . '_' . $mode, $value, $uri), $this->unique_prefix . '_' . $mode);
 		//Return a valid anchor
-		return ' <a title="' . $title . '" href="' . $url . '" '. $extras . '>' . $text . '</a>';
+		return ' <a title="' . $title . '" href="' . $url . '" '. $anchor_extras . '>' . $text . '</a>';
 	}
 	/**
 	 * Abstracts the check_admin_referer so that all the end user has to supply is the mode
@@ -149,10 +148,20 @@ abstract class mtekk_adminKit
 		}
 		//Add in the nice "settings" link to the plugins page
 		add_filter('plugin_action_links', array($this, 'filter_plugin_actions'), 10, 2);
+		if(defined('SCRIPT_DEBUG') && SCRIPT_DEBUG)
+		{
+			$suffix = '';
+		}
+		else
+		{
+			$suffix = '.min';
+		}
+		//Register JS for enable/disable settings groups
+		wp_register_script('mtekk_adminkit_engroups', plugins_url('/mtekk_adminkit_engroups' . $suffix . '.js', dirname(__FILE__) . '/mtekk_adminkit_engroups' . $suffix . '.js'), array('jquery'), self::version, true);
 		//Register JS for tabs
-		wp_register_script('mtekk_adminkit_tabs', plugins_url('/mtekk_adminkit_tabs.js', dirname(__FILE__) . '/mtekk_adminkit_tabs.js'), array('jquery-ui-tabs'));
+		wp_register_script('mtekk_adminkit_tabs', plugins_url('/mtekk_adminkit_tabs' . $suffix . '.js', dirname(__FILE__) . '/mtekk_adminkit_tabs' . $suffix . '.js'), array('jquery-ui-tabs'), self::version, true);
 		//Register CSS for tabs
-		wp_register_style('mtekk_adminkit_tabs', plugins_url('/mtekk_adminkit_tabs.css', dirname(__FILE__) . '/mtekk_adminkit_tabs.css'));
+		wp_register_style('mtekk_adminkit_tabs', plugins_url('/mtekk_adminkit_tabs' . $suffix . '.css', dirname(__FILE__) . '/mtekk_adminkit_tabs' . $suffix . '.css'));
 		//Register options
 		register_setting($this->unique_prefix . '_options', $this->unique_prefix . '_options', '');
 		//Synchronize up our settings with the database as we're done modifying them now
@@ -819,9 +828,9 @@ abstract class mtekk_adminKit
 	 * 
 	 * @param string $label
 	 * @param string $option
-	 * @param string $class [optional]
-	 * @param bool $disable [optional]
-	 * @param string $description [optional]
+	 * @param string $class (optional)
+	 * @param bool $disable (optional)
+	 * @param string $description (optional)
 	 * @return 
 	 */
 	function input_text($label, $option, $class = 'regular-text', $disable = false, $description = '')
@@ -847,12 +856,12 @@ abstract class mtekk_adminKit
 	 * 
 	 * @param string $label
 	 * @param string $option
-	 * @param string $class [optional]
-	 * @param bool $disable [optional]
-	 * @param string $description [optional]
-	 * @param int|string $min [optional] 
-	 * @param int|string $max [optional]
-	 * @param int|string $step [optional]
+	 * @param string $class (optional)
+	 * @param bool $disable (optional)
+	 * @param string $description (optional)
+	 * @param int|string $min (optional) 
+	 * @param int|string $max (optional)
+	 * @param int|string $step (optional)
 	 * @return 
 	 */
 	function input_number($label, $option, $class = 'small-text', $disable = false, $description = '', $min = '', $max = '', $step = '')
@@ -891,9 +900,9 @@ abstract class mtekk_adminKit
 	 * 
 	 * @param string $label
 	 * @param string $option
-	 * @param string $rows [optional]
-	 * @param bool $disable [optional]
-	 * @param string $description [optional]
+	 * @param string $rows (optional)
+	 * @param bool $disable (optional)
+	 * @param string $description (optional)
 	 */
 	function textbox($label, $option, $height = '3', $disable = false, $description = '')
 	{
@@ -909,9 +918,9 @@ abstract class mtekk_adminKit
 	 * 
 	 * @param string $label
 	 * @param string $option
-	 * @param string $rows [optional]
-	 * @param bool $disable [optional]
-	 * @param string $description [optional]
+	 * @param string $rows (optional)
+	 * @param bool $disable (optional)
+	 * @param string $description (optional)
 	 */
 	function tinymce($label, $option, $height = '3', $disable = false, $description = '')
 	{
@@ -937,11 +946,12 @@ abstract class mtekk_adminKit
 	 * @param string $label
 	 * @param string $option
 	 * @param string $instruction
-	 * @param bool $disable [optional]
-	 * @param string $description [optional]
+	 * @param bool $disable (optional)
+	 * @param string $description (optional)
+	 * @param string $class (optional)
 	 * @return 
 	 */
-	function input_check($label, $option, $instruction, $disable = false, $description = '')
+	function input_check($label, $option, $instruction, $disable = false, $description = '', $class = '')
 	{
 		$optid = $this->get_valid_id($option);?>
 		<tr valign="top">
@@ -950,7 +960,7 @@ abstract class mtekk_adminKit
 			</th>
 			<td>	
 				<label>
-					<input type="checkbox" name="<?php echo $this->unique_prefix . '_options[' . $option;?>]" id="<?php echo $optid;?>" <?php if($disable){echo 'disabled="disabled" class="disabled"';}?> value="true" <?php checked(true, $this->opt[$option]);?> />
+					<input type="checkbox" name="<?php echo $this->unique_prefix . '_options[' . $option;?>]" id="<?php echo $optid;?>" <?php if($disable){echo 'disabled="disabled" class="disabled ' . $class . '"';} else{echo 'class="' . $class . '"';}?> value="true" <?php checked(true, $this->opt[$option]);?> />
 						<?php echo $instruction; ?>				
 				</label><br />
 				<?php if($description !== ''){?><p class="description"><?php echo $description;?></p><?php }?>
@@ -964,13 +974,14 @@ abstract class mtekk_adminKit
 	 * @param string $option
 	 * @param string $value
 	 * @param string $instruction
-	 * @param object $disable [optional]
+	 * @param object $disable (optional)
+	 * @param string $class (optional)
 	 * @return 
 	 */
-	function input_radio($option, $value, $instruction, $disable = false)
+	function input_radio($option, $value, $instruction, $disable = false, $class = '')
 	{?>
 		<label>
-			<input name="<?php echo $this->unique_prefix . '_options[' . $option;?>]" type="radio" <?php if($disable){echo 'disabled="disabled" class="disabled togx"';}else{echo 'class="togx"';}?> value="<?php echo $value;?>" <?php checked($value, $this->opt[$option]);?> />
+			<input name="<?php echo $this->unique_prefix . '_options[' . $option;?>]" type="radio" <?php if($disable){echo 'disabled="disabled" class="disabled togx ' . $class . '"';}else{echo 'class="togx ' . $class . '"';}?> value="<?php echo $value;?>" <?php checked($value, $this->opt[$option]);?> />
 			<?php echo $instruction; ?>
 		</label><br/>
 	<?php
@@ -981,11 +992,13 @@ abstract class mtekk_adminKit
 	 * @param string $label
 	 * @param string $option
 	 * @param array $values
-	 * @param bool $disable [optional]
-	 * @param string $description [optional]
+	 * @param bool $disable (optional)
+	 * @param string $description (optional)
+	 * @param array $titles (optional) The array of titiles for the options, if they should be different from the values
+	 * @param string $class (optional) Extra class to apply to the elements
 	 * @return 
 	 */
-	function input_select($label, $option, $values, $disable = false, $description = '', $titles = false)
+	function input_select($label, $option, $values, $disable = false, $description = '', $titles = false, $class = '')
 	{
 		//If we don't have titles passed in, we'll use option names as values
 		if(!$titles)
@@ -998,7 +1011,7 @@ abstract class mtekk_adminKit
 				<label for="<?php echo $optid;?>"><?php echo $label;?></label>
 			</th>
 			<td>
-				<select name="<?php echo $this->unique_prefix . '_options[' . $option;?>]" id="<?php echo $optid;?>" <?php if($disable){echo 'disabled="disabled" class="disabled"';}?>>
+				<select name="<?php echo $this->unique_prefix . '_options[' . $option;?>]" id="<?php echo $optid;?>" <?php if($disable){echo 'disabled="disabled" class="disabled ' . $class . '"';} else{echo 'class="' . $class . '"';}?>>
 					<?php $this->select_options($option, $titles, $values); ?>
 				</select><br />
 				<?php if($description !== ''){?><p class="description"><?php echo $description;?></p><?php }?>
@@ -1011,7 +1024,8 @@ abstract class mtekk_adminKit
 	 *
 	 * @param string $optionname name of wordpress options store
 	 * @param array $options array of names of options that can be selected
-	 * @param array $exclude[optional] array of names in $options array to be excluded
+	 * @param array $values array of the values of the options that can be selected
+	 * @param array $exclude(optional) array of names in $options array to be excluded
 	 */
 	function select_options($optionname, $options, $values, $exclude = array())
 	{
