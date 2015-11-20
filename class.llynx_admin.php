@@ -62,6 +62,8 @@ class llynx_admin extends mtekk_adminKit
 		//Grab default options that were passed in
 		$this->opt = $opts;
 		$this->template_tags = $template_tags;
+		add_action('admin_print_styles-post.php', array($this, 'admin_edit_page_styles'));
+		add_action('admin_print_styles-post-new.php', array($this, 'admin_edit_page_styles'));
 		//We're going to make sure we load the parent's constructor
 		parent::__construct();
 	}
@@ -81,6 +83,17 @@ class llynx_admin extends mtekk_adminKit
 		add_action('media_buttons', array($this, 'media_buttons'));
 		//We're going to make sure we run the parent's version of this function as well
 		parent::init();
+	}
+	function admin_edit_page_styles()
+	{
+		//Find the url for the image, use nice functions
+		$imgSrc = plugins_url('wp-lynx/llynx.png');
+		printf('<style type="text/css" media="screen">
+		.wp-lynx-media-button {
+			background: url(%s) 0 3px no-repeat;
+			background-size: 12px 12px;
+		}
+		</style>', $imgSrc);
 	}
 	function wp_loaded()
 	{
@@ -122,13 +135,7 @@ class llynx_admin extends mtekk_adminKit
 	 */
 	function media_buttons($context)
 	{
-		//Find the url for the image, use nice functions
-		$imgSrc = plugins_url('wp-lynx/llynx.png');
-		//The hyperlink title
-		$title = __('Add a Lynx Print', 'wp-lynx');
-		//Append our link to the current context
-		//%s&amp;type=wp_lynx&amp;TB_iframe=true
-		printf('<button class="button add_lynx_print" data-editor="%1$s" type="button"><img src="%2$s" alt="%3$s"/>%4$s</button>', $context, $imgSrc, $this->short_name, __('Insert Lynx Print', 'wp-lynx'));
+		printf('<button class="button add_lynx_print" data-editor="%1$s" type="button"><span class="wp-lynx-media-button wp-media-buttons-icon"></span>%2$s</button>', $context, __('Insert Lynx Print', 'wp-lynx'));
 	}
 	/**
 	 * Upgrades input options array, sets to $this->opt
