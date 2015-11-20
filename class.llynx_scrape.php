@@ -50,7 +50,7 @@ class llynxScrape
 			$this->scrapeContent($url);
 		}
 	}
-	function getContent($url, $referer = null, $range = null)
+	function getContent($url, $referer = null, $range = null, $encoding = '')
 	{
 		if(function_exists('curl_init'))
 		{
@@ -58,7 +58,7 @@ class llynxScrape
 				CURLOPT_RETURNTRANSFER	=> true,		// Return web page
 				CURLOPT_HEADER			=> false,		// Don't return headers
 				CURLOPT_FOLLOWLOCATION	=> !ini_get('safe_mode'),		// Follow redirects, if not in safemode
-				CURLOPT_ENCODING		=> '',			// Handle all encodings
+				CURLOPT_ENCODING		=> $encoding,			// Handle all encodings
 				CURLOPT_USERAGENT		=> $this->opt['Scurl_agent'],		// Useragent
 				CURLOPT_AUTOREFERER		=> true,		// Set referer on redirect
 				CURLOPT_FAILONERROR		=> true,		// Fail silently on HTTP error
@@ -248,8 +248,8 @@ class llynxScrape
 					//Need to get to a frame header for JPEG, default is 256 as all cleaned up JPEGS need this at max
 					$range .= $this->opt['aimg_max_range'];
 				}
-				//We only want appropriately sized images
-				if($data = $this->getContent($fixedURL, $baseURL, $range))
+				//We only want appropriately sized images, have to specify encoding of identity to prevent poorly configured servers from sending double compressed images
+				if($data = $this->getContent($fixedURL, $baseURL, $range, 'identity'))
 				{
 					if(strlen($data) >= 10 && $tempSize = $this->getGIFImageXY($data))
 					{

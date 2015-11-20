@@ -56,3 +56,8 @@
 .llynx-print-insert-toolbar{
 	padding: 0 16px;
 }
+.llynx_save{
+	margin: 10px 0;
+	padding: 11px 12px;
+	float: right;
+}

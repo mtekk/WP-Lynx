@@ -33,7 +33,7 @@ if(version_compare(PHP_VERSION, '5.3.0', '<'))
 	//Silently deactivate plugin, keeps admin usable
 	deactivate_plugins(plugin_basename(__FILE__), true);
 	//Spit out die messages
-	wp_die(sprintf(__('Your PHP version is too old, please upgrade to a newer version. Your version is %s, this plugin requires %s', 'wp_lynx'), phpversion(), '5.3.0'));
+	wp_die(sprintf(__('Your PHP version is too old, please upgrade to a newer version. Your version is %s, this plugin requires %s', 'wp-lynx'), phpversion(), '5.3.0'));
 }
 if(!function_exists('mb_strlen'))
 {
@@ -125,11 +125,6 @@ class linksLynx
 		//We're going to make sure we run the parent's version of this function as well
 		parent::init();
 		$this->llynx_scrape->opt = $this->opt;
-		//If we are emulating the user's browser, we should update our user agent accordingly
-		if($this->opt['bcurl_embrowser'])
-		{
-			$this->llynx_scrape->opt['Scurl_agent'] = $_SERVER['HTTP_USER_AGENT'];
-		}
 		add_action('media_upload_wp_lynx', array($this, 'media_upload'));
 		$this->allowed_html = wp_kses_allowed_html('post');
 		wp_enqueue_script('llynx_javascript', plugins_url('/wp_lynx.js', dirname(__FILE__) . '/wp_lynx.js'), array('jquery'));
@@ -204,6 +199,14 @@ class linksLynx
 	}
 	function fetch_url()
 	{
+		//Sync our options
+		$this->opt = mtekk_adminKit::parse_args(get_option('llynx_options'), $this->opt);
+		//If we are emulating the user's browser, we should update our user agent accordingly
+		if($this->opt['bcurl_embrowser'])
+		{
+			$this->llynx_scrape->opt['Scurl_agent'] = $_SERVER['HTTP_USER_AGENT'];
+		}
+		$this->llynx_scrape->opt = $this->opt;
 		error_reporting(E_ALL);
 		//Grab the nonce and check
 		//$nonce = intval($_POST['nonce']);
@@ -275,6 +278,9 @@ class linksLynx
 	}
 	function fetch_print()
 	{
+		//Sync our options
+		$this->opt = mtekk_adminKit::parse_args(get_option('llynx_options'), $this->opt);
+		$this->llynx_scrape->opt = $this->opt;
 		//Grab the nonce and check
 		//$nonce = intval($_POST['nonce']);
 		//Clean up the URL

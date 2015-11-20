@@ -120,7 +120,7 @@ var llynx = llynx || {};
 			this.model.destroy();
 		},
 		insertPre : function() {
-			$('.spinner', this.$el).show();
+			$('.spinner', this.$el).css('visibility', 'visible');
 			//TODO: Enable nonces
 			$.post(llynx.ajaxurl, {
 				action: 'wp_lynx_fetch_print',
@@ -239,7 +239,8 @@ var llynx = llynx || {};
 			_.bindAll(this, 'keyup', 'save', 'response', 'addSite', 'addMessage', 'addAll');
 		},
 		events: {
-			"keyup #llynx_url" : "keyup"
+			'keyup #llynx_url' : 'keyup',
+			'click .llynx_save' : 'save'
 		},
 		keyup : function(e) {
 			if(e.keyCode === 13)
@@ -248,7 +249,7 @@ var llynx = llynx || {};
 			}
 		},
 		save : function(e) {
-			$('.embed-url .spinner').show();
+			$('.embed-url .spinner').css('visibility', 'visible');
 			//Clear messages before running again
 			_.invoke(llynx.messages.toArray(), 'destroy');
 			//TODO: Enable nonces
@@ -261,7 +262,7 @@ var llynx = llynx || {};
 				"json");
 		},
 		response : function(data) {
-			$('.embed-url .spinner').hide();
+			$('.embed-url .spinner').css('visibility', 'hidden');
 			if(data.hasOwnProperty('error'))
 			{
 				console.log(data.error_msg);
@@ -315,7 +316,6 @@ var llynx = llynx || {};
 			content:  'llynx_help_state'
 		}
 	});
-	media.buttonId = '#add_link_print',
 
 	_.extend( media, {
 		frame: function() {
@@ -389,7 +389,7 @@ var llynx = llynx || {};
 		},
 
 		init: function() {
-			$( media.buttonId ).on( 'click', function( e ) {
+			$( '.add_lynx_print' ).on( 'click', function( e ) {
 				e.preventDefault();
 				media.frame().open();
 			});
