@@ -1,6 +1,6 @@
 <?php
 /*  
-	Copyright 2010-2014  John Havlik  (email : john.havlik@mtekk.us)
+	Copyright 2010-2015  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ if(!function_exists('url_to_absolute'))
 }
 class llynxScrape
 {
-	const version = '1.0.0';
+	const version = '1.0.90';
 	public $opt = array(
 		'ap_max_count' => 5,
 		'ap_min_length' => 120,

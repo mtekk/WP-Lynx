@@ -1,5 +1,5 @@
 <?php
-/*  Copyright 2007-2014  John Havlik  (email : john.havlik@mtekk.us)
+/*  Copyright 2007-2015  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ if(!class_exists('mtekk_adminKit'))
  */
 class llynx_admin extends mtekk_adminKit
 {
-	const version = '1.0.0';
+	const version = '1.0.90';
 	protected $full_name = 'WP Lynx Settings';
 	protected $short_name = 'WP Lynx';
 	protected $access_level = 'manage_options';
