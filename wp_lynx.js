@@ -316,7 +316,6 @@ var llynx = llynx || {};
 			content:  'llynx_help_state'
 		}
 	});
-	media.buttonId = '#add_link_print',
 
 	_.extend( media, {
 		frame: function() {
@@ -390,7 +389,7 @@ var llynx = llynx || {};
 		},
 
 		init: function() {
-			$( media.buttonId ).on( 'click', function( e ) {
+			$( '.add_lynx_print' ).on( 'click', function( e ) {
 				e.preventDefault();
 				media.frame().open();
 			});

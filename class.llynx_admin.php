@@ -120,7 +120,7 @@ class llynx_admin extends mtekk_adminKit
 	 * Adds a nice link button next to the Upload/Insert buttons in the edit pannel
 	 * 
 	 */
-	function media_buttons($id)
+	function media_buttons($context)
 	{
 		//Find the url for the image, use nice functions
 		$imgSrc = plugins_url('wp-lynx/llynx.png');
@@ -128,7 +128,7 @@ class llynx_admin extends mtekk_adminKit
 		$title = __('Add a Lynx Print', 'wp-lynx');
 		//Append our link to the current context
 		//%s&amp;type=wp_lynx&amp;TB_iframe=true
-		printf('<a title="%s" href="#" id="add_link_print" class="button"><img src="%s" alt="%s"/>%s</a>', $title, $imgSrc, $this->short_name, __('Add Lynx Print', 'wp-lynx'));
+		printf('<button class="button add_lynx_print" data-editor="%1$s" type="button"><img src="%2$s" alt="%3$s"/>%4$s</button>', $context, $imgSrc, $this->short_name, __('Insert Lynx Print', 'wp-lynx'));
 	}
 	/**
 	 * Upgrades input options array, sets to $this->opt
