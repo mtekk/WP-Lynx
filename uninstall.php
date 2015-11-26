@@ -91,4 +91,4 @@ class llynx_uninstaller extends mtekk_adminKit_uninstaller
 /*
  * main
  */
-new wp_lynx_uninstaller();
+new llynx_uninstaller();
