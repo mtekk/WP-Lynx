@@ -259,7 +259,7 @@ var llynx = llynx || {};
 				nonce: '1234'
 				},
 				this.response,
-				"json");
+				"json").fail(this.responseBad);
 		},
 		response : function(data) {
 			$('.embed-url .spinner').css('visibility', 'hidden');
@@ -272,6 +272,11 @@ var llynx = llynx || {};
 			{
 				llynx.sites.create({url: data.url, title: data.title, descriptions: data.descriptions, images: data.images});
 			}
+		},
+		responseBad : function() {
+			$('.embed-url .spinner').css('visibility', 'hidden');
+			console.log(objectL10n.wp_lynx_request_error_msg);
+			llynx.messages.create({type: 'error', message: objectL10n.wp_lynx_request_error_msg});
 		},
 		addSite : function(site) {
 			var view = new llynx.view.lynxPrint({model: site});

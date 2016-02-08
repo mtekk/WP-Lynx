@@ -188,6 +188,10 @@ class linksLynx
 				'insertSuccessMsg' => __('Lynx Print inserted into post successfully', 'wp-lynx')
 				));
 			wp_enqueue_style('llynx_media');
+			//Load the translations for the tabs
+			wp_localize_script('llynx_javascript', 'objectL10n', array(
+				'wp_lynx_request_error_msg' => __('It appears your server timed out while processing this request.', 'wp-lynx')
+			));
 		}
 	}
 	/**
