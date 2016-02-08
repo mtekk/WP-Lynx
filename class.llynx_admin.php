@@ -302,9 +302,9 @@ class llynx_admin extends mtekk_adminKit
 		//Load the translations for the tabs
 		wp_localize_script('mtekk_adminkit_tabs', 'objectL10n', array(
 			'mtad_uid' => 'llynx',
-			'mtad_import' => __('Import', $this->identifier),
-			'mtad_export' => __('Export', $this->identifier),
-			'mtad_reset' => __('Reset', $this->identifier),
+			'mtad_import' => __('Import', 'wp-lynx'),
+			'mtad_export' => __('Export', 'wp-lynx'),
+			'mtad_reset' => __('Reset', 'wp-lynx'),
 		));
 	}
 	/**
