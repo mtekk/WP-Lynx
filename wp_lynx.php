@@ -7,7 +7,7 @@ Version: 1.1.1
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
-Text Domain: wp_lynx
+Text Domain: wp-lynx
 Domain Path: /languages/
 */
 /*  
@@ -56,7 +56,7 @@ class linksLynx
 {
 	const version = '1.1.1';
 	protected $name = 'WP Lynx';
-	protected $identifier = 'wp_lynx';
+	protected $identifier = 'wp-lynx';
 	protected $unique_prefix = 'llynx';
 	protected $plugin_basename = null;
 	protected $admin = null;

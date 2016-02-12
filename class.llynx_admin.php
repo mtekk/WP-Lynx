@@ -46,7 +46,7 @@ class llynx_admin extends mtekk_adminKit
 	protected $full_name = 'WP Lynx Settings';
 	protected $short_name = 'WP Lynx';
 	protected $access_level = 'manage_options';
-	protected $identifier = 'wp_lynx';
+	protected $identifier = 'wp-lynx';
 	protected $unique_prefix = 'llynx';
 	protected $plugin_basename = null;
 	protected $support_url = 'http://mtekk.us/archives/wordpress/plugins-wordpress/wp-lynx-';

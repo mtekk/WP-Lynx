@@ -3,7 +3,7 @@ Contributors: mtekk
 Tags: Links, Facebook, Open Graph, post, posts
 Requires at least: 4.2
 Tested up to: 4.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 WP Lynx allows you to mimic Facebook's wall links in your WordPress posts.
 
 == Description ==
@@ -25,6 +25,13 @@ Please visit [WP Lynx's](http://mtekk.us/code/wp-lynx/#installation "WP Lynx's p
 2. This screenshot shows the Add Lynx Print screen with two Lynx Prints in queue to be added to the current post
 
 == Changelog ==
+
+= 1.1.1 =
+Release date: February 12th, 2016
+
+* Bug fix: Fixed PHP error caused by calling the wrong class in the uninstaller.
+* Bug fix: Fixed alignment issue of the main content of the settings page on WordPress 4.4.
+* Bug fix: The Lynx Print adding interface now handles server side timeouts more gracefully. 
 
 = 1.1.0 =
 Release date: November 23rd, 2015
