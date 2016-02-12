@@ -12,9 +12,9 @@ WP Lynx allows you to create stylized links akin to those in Facebook. These sty
 
 Note: version 1.0.0 of this plugin requires PHP5.3 or newer.
 
-* English - default -
+= Translations =
 
-Don't see your language on the list? Feel free to translate WP Lynx and send John Havlik the translations.
+WP Lynx now supports WordPress.org language packs. Want to translate WP Lynx? Visit [WP Lynx's WordPress.org translation project](https://translate.wordpress.org/projects/wp-plugins/wp-lynx/).
 
 == Installation ==
 
