@@ -480,6 +480,10 @@ class linksLynx
 		//Replace the template tags with values
 		return str_replace($this->template_tags, $values, $this->opt['Htemplate']);
 	}
+        public function uninstall()
+        {
+                $this->admin->uninstall();
+        }
 }
 //Let's make an instance of our object takes care of everything
 $linksLynx = new linksLynx;
