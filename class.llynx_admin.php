@@ -42,7 +42,7 @@ if(!class_exists('mtekk_adminKit'))
  */
 class llynx_admin extends mtekk_adminKit
 {
-	const version = '1.1.1';
+	const version = '1.1.2';
 	protected $full_name = 'WP Lynx Settings';
 	protected $short_name = 'WP Lynx';
 	protected $access_level = 'manage_options';
@@ -98,17 +98,6 @@ class llynx_admin extends mtekk_adminKit
 	function wp_loaded()
 	{
 		parent::wp_loaded();
-	}
-	/**
-	 * Makes sure the current user can manage options to proceed
-	 */
-	function security()
-	{
-		//If the user can not manage options we will die on them
-		if(!current_user_can($this->access_level))
-		{
-			wp_die(__('Insufficient privileges to proceed.', 'wp-lynx'));
-		}
 	}
 	/**
 	 * Adds a style to tiny mce for Link Prints
@@ -317,6 +306,9 @@ class llynx_admin extends mtekk_adminKit
 	{
 		global $wp_taxonomies;
 		$this->security();
+		do_action($this->unique_prefix . '_settings_pre_messages', $this->opt);
+		//Display our messages
+		$this->messages();
 		$uploadDir = wp_upload_dir();
 		if(!isset($uploadDir['path']) || !is_writable($uploadDir['path']))
 		{
@@ -334,7 +326,7 @@ class llynx_admin extends mtekk_adminKit
 			return;
 		}
 		?>	
-		<form action="options-general.php?page=wp_lynx" method="post" id="llynx-options">
+		<form action="<?php echo $this->admin_url(); ?>" method="post" id="llynx-options">
 			<?php settings_fields('llynx_options');?>
 			<div id="hasadmintabs">
 			<fieldset id="general" class="llynx_options">
