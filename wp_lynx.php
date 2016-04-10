@@ -201,6 +201,50 @@ class linksLynx
 	{
 		include_once('template.llynx_views.php');
 	}
+	/**
+	 * Creates a single page image for the passed in PDF
+	 * 
+	 * @param string $content The raw content of the PDF returned by getContent
+	 * @param string $name The name of the PDF
+	 * 
+	 * @return Imagick the image representing the specified PDF
+	 */
+	function create_pdf_image($content, $name)
+	{
+		if(class_exists('Imagick'))
+		{
+			//Create our thumbnail
+			$image = new Imagick();
+			$image->readImageBlob($content, $name . '[0]');
+			$image->setIteratorIndex(0);
+			$image->setImageFormat('jpeg');
+			$image->setImageCompressionQuality($this->opt['acache_quality']);
+			return $image;
+		}
+		return false;
+	}
+	/**
+	 * This function is meant to be called to return the content of an image for a specified PDF
+	 */
+	function fetch_pdf_image_preview()
+	{
+		if(class_exists('Imagick'))
+		{
+			//Code to find the $url goes here
+			
+			//Fetch the PDF (or atleast part of it)
+			$content = $this->llynx_scrape->getContent($url);
+			$thumbnail = $this->create_pdf_image($content, 'preview.pdf');
+			if($thumbnail !== false)
+			{
+				//Set the header and echo the results
+				header('Content-Type: image/' . $thumbnail->getImageFormat());
+				echo $thumbnail->getImageBlob();
+				//There is no additonal content
+				die();
+			}
+		}
+	}
 	function fetch_url()
 	{
 		//Sync our options
@@ -480,10 +524,10 @@ class linksLynx
 		//Replace the template tags with values
 		return str_replace($this->template_tags, $values, $this->opt['Htemplate']);
 	}
-        public function uninstall()
-        {
-                $this->admin->uninstall();
-        }
+	public function uninstall()
+	{
+		$this->admin->uninstall();
+	}
 }
 //Let's make an instance of our object takes care of everything
 $linksLynx = new linksLynx;
