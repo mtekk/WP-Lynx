@@ -111,9 +111,10 @@ class llynxScrape
 			//If this is PDF we must do other things
 			if($this->is_PDF($content))
 			{
+				//TODO: eventually we could use a 3rd party library to attempt to extract the title and maybe some text
 				$this->title = '';
-				$this->text = array('PDF');
-				$this->images[] = pdf_helpers::fetch_pdf_image_preview($url);
+				$this->text = array('');
+				$this->images[] = pdf_helpers::pdf_image_preview($content);
 			}
 			else
 			{
