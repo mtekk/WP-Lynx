@@ -241,15 +241,8 @@ class linksLynx
 			die();
 		}
 		$uploadDir = wp_upload_dir();
+		//If the upload directory isn't set or writeable, we can't upload thumbnails, so disable them
 		if(!isset($uploadDir['path']) || !is_writable($uploadDir['path']))
-		{
-			$allow_images = false;
-		}
-		else
-		{
-			$allow_images = true;
-		}
-		if(!$allow_images)
 		{
 			$this->llynx_scrape->images = array();
 		}
