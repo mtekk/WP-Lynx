@@ -22,6 +22,11 @@ if(!function_exists('url_to_absolute'))
 {
 	require_once(dirname(__FILE__) . '/includes/url_to_absolute.php');
 }
+//Include pdf_helpers class
+if(!class_exists('pdf_helpers'))
+{
+	require_once(dirname(__FILE__) . '/class.pdf_helpers.php');
+}
 class llynxScrape
 {
 	const version = '1.1.2';
@@ -100,25 +105,35 @@ class llynxScrape
 		//Get our content
 		if($content = $this->getContent($url))
 		{
-			//Convert to UTF-8
-			$content =  mb_convert_encoding($content, "UTF-8", $this->findEncoding($content));
-			//Strip any script tags
-			$content = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', ' ', $content);
-			$content = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', ' ', $content);
+			//Reset images and text variables
 			$this->images = array();
-			//Reset text variable
 			$this->text = array();
-			//Find our Open Graph content
-			$this->findOGtags($content);
-			if(!$this->opt['bog_only'] || (count($this->images) < 1 && count($this->text) < 1))
+			//If this is PDF we must do other things
+			if($this->is_PDF($content))
 			{
-				//Extract images on the page
-				$this->findImages($content, $url);
-				//Extract a few paragraphs from the page
-				$this->findText($content);
+				$this->title = '';
+				$this->text = array('PDF');
+				$this->images[] = pdf_helpers::fetch_pdf_image_preview($url);
 			}
-			//Extract the page title
-			$this->findTitle($content);
+			else
+			{
+				//Convert to UTF-8
+				$content =  mb_convert_encoding($content, "UTF-8", $this->findEncoding($content));
+				//Strip any script tags
+				$content = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', ' ', $content);
+				$content = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', ' ', $content);
+				//Find our Open Graph content
+				$this->findOGtags($content);
+				if(!$this->opt['bog_only'] || (count($this->images) < 1 && count($this->text) < 1))
+				{
+					//Extract images on the page
+					$this->findImages($content, $url);
+					//Extract a few paragraphs from the page
+					$this->findText($content);
+				}
+				//Extract the page title
+				$this->findTitle($content);
+			}
 		}
 	}
 	function parseTag($tag, $content)
@@ -352,7 +367,7 @@ class llynxScrape
 	}
 	function is_PNG($data)
 	{
-		//The identity for a PNG is 8Bytes (64bits)long
+		//The identity for a PNG is 8Bytes (64bits) long
 		$ident = unpack('Nupper/Nlower', $data);
 		//Make sure we get PNG
 		if($ident['upper'] === 0x89504E47 && $ident['lower'] === 0x0D0A1A0A)
@@ -363,7 +378,7 @@ class llynxScrape
 	}
 	function is_GIF($data)
 	{
-		//The identity for a GIF is 6bytes (48Bits)long
+		//The identity for a GIF is 6bytes (48Bits) long
 		$ident = unpack('nupper/nmiddle/nlower', $data);
 		//Make sure we get GIF 87a or 89a
 		if($ident['upper'] === 0x4749 && $ident['middle'] === 0x4638 && ($ident['lower'] === 0x3761 || $ident['lower'] === 0x3961))
@@ -376,6 +391,17 @@ class llynxScrape
 		$ident = unpack('nmagic/nmarker', $data);
 		//Make sure we're a JPEG
 		if($ident['magic'] === 0xFFD8)
+		{
+			return true;
+		}
+		return false;
+	}
+	function is_PDF($data)
+	{
+		//The identity for a PDF is 4Bytes (32bits) long
+		$ident = unpack('Nupper', $data);
+		//Make sure we get %PDF
+		if($ident['upper'] === 0x25504446)
 		{
 			return true;
 		}

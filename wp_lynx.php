@@ -49,6 +49,11 @@ if(!class_exists('llynxScrape'))
 {
 	require_once(dirname(__FILE__) . '/class.llynx_scrape.php');
 }
+//Include pdf_helpers class
+if(!class_exists('pdf_helpers'))
+{
+	require_once(dirname(__FILE__) . '/class.pdf_helpers.php');
+}
 /**
  * The administrative interface class 
  */
@@ -201,45 +206,6 @@ class linksLynx
 	{
 		include_once('template.llynx_views.php');
 	}
-	/**
-	 * Creates a single page image for the passed in PDF
-	 * 
-	 * @param string $content The raw content of the PDF returned by getContent
-	 * @param string $name The name of the PDF
-	 * 
-	 * @return Imagick the image representing the specified PDF
-	 */
-	function create_pdf_image($content, $name)
-	{
-		if(class_exists('Imagick'))
-		{
-			//Create our thumbnail
-			$image = new Imagick();
-			$image->readImageBlob($content, $name . '[0]');
-			$image->setIteratorIndex(0);
-			$image->setImageFormat('jpeg');
-			$image->setImageCompressionQuality($this->opt['acache_quality']);
-			return $image;
-		}
-		return false;
-	}
-	/**
-	 * This function is meant to be called to return the content of an image for a specified PDF
-	 */
-	function fetch_pdf_image_preview($url)
-	{
-		if(class_exists('Imagick'))
-		{
-			//Fetch the PDF (or atleast part of it)
-			$content = $this->llynx_scrape->getContent($url);
-			$thumbnail = $this->create_pdf_image($content, 'preview.pdf');
-			if($thumbnail !== false)
-			{
-				return 'data:image/' . $thumbnail->getImageFormat() . ';base64,' . base64_encode($thumbnail->getImageBlob());
-			}
-		}
-		return false;
-	}
 	function fetch_url()
 	{
 		//Sync our options
@@ -264,23 +230,9 @@ class linksLynx
 				));
 			die();
 		}
-		//Hacky hack hack
-		//TODO: This should move to lynx_scrape
-		else if(strpos($url, '.pdf') !== false)
-		{
-			$image = $this->fetch_pdf_image_preview($url);
-			echo json_encode(array(
-				'title' => 'A PDF file',
-				'url' => $url,
-				'descriptions' => array('This is a PDF, must provide your own description'),
-				'images' => array($image)
-			));
-			//Nothing left to do but die
-			die();
-		}
 		$this->llynx_scrape->scrapeContent($url);
 		//Check if llynx_scrape found errors
-		if((count($this->llynx_scrape->images) < 1 && $this->llynx_scrape->title == '' && count($this->llynx_scrape->text) < 1))
+		if(count($this->llynx_scrape->images) < 1 && $this->llynx_scrape->title == '' && count($this->llynx_scrape->text) < 1)
 		{
 			echo json_encode(array(
 				'error' => 'scrape',
