@@ -226,24 +226,19 @@ class linksLynx
 	/**
 	 * This function is meant to be called to return the content of an image for a specified PDF
 	 */
-	function fetch_pdf_image_preview()
+	function fetch_pdf_image_preview($url)
 	{
 		if(class_exists('Imagick'))
 		{
-			//Code to find the $url goes here
-			
 			//Fetch the PDF (or atleast part of it)
 			$content = $this->llynx_scrape->getContent($url);
 			$thumbnail = $this->create_pdf_image($content, 'preview.pdf');
 			if($thumbnail !== false)
 			{
-				//Set the header and echo the results
-				header('Content-Type: image/' . $thumbnail->getImageFormat());
-				echo $thumbnail->getImageBlob();
-				//There is no additonal content
-				die();
+				return 'data:image/' . $thumbnail->getImageFormat() . ';base64,' . base64_encode($thumbnail->getImageBlob());
 			}
 		}
+		return false;
 	}
 	function fetch_url()
 	{
@@ -267,6 +262,20 @@ class linksLynx
 				'error' => 'url',
 				'error_msg' => __('Invalid URL', 'wp-lynx')
 				));
+			die();
+		}
+		//Hacky hack hack
+		//TODO: This should move to lynx_scrape
+		else if(strpos($url, '.pdf') !== false)
+		{
+			$image = $this->fetch_pdf_image_preview($url);
+			echo json_encode(array(
+				'title' => 'A PDF file',
+				'url' => $url,
+				'descriptions' => array('This is a PDF, must provide your own description'),
+				'images' => array($image)
+			));
+			//Nothing left to do but die
 			die();
 		}
 		$this->llynx_scrape->scrapeContent($url);
