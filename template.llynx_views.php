@@ -57,7 +57,7 @@ require_once(dirname(__FILE__) . '/includes/block_direct_access.php');
 		<span><%= message %></span>
 		<a class="llynx_message_close" href="#" title="<?php _e('Dismiss Message','wp-lynx')?>">
 			<span class="llynx_close_icon">
-				<span class="screen-reader-text"><?php _e('Dismiss Message', 'wp-lyxn');?></span>
+				<span class="screen-reader-text"><?php _e('Dismiss Message', 'wp-lynx');?></span>
 			</span>
 		</a>
 	</div>
