@@ -290,11 +290,12 @@ class linksLynx
 		//Clean the title
 		$title = esc_attr($_POST['title']);
 		//Clean the image
+		$is_pdf = pdf_helpers::is_image_data($_POST['image']);
 		$image = esc_url_raw($_POST['image']);
 		//Clean the description
 		$description = wp_kses($_POST['description'], wp_kses_allowed_html('post'));
 		//Assemble the lynx print and echo
-		echo $this->url_insert_handler($url, $title, $description, $image, false);
+		echo $this->url_insert_handler($url, $title, $description, $image, false, $is_pdf);
 		die();
 	}
 	/**
@@ -311,7 +312,7 @@ class linksLynx
 	function save_thumbnail($thumbnail, $name, $extension, $directory, &$file_name)
 	{
 		//PDFs are special
-		if($extension === 'pdf')
+		if($extension == 'pdf')
 		{
 			//Make sure we use a unique filename
 			$file_name = wp_unique_filename($directory['path'], $name . '.jpg');
@@ -371,7 +372,11 @@ class linksLynx
 		}
 		//The extension should be the stuff after the last '.', make sure its lower case
 		$extension = strtolower(end($image_parts));
-		if($this->llynx_scrape->is_PNG($data))
+		if($data instanceof Imagick)
+		{
+			$extension = 'pdf';
+		}
+		else if($this->llynx_scrape->is_PNG($data))
 		{
 			$extension = 'png';
 		}
@@ -464,9 +469,10 @@ class linksLynx
 	 * @param string $description
 	 * @param string $image
 	 * @param bool $no_image
+	 * @param bool $is_pdf
 	 * @return string compiled HTML
 	 */
-	function url_insert_handler($url, $title, $description, $image_source_url = NULL, $no_image = false)
+	function url_insert_handler($url, $title, $description, $image_source_url = NULL, $no_image = false, $is_pdf = false)
 	{
 		$values = array('url' => $url,
 					'short_url' => '',
@@ -493,7 +499,7 @@ class linksLynx
 			$values['short_url'] = $values['url'];
 		}
 		//Build the image component, if needed
-		if(!$no_image && $image_source_url !== NULL)
+		if(!$no_image && ($image_source_url !== NULL || $is_pdf))
 		{
 			//Get the upload location
 			$uploadDir = wp_upload_dir();
@@ -505,7 +511,7 @@ class linksLynx
 				$new_height = 0;
 				$new_width = 0;
 				//If we have a PDF we have some special work to perform
-				if(pdf_helpers::is_image_data($image_source_url))
+				if($is_pdf)
 				{
 					$image_name = explode('/', $url);
 					$image_name = end($image_name);
@@ -525,6 +531,7 @@ class linksLynx
 						{
 							$imgData->thumbnailImage($new_width, $new_height, false);
 						}
+						$imgThumb = $imgData;
 					}
 				}
 				//All other images are ehandled as before
