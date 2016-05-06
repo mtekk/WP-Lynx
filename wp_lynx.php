@@ -502,8 +502,8 @@ class linksLynx
 			if(isset($uploadDir['path']) && $uploadDir['url'] != NULL)
 			{
 				$imgData = false;
-				$nH = 0;
-				$nW = 0;
+				$new_height = 0;
+				$new_width = 0;
 				//If we have a PDF we have some special work to perform
 				if(pdf_helpers::is_image_data($image_source_url))
 				{
@@ -512,15 +512,27 @@ class linksLynx
 					if($content = $this->llynx_scrape->getContent($url))
 					{
 						$imgData = pdf_helpers::create_pdf_image($content, $image_name, $this->opt['acache_quality']);
-						$imgData->resizeimage($width, 2* $width, Imagick::FILTER_CUBIC, 0.5);
+						//Still need to get the dimensions so we have the scaled data
+						$width = $imgData->getImageWidth();
+						$height = $imgData->getImageHeight();
+						$this->get_scaled_dimensions($width, $height, $new_width, $new_height);
+						//Crop the thumbnail if we need to, otherwise just scale
+						if($this->opt['bcache_crop'])
+						{
+							$imgData->cropThumbnailImage($this->opt['acache_max_x'], $this->opt['acache_max_y']);
+						}
+						else
+						{
+							$imgData->thumbnailImage($new_width, $new_height, false);
+						}
 					}
 				}
-				//All other images are easy
+				//All other images are ehandled as before
 				else
 				{
 					$imgData = $this->llynx_scrape->getContent($image_source_url, $url);
 					//Resize the image
-					$imgThumb = $this->resize_image($imgData, $nW, $nH);
+					$imgThumb = $this->resize_image($imgData, $new_width, $new_height);
 				}
 				if($imgData !== false)
 				{
@@ -536,7 +548,7 @@ class linksLynx
 						$perms = $perms & 0000666;
 						@chmod($imgLoc, $perms);
 						//Assemble the image and link it, if it exists
-						$values['image'] = sprintf('<a title="Go to %1$s" href="%2$s"><img alt="%1$s" src="%3$s" width="%4$s" height="%5$s" /></a>', esc_attr($values['title']), $values['short_url'], $imgURL, $nW, $nH);
+						$values['image'] = sprintf('<a title="Go to %1$s" href="%2$s"><img alt="%1$s" src="%3$s" width="%4$s" height="%5$s" /></a>', esc_attr($values['title']), $values['short_url'], $imgURL, $new_width, $new_height);
 					}
 				}
 			}
