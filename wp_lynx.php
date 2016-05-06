@@ -469,7 +469,7 @@ class linksLynx
 			}
 		}
 		//Make sure short_url is never blank
-		else if($values['short_url'] == '')
+		if($values['short_url'] == '')
 		{
 			$values['short_url'] = $values['url'];
 		}
