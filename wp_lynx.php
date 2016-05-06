@@ -300,7 +300,7 @@ class linksLynx
 	/**
 	 * Handles saving the image thumbnails
 	 * 
-	 * @param resource $thumbnail The thumbnail image to save
+	 * @param resource $thumbnail The thumbnail image to save, may be GD or Imagick resource
 	 * @param string $name The name of the image to save
 	 * @param string $extension The image thumbnail extensions
 	 * @param string $directory The directory to save in
@@ -310,8 +310,17 @@ class linksLynx
 	 */
 	function save_thumbnail($thumbnail, $name, $extension, $directory, &$file_name)
 	{
+		//PDFs are special
+		if($extension === 'pdf')
+		{
+			//Make sure we use a unique filename
+			$file_name = wp_unique_filename($directory['path'], $name . '.jpg');
+			//Compile our image location and image URL
+			$save_location = $directory['path'] . '/' . $file_name;
+			return $thumbnail->writeImage($save_location);
+		}
 		//If we will be saving as jpeg
-		if($this->opt['Scache_type'] == 'jpeg' || ($this->opt['Scache_type'] == 'original' && ($extension == 'jpg' || $extension == 'jpeg')))
+		else if($this->opt['Scache_type'] == 'jpeg' || ($this->opt['Scache_type'] == 'original' && ($extension == 'jpg' || $extension == 'jpeg')))
 		{
 			//Make sure we use a unique filename
 			$file_name = wp_unique_filename($directory['path'], $name . '.jpg');
@@ -376,66 +385,76 @@ class linksLynx
 		}
 		return array('name' => $image_name, 'extension' => $extension);
 	}
-//TODO Old junk need to refactor	
 	/**
-	 * resize_image
+	 * Calculates new height and width numbers based off of the settings for thumbnail scaling/cropping
 	 * 
-	 * Resizes the given image
-	 * 
-	 * @param bitstream $data
-	 * @param int $nW
-	 * @param int $nH
-	 * @return GDImage 
+	 * @param int &$width The original width of the image
+	 * @param int &$height The original height of the image
+	 * @param int &$new_width The scaled width of the image
+	 * @param int &$new_height The scaled height of the image
 	 */
-	function resize_image($data, &$nW, &$nH)
+	function get_scaled_dimensions(&$width, &$height, &$new_width, &$new_height)
 	{
-		//Time to resize the image
-		$imgRaw = imagecreatefromstring($data);
-		//Get the image dimensions and aspect ratio
-		$w = imagesx($imgRaw);
-		$h = imagesy($imgRaw);
-		$r = $w/$h;
+		$aspect_ratio = $width/$height;
 		//If we will be cropping the image we need to do some calculations
 		if($this->opt['bcache_crop'])
 		{
 			//If we are wider, hight is more important
-			if($w > $h)
+			if($width > $height)
 			{
-				$w = ceil($w - ($w * ($r - $this->opt['acache_max_x'] / $this->opt['acache_max_y'])));
+				$width = ceil($width - ($width * ($aspect_ratio - $this->opt['acache_max_x'] / $this->opt['acache_max_y'])));
 			}
 			//If we are taller, width is more important
 			else
 			{
-				$h = ceil($h - ($h * ($r - $this->opt['acache_max_x'] / $this->opt['acache_max_y'])));
+				$height = ceil($height - ($height * ($aspect_ratio - $this->opt['acache_max_x'] / $this->opt['acache_max_y'])));
 			}
 			//Out new height and widths are simple as we are cropping
-			$nH = $this->opt['acache_max_y'];
-			$nW = $this->opt['acache_max_x'];
+			$new_height = $this->opt['acache_max_y'];
+			$new_width = $this->opt['acache_max_x'];
 		}
 		//Otherwise we're just resizing
 		else
 		{
 			//If the destination ration is wider than the source we need to adjust accordingly
-			if($this->opt['acache_max_x']/$this->opt['acache_max_y'] > $r)
+			if($this->opt['acache_max_x']/$this->opt['acache_max_y'] > $aspect_ratio)
 			{
 				//We are height limited, maintain aspect ratio
-				$nW = $this->opt['acache_max_y'] * $r;
-				$nH = $this->opt['acache_max_y'];
+				$new_width = $this->opt['acache_max_y'] * $aspect_ratio;
+				$new_height = $this->opt['acache_max_y'];
 			}
 			else
 			{
 				//We are width limited, maintain aspect ratio
-				$nW = $this->opt['acache_max_x'];
-				$nH = $this->opt['acache_max_x'] / $r;
+				$new_width = $this->opt['acache_max_x'];
+				$new_height = $this->opt['acache_max_x'] / $aspect_ratio;
 			}
 		}
+	}
+	/**
+	 * Resizes and possibly cropps the given image
+	 * 
+	 * @param bitstream $data The raw bistream of the image to resize
+	 * @param int &$new_width The new width of the resized image
+	 * @param int &$new_height The new height of the resized image
+	 * @return GDImage The scaled/cropped image
+	 */
+	function resize_image($data, &$new_width, &$new_height)
+	{
+		//Time to resize the image
+		$imgRaw = imagecreatefromstring($data);
+		//Get the image dimensions and aspect ratio
+		$width = imagesx($imgRaw);
+		$height = imagesy($imgRaw);
+		$this->get_scaled_dimensions($width, $height, $new_width, $new_height);
 		//Create the destination image
-		$imgThumb = imagecreatetruecolor($nW, $nH);
+		$imgThumb = imagecreatetruecolor($new_width, $new_height);
 		//Do the resizing/cropping
-		imagecopyresampled($imgThumb, $imgRaw, 0, 0, 0, 0, $nW, $nH, $w, $h);
+		imagecopyresampled($imgThumb, $imgRaw, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
 		//Return the thumbnail
 		return $imgThumb;
 	}
+//TODO Old junk need to refactor
 	/**
 	 * url_insert_handler
 	 * 
@@ -473,7 +492,7 @@ class linksLynx
 		{
 			$values['short_url'] = $values['url'];
 		}
-		//Built the image component, if needed
+		//Build the image component, if needed
 		if(!$no_image && $image_source_url !== NULL)
 		{
 			//Get the upload location
@@ -482,18 +501,31 @@ class linksLynx
 			//If we recieved an error, then we have no image
 			if(isset($uploadDir['path']) && $uploadDir['url'] != NULL)
 			{
+				$imgData = false;
+				$nH = 0;
+				$nW = 0;
+				//If we have a PDF we have some special work to perform
 				if(pdf_helpers::is_image_data($image_source_url))
 				{
-					
+					$image_name = explode('/', $url);
+					$image_name = end($image_name);
+					if($content = $this->llynx_scrape->getContent($url))
+					{
+						$imgData = pdf_helpers::create_pdf_image($content, $image_name, $this->opt['acache_quality']);
+						$imgData->resizeimage($width, 2* $width, Imagick::FILTER_CUBIC, 0.5);
+					}
 				}
-				else if($imgData = $this->llynx_scrape->getContent($image_source_url, $url))
+				//All other images are easy
+				else
+				{
+					$imgData = $this->llynx_scrape->getContent($image_source_url, $url);
+					//Resize the image
+					$imgThumb = $this->resize_image($imgData, $nW, $nH);
+				}
+				if($imgData !== false)
 				{
 					//Get the image name and extension from the image data and URL
 					$image = $this->get_image_name($imgData, $image_source_url);
-					//Generate the thumbnail
-					$nH = 0;
-					$nW = 0;
-					$imgThumb = $this->resize_image($imgData, $nW, $nH);
 					//If the image was saved, we'll allow the image tag to be replaced
 					if($this->save_thumbnail($imgThumb, $image['name'], $image['extension'], $uploadDir, $fileName))
 					{
