@@ -72,4 +72,15 @@ class pdf_helpers
 		}
 		return false;
 	}
+	/*
+	 * This function reads the first few bytes of the input string to see if it is image data or a url
+	 * 
+	 * @param string $content The raw content to determine if it is a URL or data
+	 * 
+	 * @return bool Wheather or not the content is image data
+	 */
+	static public function is_image_data($content)
+	{
+		return (stripos($content, 'data:image') === 0 && stripos($content, ';base64,') !== false);
+	}
 }
