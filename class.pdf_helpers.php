@@ -45,7 +45,10 @@ class pdf_helpers
 			$image = new Imagick();
 			$image->readImageBlob($content, $name . '[0]');
 			$image->setIteratorIndex(0);
-			$image->setImageFormat('jpeg');
+			$image->setImageBackgroundColor('#ffffff');
+			$image->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
+			$image->mergeImageLayers(Imagick::LAYERMETHOD_FLATTEN);
+			$image->setImageFormat('jpg');
 			$image->setImageCompressionQuality($quality);
 			return $image;
 		}
@@ -65,7 +68,7 @@ class pdf_helpers
 			$thumbnail = pdf_helpers::create_pdf_image($content, 'preview.pdf');
 			if($thumbnail !== false)
 			{
-				$thumbnail->resizeimage(250, 500, Imagick::FILTER_CUBIC, 0.5);
+				$thumbnail->thumbnailImage(250, 0, false);
 				return 'data:image/' . $thumbnail->getImageFormat() . ';base64,' . base64_encode($thumbnail->getImageBlob());
 			}
 		}
