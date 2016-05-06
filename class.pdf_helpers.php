@@ -33,12 +33,11 @@ class pdf_helpers
 	 * 
 	 * @param string $content The raw content of the PDF returned by getContent
 	 * @param string $name The name of the PDF
-	 * @param int $width The width of the image, defaults to 250 px
 	 * @param int $quality The quality factor for JPEG
 	 * 
 	 * @return Imagick the image representing the specified PDF
 	 */
-	static public function create_pdf_image($content, $name, $width = 250, $quality = 75)
+	static public function create_pdf_image($content, $name, $quality = 75)
 	{
 		if(class_exists('Imagick'))
 		{
@@ -47,7 +46,6 @@ class pdf_helpers
 			$image->readImageBlob($content, $name . '[0]');
 			$image->setIteratorIndex(0);
 			$image->setImageFormat('jpeg');
-			//$image->resizeimage($width, 2* $width, Imagick::FILTER_CUBIC, 0.5);
 			$image->setImageCompressionQuality($quality);
 			return $image;
 		}
@@ -67,6 +65,7 @@ class pdf_helpers
 			$thumbnail = pdf_helpers::create_pdf_image($content, 'preview.pdf');
 			if($thumbnail !== false)
 			{
+				$thumbnail->resizeimage(250, 500, Imagick::FILTER_CUBIC, 0.5);
 				return 'data:image/' . $thumbnail->getImageFormat() . ';base64,' . base64_encode($thumbnail->getImageBlob());
 			}
 		}
