@@ -297,6 +297,85 @@ class linksLynx
 		echo $this->url_insert_handler($url, $title, $description, $image, false);
 		die();
 	}
+	/**
+	 * Handles saving the image thumbnails
+	 * 
+	 * @param resource $thumbnail The thumbnail image to save
+	 * @param string $name The name of the image to save
+	 * @param string $extension The image thumbnail extensions
+	 * @param string $directory The directory to save in
+	 * @param string &$file_name The passed by reference file name for the saved image
+	 * 
+	 * @return bool whether or not the image thumbnail was sucessfully saved
+	 */
+	function save_thumbnail($thumbnail, $name, $extension, $directory, &$file_name)
+	{
+		//If we will be saving as jpeg
+		if($this->opt['Scache_type'] == 'jpeg' || ($this->opt['Scache_type'] == 'original' && ($extension == 'jpg' || $extension == 'jpeg')))
+		{
+			//Make sure we use a unique filename
+			$file_name = wp_unique_filename($directory['path'], $name . '.jpg');
+			//Compile our image location and image URL
+			$save_location = $directory['path'] . '/' . $file_name;
+			//Save as JPEG
+			return imagejpeg($thumbnail, $save_location, $this->opt['acache_quality']);
+		}
+		//If we will be saving as png
+		else if($this->opt['Scache_type'] == 'png' || ($this->opt['Scache_type'] == 'original' && $extension == 'png'))
+		{
+			//Make sure we use a unique filename
+			$file_name = wp_unique_filename($directory['path'], $name . '.png');
+			//Compile our image location and image URL
+			$save_location = $directory['path'] . '/' . $file_name;
+			//Save as PNG
+			return imagepng($thumbnail, $save_location);
+		}
+		//If we will be saving as gif
+		else
+		{
+			//Make sure we use a unique filename
+			$file_name = wp_unique_filename($directory['path'], $name . '.gif');
+			//Compile our image location and image URL
+			$save_location = $directory['path'] . '/' . $file_name;
+			//Save as GIF
+			return imagegif($thumbnail, $save_location);
+		}
+	}
+	/**
+	 * Extracts the image extension from the available data
+	 * 
+	 * @param resource $data The image data
+	 * @param string $url The URL for the image
+	 * 
+	 * @return array An associative array with the name and extension of the image
+	 */
+	function get_image_name($data, $url)
+	{
+		//We need to manipulate the url to get the image name
+		$image_name = explode('/', $url);
+		$image_name = end($image_name);
+		$image_parts = explode('.', $image_name);
+		$image_name = $image_parts[0];
+		if($image_name == '')
+		{
+			$image_name = 'llynx-site-thumb';
+		}
+		//The extension should be the stuff after the last '.', make sure its lower case
+		$extension = strtolower(end($image_parts));
+		if($this->llynx_scrape->is_PNG($data))
+		{
+			$extension = 'png';
+		}
+		else if($this->llynx_scrape->is_JPEG($data))
+		{
+			$extension = 'jpg';
+		}
+		else if($this->llynx_scrape->is_GIF($data))
+		{
+			$extension = 'gif';
+		}
+		return array('name' => $image_name, 'extension' => $extension);
+	}
 //TODO Old junk need to refactor	
 	/**
 	 * resize_image
@@ -368,7 +447,7 @@ class linksLynx
 	 * @param bool $no_image
 	 * @return string compiled HTML
 	 */
-	function url_insert_handler($url, $title, $description, $image = NULL, $no_image = false)
+	function url_insert_handler($url, $title, $description, $image_source_url = NULL, $no_image = false)
 	{
 		$values = array('url' => $url,
 					'short_url' => '',
@@ -395,83 +474,38 @@ class linksLynx
 			$values['short_url'] = $values['url'];
 		}
 		//Built the image component, if needed
-		if(!$no_image && $image !== NULL)
+		if(!$no_image && $image_source_url !== NULL)
 		{
 			//Get the upload location
 			$uploadDir = wp_upload_dir();
 			//Grab the image (raw data), use a referrer to avoid issues with anti-hotlinking scripts
 			//If we recieved an error, then we have no image
-			if(isset($uploadDir['path']) && $uploadDir['url'] != NULL && $imgData = $this->llynx_scrape->getContent($image, $url))
+			if(isset($uploadDir['path']) && $uploadDir['url'] != NULL)
 			{
-				//We need to manipulate the url to get the image name
-				$imgName = explode('/', $image);
-				$imgName = end($imgName);
-				$imgParts = explode('.',$imgName);
-				$imgName = $imgParts[0];
-				if($imgName == '')
+				if(pdf_helpers::is_image_data($image_source_url))
 				{
-					$imgName = 'llynx-site-thumb';
+					
 				}
-				//The extension should be the stuff after the last '.', make sure its lower case
-				$imgExt = strtolower(end($imgParts));
-				if($this->llynx_scrape->is_PNG($imgData))
+				else if($imgData = $this->llynx_scrape->getContent($image_source_url, $url))
 				{
-					$imgExt = 'png';
-				}
-				else if($this->llynx_scrape->is_JPEG($imgData))
-				{
-					$imgExt = 'jpg';
-				}
-				else if($this->llynx_scrape->is_GIF($imgData))
-				{
-					$imgExt = 'gif';
-				}
-				//Generate the thumbnail
-				$nH = 0;
-				$nW = 0;
-				$imgThumb = $this->resize_image($imgData, $nW, $nH);
-				$saved = false;
-				//If we will be saving as jpeg
-				if($this->opt['Scache_type'] == 'jpeg' || ($this->opt['Scache_type'] == 'original' && ($imgExt == 'jpg' || $imgExt == 'jpeg')))
-				{
-					//Make sure we use a unique filename
-					$fileName = wp_unique_filename($uploadDir['path'], $imgName . '.jpg');
-					//Compile our image location and image URL
-					$imgLoc = $uploadDir['path'] . '/' . $fileName;
-					//Save as JPEG
-					$saved = imagejpeg($imgThumb, $imgLoc, $this->opt['acache_quality']);
-				}
-				//If we will be saving as png
-				else if($this->opt['Scache_type'] == 'png' || ($this->opt['Scache_type'] == 'original' && $imgExt == 'png'))
-				{
-					//Make sure we use a unique filename
-					$fileName = wp_unique_filename($uploadDir['path'], $imgName . '.png');
-					//Compile our image location and image URL
-					$imgLoc = $uploadDir['path'] . '/' . $fileName;
-					//Save as PNG
-					$saved = imagepng($imgThumb, $imgLoc);
-				}
-				//If we will be saving as gif
-				else
-				{
-					//Make sure we use a unique filename
-					$fileName = wp_unique_filename($uploadDir['path'], $imgName . '.gif');
-					//Compile our image location and image URL
-					$imgLoc = $uploadDir['path'] . '/' . $fileName;
-					//Save as GIF
-					$saved = imagegif($imgThumb, $imgLoc);
-				}
-				$imgURL = $uploadDir['url'] . '/' . $fileName;
-				//If the image was saved, we'll allow the image tag to be replaced
-				if($saved)
-				{
-					//Verify we have the correct permissions of new file
-					$stat = @stat(dirname($imgLoc));
-					$perms = $stat['mode'] & 0007777;
-					$perms = $perms & 0000666;
-					@chmod($imgLoc, $perms);
-					//Assemble the image and link it, if it exists
-					$values['image'] = sprintf('<a title="Go to %1$s" href="%2$s"><img alt="%1$s" src="%3$s" width="%4$s" height="%5$s" /></a>', esc_attr($values['title']), $values['short_url'], $imgURL, $nW, $nH);
+					//Get the image name and extension from the image data and URL
+					$image = $this->get_image_name($imgData, $image_source_url);
+					//Generate the thumbnail
+					$nH = 0;
+					$nW = 0;
+					$imgThumb = $this->resize_image($imgData, $nW, $nH);
+					//If the image was saved, we'll allow the image tag to be replaced
+					if($this->save_thumbnail($imgThumb, $image['name'], $image['extension'], $uploadDir, $fileName))
+					{
+						$imgURL = $uploadDir['url'] . '/' . $fileName;
+						//Verify we have the correct permissions of new file
+						$stat = @stat(dirname($imgLoc));
+						$perms = $stat['mode'] & 0007777;
+						$perms = $perms & 0000666;
+						@chmod($imgLoc, $perms);
+						//Assemble the image and link it, if it exists
+						$values['image'] = sprintf('<a title="Go to %1$s" href="%2$s"><img alt="%1$s" src="%3$s" width="%4$s" height="%5$s" /></a>', esc_attr($values['title']), $values['short_url'], $imgURL, $nW, $nH);
+					}
 				}
 			}
 		}
