@@ -230,6 +230,7 @@ var llynx = llynx || {};
 	});
 	//lynxPrintAdd
 	media.view.llynxPrintAdd = Backbone.View.extend({
+		spinnerQueue: 0,
 		className: 'llynx-print-add-frame',
 		template:  _.template($('#tmpl-llynx-print-add').html()),
 		initialize : function(){
@@ -252,17 +253,22 @@ var llynx = llynx || {};
 			$('.embed-url .spinner').css('visibility', 'visible');
 			//Clear messages before running again
 			_.invoke(llynx.messages.toArray(), 'destroy');
-			//TODO: Enable nonces
-			$.post(llynx.ajaxurl, {
-				action: 'wp_lynx_fetch_url',
-				url: $('input[name=llynx_url]').val(),
-				nonce: '1234'
-				},
-				this.response,
-				"json").fail(this.responseBad);
+			var urls = $('input[name=llynx_url]').val().split(' ');
+			var context = this;
+			urls.forEach(function(url){
+				context.spinnerQueue++;
+				//TODO: Enable nonces
+				$.post(llynx.ajaxurl, {
+					action: 'wp_lynx_fetch_url',
+					url: url,
+					nonce: '1234'
+					},
+					context.response,
+					"json").fail(context.responseBad);
+			});
 		},
 		response : function(data) {
-			$('.embed-url .spinner').css('visibility', 'hidden');
+			this.manageSpinner();
 			if(data.hasOwnProperty('error'))
 			{
 				console.log(data.error_msg);
@@ -274,9 +280,16 @@ var llynx = llynx || {};
 			}
 		},
 		responseBad : function() {
-			$('.embed-url .spinner').css('visibility', 'hidden');
+			this.manageSpinner();
 			console.log(objectL10n.wp_lynx_request_error_msg);
 			llynx.messages.create({type: 'error', message: objectL10n.wp_lynx_request_error_msg});
+		},
+		manageSpinner : function() {
+			this.spinnerQueue--;
+			if(this.spinnerQueue == 0)
+			{
+				$('.embed-url .spinner').css('visibility', 'hidden');
+			}
 		},
 		addSite : function(site) {
 			var view = new llynx.view.lynxPrint({model: site});
