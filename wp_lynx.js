@@ -131,7 +131,11 @@ var llynx = llynx || {};
 				nonce: '1234'
 				},
 				this.sendToPost,
-				"html");
+				"html").fail(this.responseBad);
+		},
+		responseBad : function() {
+			console.log(objectL10n.wp_lynx_request_error_msg);
+			llynx.messages.create({type: 'error', message: objectL10n.wp_lynx_request_error_msg});
 		},
 		sendToPost : function(data) {
 			//In the future this may be more intellegent, but for now the server gives us ready to use HTML
@@ -198,7 +202,11 @@ var llynx = llynx || {};
 				nonce: '1234'
 				},
 				this.sendToPost,
-				"html");
+				"html").fail(this.responseBad);
+		},
+		responseBad : function() {
+			console.log(objectL10n.wp_lynx_request_error_msg);
+			llynx.messages.create({type: 'error', message: objectL10n.wp_lynx_request_error_msg});
 		},
 		sendToPost : function(data) {
 			//In the future this may be more intellegent, but for now the server gives us ready to use HTML
