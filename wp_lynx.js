@@ -254,18 +254,17 @@ var llynx = llynx || {};
 			//Clear messages before running again
 			_.invoke(llynx.messages.toArray(), 'destroy');
 			var urls = $('input[name=llynx_url]').val().split(' ');
-			var context = this;
 			urls.forEach(function(url){
-				context.spinnerQueue++;
+				this.spinnerQueue++;
 				//TODO: Enable nonces
 				$.post(llynx.ajaxurl, {
 					action: 'wp_lynx_fetch_url',
 					url: url,
 					nonce: '1234'
 					},
-					context.response,
-					"json").fail(context.responseBad);
-			});
+					this.response,
+					"json").fail(this.responseBad);
+			}, this);
 		},
 		response : function(data) {
 			this.manageSpinner();
@@ -285,8 +284,7 @@ var llynx = llynx || {};
 			llynx.messages.create({type: 'error', message: objectL10n.wp_lynx_request_error_msg});
 		},
 		manageSpinner : function() {
-			this.spinnerQueue--;
-			if(this.spinnerQueue == 0)
+			if(--this.spinnerQueue == 0)
 			{
 				$('.embed-url .spinner').css('visibility', 'hidden');
 			}
