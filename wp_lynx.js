@@ -11,7 +11,7 @@ var llynx = llynx || {};
 		{
 			editor = tinymce.get(wpActiveEditor);
 			//If we find ourselves in a llynx div, append to end of it to prevent llynx printception
-			if(node = editor.dom.getParent(editor.selection.getNode(), 'div.llynx_print'))
+			if(editor && (node = editor.dom.getParent(editor.selection.getNode(), 'div.llynx_print')))
 			{
 				$(node).after(html);
 				return 0;
