@@ -16,12 +16,6 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
-//Include our url fixing functions
-if(!function_exists('url_to_absolute'))
-{
-	require_once(dirname(__FILE__) . '/includes/url_to_absolute.php');
-}
 //Include pdf_helpers class
 if(!class_exists('pdf_helpers'))
 {
@@ -364,7 +358,8 @@ class llynxScrape
 	 */
 	function urlFix($baseURL, $url)
 	{
-		return url_to_absolute($baseURL, $url);
+		return WP_Http::make_absolute_url($url, $baseURL);
+		//return url_to_absolute($baseURL, $url);
 	}
 	function is_PNG($data)
 	{
