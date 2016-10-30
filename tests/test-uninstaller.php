@@ -51,4 +51,3 @@ class UninstallerTests extends WP_Plugin_Uninstall_UnitTestCase
 		$this->assertEquals( false, get_option('llynx_options_bk') );
 	}
 }
-
