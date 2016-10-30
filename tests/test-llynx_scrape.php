@@ -9,7 +9,7 @@ class ScrapeTest extends WP_UnitTestCase {
 	public $scrape;
 	function setUp() {
 		parent::setUp();
-		$this->scrape = new llynx_scrape();
+		$this->scrape = new llynxScrape();
 	}
 	public function tearDown() {
 		parent::tearDown();
