@@ -359,7 +359,6 @@ class llynxScrape
 	function urlFix($baseURL, $url)
 	{
 		return WP_Http::make_absolute_url($url, $baseURL);
-		//return url_to_absolute($baseURL, $url);
 	}
 	function is_PNG($data)
 	{
