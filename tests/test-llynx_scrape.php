@@ -41,6 +41,22 @@ class ScrapeTest extends WP_UnitTestCase {
 		$this->assertSame('', $this->scrape->title);
 	}
 	function test_trimText(){
-		
+		$short_text = 'Better not touch me';
+		$long_text = 'This is partofamuchlongertext block';
+		//Test text + 3 characters shorter than max length
+		$result = $this->scrape->trimText($short_text, 23);
+		$this->assertSame($short_text, $result);
+		//Test text + 3 characters at max length
+		$result = $this->scrape->trimText($short_text, 22);
+		$this->assertSame($short_text, $result);
+		//Test text + 3 characters characters over max
+		$result = $this->scrape->trimText($short_text, 21);
+		$this->assertSame('Better not touch&hellip;', $result);
+		//Test text much longer than max
+		$result = $this->scrape->trimText($short_text, 12);
+		$this->assertSame('Better not&hellip;', $result);
+		//Test text longer than max with really long word
+		$result = $this->scrape->trimText($long_text, 24);
+		$this->assertSame('This is partofamuchlong&hellip;', $result);
 	}
 }
