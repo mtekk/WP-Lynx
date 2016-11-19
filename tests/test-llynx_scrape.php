@@ -24,4 +24,23 @@ class ScrapeTest extends WP_UnitTestCase {
 		$url2 = $this->scrape->urlFix($base_url, '/code/breadcrumb-navxt');
 		$this->assertSame($full_url, $url2);
 	}
+	function test_findTitle(){
+		$text1 = '<html>
+	<head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <title>Aptana  | Download Aptana Studio 3.6.1 </title>
+	</head>';
+		$text2 = '<html>
+	<head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	</head>';
+		$this->scrape->findTitle($text1);
+		$this->assertSame('Aptana | Download Aptana Studio 3.6.1', $this->scrape->title);
+		$this->scrape->title = '';
+		$this->scrape->findTitle($text2);
+		$this->assertSame('', $this->scrape->title);
+	}
+	function test_trimText(){
+		
+	}
 }

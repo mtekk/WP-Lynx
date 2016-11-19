@@ -314,8 +314,11 @@ class llynxScrape
 	{
 		//Match the title tag
 		preg_match('/<title>([^>]*)<\/title>/i', $content, $title);
-		//Clean up the title, remove excess whitespace and such
-		$this->title = trim(preg_replace('/(\s\s+|\n)/', ' ',strip_tags($title[0])));
+		if(isset($title[0]))
+		{
+			//Clean up the title, remove excess whitespace and such
+			$this->title = trim(preg_replace('/(\s\s+|\n)/', ' ',strip_tags($title[0])));
+		}
 	}
 	/**
 	 * titleTrim
