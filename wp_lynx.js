@@ -11,7 +11,7 @@ var llynx = llynx || {};
 		{
 			editor = tinymce.get(wpActiveEditor);
 			//If we find ourselves in a llynx div, append to end of it to prevent llynx printception
-			if(node = editor.dom.getParent(editor.selection.getNode(), 'div.llynx_print'))
+			if(editor && (node = editor.dom.getParent(editor.selection.getNode(), 'div.llynx_print')))
 			{
 				$(node).after(html);
 				return 0;
@@ -131,7 +131,11 @@ var llynx = llynx || {};
 				nonce: '1234'
 				},
 				this.sendToPost,
-				"html");
+				"html").fail(this.responseBad);
+		},
+		responseBad : function() {
+			console.log(objectL10n.wp_lynx_request_error_msg);
+			llynx.messages.create({type: 'error', message: objectL10n.wp_lynx_request_error_msg});
 		},
 		sendToPost : function(data) {
 			//In the future this may be more intellegent, but for now the server gives us ready to use HTML
@@ -198,7 +202,11 @@ var llynx = llynx || {};
 				nonce: '1234'
 				},
 				this.sendToPost,
-				"html");
+				"html").fail(this.responseBad);
+		},
+		responseBad : function() {
+			console.log(objectL10n.wp_lynx_request_error_msg);
+			llynx.messages.create({type: 'error', message: objectL10n.wp_lynx_request_error_msg});
 		},
 		sendToPost : function(data) {
 			//In the future this may be more intellegent, but for now the server gives us ready to use HTML
@@ -230,6 +238,7 @@ var llynx = llynx || {};
 	});
 	//lynxPrintAdd
 	media.view.llynxPrintAdd = Backbone.View.extend({
+		spinnerQueue: 0,
 		className: 'llynx-print-add-frame',
 		template:  _.template($('#tmpl-llynx-print-add').html()),
 		initialize : function(){
@@ -252,17 +261,21 @@ var llynx = llynx || {};
 			$('.embed-url .spinner').css('visibility', 'visible');
 			//Clear messages before running again
 			_.invoke(llynx.messages.toArray(), 'destroy');
-			//TODO: Enable nonces
-			$.post(llynx.ajaxurl, {
-				action: 'wp_lynx_fetch_url',
-				url: $('input[name=llynx_url]').val(),
-				nonce: '1234'
-				},
-				this.response,
-				"json").fail(this.responseBad);
+			var urls = $('input[name=llynx_url]').val().split(' ');
+			urls.forEach(function(url){
+				this.spinnerQueue++;
+				//TODO: Enable nonces
+				$.post(llynx.ajaxurl, {
+					action: 'wp_lynx_fetch_url',
+					url: url,
+					nonce: '1234'
+					},
+					this.response,
+					"json").fail(this.responseBad);
+			}, this);
 		},
 		response : function(data) {
-			$('.embed-url .spinner').css('visibility', 'hidden');
+			this.manageSpinner();
 			if(data.hasOwnProperty('error'))
 			{
 				console.log(data.error_msg);
@@ -274,9 +287,15 @@ var llynx = llynx || {};
 			}
 		},
 		responseBad : function() {
-			$('.embed-url .spinner').css('visibility', 'hidden');
+			this.manageSpinner();
 			console.log(objectL10n.wp_lynx_request_error_msg);
 			llynx.messages.create({type: 'error', message: objectL10n.wp_lynx_request_error_msg});
+		},
+		manageSpinner : function() {
+			if(--this.spinnerQueue == 0)
+			{
+				$('.embed-url .spinner').css('visibility', 'hidden');
+			}
 		},
 		addSite : function(site) {
 			var view = new llynx.view.lynxPrint({model: site});

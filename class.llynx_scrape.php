@@ -16,11 +16,10 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
-//Include our url fixing functions
-if(!function_exists('url_to_absolute'))
+//Include pdf_helpers class
+if(!class_exists('pdf_helpers'))
 {
-	require_once(dirname(__FILE__) . '/includes/url_to_absolute.php');
+	require_once(dirname(__FILE__) . '/class.pdf_helpers.php');
 }
 class llynxScrape
 {
@@ -100,25 +99,36 @@ class llynxScrape
 		//Get our content
 		if($content = $this->getContent($url))
 		{
-			//Convert to UTF-8
-			$content =  mb_convert_encoding($content, "UTF-8", $this->findEncoding($content));
-			//Strip any script tags
-			$content = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', ' ', $content);
-			$content = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', ' ', $content);
+			//Reset images and text variables
 			$this->images = array();
-			//Reset text variable
 			$this->text = array();
-			//Find our Open Graph content
-			$this->findOGtags($content);
-			if(!$this->opt['bog_only'] || (count($this->images) < 1 && count($this->text) < 1))
+			//If this is PDF we must do other things
+			if($this->is_PDF($content))
 			{
-				//Extract images on the page
-				$this->findImages($content, $url);
-				//Extract a few paragraphs from the page
-				$this->findText($content);
+				//TODO: eventually we could use a 3rd party library to attempt to extract the title and maybe some text
+				$this->title = '';
+				$this->text = array('');
+				$this->images[] = pdf_helpers::pdf_image_preview($content);
 			}
-			//Extract the page title
-			$this->findTitle($content);
+			else
+			{
+				//Convert to UTF-8
+				$content =  mb_convert_encoding($content, "UTF-8", $this->findEncoding($content));
+				//Strip any script tags
+				$content = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', ' ', $content);
+				$content = preg_replace('/<style\b[^>]*>(.*?)<\/style>/is', ' ', $content);
+				//Find our Open Graph content
+				$this->findOGtags($content);
+				if(!$this->opt['bog_only'] || (count($this->images) < 1 && count($this->text) < 1))
+				{
+					//Extract images on the page
+					$this->findImages($content, $url);
+					//Extract a few paragraphs from the page
+					$this->findText($content);
+				}
+				//Extract the page title
+				$this->findTitle($content);
+			}
 		}
 	}
 	function parseTag($tag, $content)
@@ -304,8 +314,11 @@ class llynxScrape
 	{
 		//Match the title tag
 		preg_match('/<title>([^>]*)<\/title>/i', $content, $title);
-		//Clean up the title, remove excess whitespace and such
-		$this->title = trim(preg_replace('/(\s\s+|\n)/', ' ',strip_tags($title[0])));
+		if(isset($title[0]))
+		{
+			//Clean up the title, remove excess whitespace and such
+			$this->title = trim(preg_replace('/(\s\s+|\n)/', ' ',strip_tags($title[0])));
+		}
 	}
 	/**
 	 * titleTrim
@@ -348,11 +361,11 @@ class llynxScrape
 	 */
 	function urlFix($baseURL, $url)
 	{
-		return url_to_absolute($baseURL, $url);
+		return WP_Http::make_absolute_url($url, $baseURL);
 	}
 	function is_PNG($data)
 	{
-		//The identity for a PNG is 8Bytes (64bits)long
+		//The identity for a PNG is 8Bytes (64bits) long
 		$ident = unpack('Nupper/Nlower', $data);
 		//Make sure we get PNG
 		if($ident['upper'] === 0x89504E47 && $ident['lower'] === 0x0D0A1A0A)
@@ -363,7 +376,7 @@ class llynxScrape
 	}
 	function is_GIF($data)
 	{
-		//The identity for a GIF is 6bytes (48Bits)long
+		//The identity for a GIF is 6bytes (48Bits) long
 		$ident = unpack('nupper/nmiddle/nlower', $data);
 		//Make sure we get GIF 87a or 89a
 		if($ident['upper'] === 0x4749 && $ident['middle'] === 0x4638 && ($ident['lower'] === 0x3761 || $ident['lower'] === 0x3961))
@@ -376,6 +389,17 @@ class llynxScrape
 		$ident = unpack('nmagic/nmarker', $data);
 		//Make sure we're a JPEG
 		if($ident['magic'] === 0xFFD8)
+		{
+			return true;
+		}
+		return false;
+	}
+	function is_PDF($data)
+	{
+		//The identity for a PDF is 4Bytes (32bits) long
+		$ident = unpack('Nupper', $data);
+		//Make sure we get %PDF
+		if($ident['upper'] === 0x25504446)
 		{
 			return true;
 		}

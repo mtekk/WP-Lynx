@@ -14,7 +14,6 @@ class UninstallerTests extends WP_Plugin_Uninstall_UnitTestCase
 		// This code will run before each test!
 		$current_user = new WP_User(1);
 		$current_user->set_role('administrator');
-		require dirname( dirname( __FILE__ ) ) . '/wp_lynx.php';
 		require dirname( dirname( __FILE__ ) ) . '/class.llynx_admin.php';
 		$llynx_admin = new llynx_admin(
 			array('Sfoo' => 'bar'),
@@ -52,4 +51,3 @@ class UninstallerTests extends WP_Plugin_Uninstall_UnitTestCase
 		$this->assertEquals( false, get_option('llynx_options_bk') );
 	}
 }
-
