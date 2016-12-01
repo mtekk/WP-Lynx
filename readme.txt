@@ -1,9 +1,9 @@
 === WP Lynx ===
 Contributors: mtekk
 Tags: Links, Facebook, Open Graph, post, posts
-Requires at least: 4.3
-Tested up to: 4.5
-Stable tag: 1.1.2
+Requires at least: 4.4
+Tested up to: 4.7
+Stable tag: 1.2.0
 WP Lynx allows you to mimic Facebook's wall links in your WordPress posts.
 
 == Description ==
@@ -25,6 +25,15 @@ Please visit [WP Lynx's](http://mtekk.us/code/wp-lynx/#installation "WP Lynx's p
 2. This screenshot shows the Add Lynx Print screen with two Lynx Prints in queue to be added to the current post
 
 == Changelog ==
+
+= 1.2.0 =
+Release date: November 30th, 2016
+
+* Behavior change: Migrated to WP HTTP class for URL parsing, removing external library dependency.
+* New feature: Support for simultaneous multiple URL fetching added.
+* New feature: Support for image previews of PDFs added for users with Imagick.
+* Bug fix: Fixed issue where Lynx Prints would not insert into the post.
+* Bug fix: Fixed issue where sites without a title tag would cause a PHP warning.
 
 = 1.1.2 =
 Release date: April 1st, 2016
@@ -125,6 +134,10 @@ Release date: June 14th, 2010
 * Initial Public Release
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+This version requires PHP5.3 or newer, do not update if still on PHP5.2. This version adds support for PDF thumbnails for users with Imagick.
+
 = 1.1.0 =
 This version requires PHP5.3 or newer, do not update if still on PHP5.2. This version improves support for multiple visual editors on a page.
 

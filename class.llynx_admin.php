@@ -42,7 +42,7 @@ if(!class_exists('mtekk_adminKit'))
  */
 class llynx_admin extends mtekk_adminKit
 {
-	const version = '1.1.2';
+	const version = '1.2.0';
 	protected $full_name = 'WP Lynx Settings';
 	protected $short_name = 'WP Lynx';
 	protected $access_level = 'manage_options';
