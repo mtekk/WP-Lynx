@@ -11,7 +11,7 @@ Text Domain: wp-lynx
 Domain Path: /languages/
 */
 /*  
-	Copyright 2010-2016  John Havlik  (email : john.havlik@mtekk.us)
+	Copyright 2010-2017  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ if(!class_exists('pdf_helpers'))
  */
 class linksLynx
 {
-	const version = '1.2.0';
+	const version = '1.2.50';
 	protected $name = 'WP Lynx';
 	protected $identifier = 'wp-lynx';
 	protected $unique_prefix = 'llynx';
