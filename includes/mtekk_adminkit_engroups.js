@@ -1,11 +1,11 @@
 jQuery(function()
 {
-	jQuery(".adminkit-engroup input:checkbox").each(mtekk_admin_enable_group);
-	jQuery("input:checkbox.adminkit-enset").each(mtekk_admin_enable_set);
+	jQuery(".adminkit-engroup input:checkbox.adminkit-enset-ctrl").each(mtekk_admin_enable_group);
+	jQuery("input:checkbox.adminkit-enset-ctrl").each(mtekk_admin_enable_set);
 });
 function mtekk_admin_enable_group(){
 	var setting = this;
-	jQuery(this).parents(".adminkit-engroup").find("input").each(function(){
+	jQuery(this).parents(".adminkit-engroup").find("input, textarea").each(function(){
 		if(this != setting){
 			if(jQuery(setting).prop("checked")){
 				jQuery(this).prop("disabled", false);
@@ -20,7 +20,7 @@ function mtekk_admin_enable_group(){
 }
 function mtekk_admin_enable_set(){
 	var setting = this;
-	jQuery(this).parents(".adminkit-enset-top").find("input.adminkit-enset").each(function(){
+	jQuery(this).parents(".adminkit-enset-top").find("input.adminkit-enset, textarea.adminkit-enset").each(function(){
 		if(this != setting){
 			if(jQuery(setting).prop("checked")){
 				jQuery(this).prop("disabled", false);
@@ -33,5 +33,5 @@ function mtekk_admin_enable_set(){
 		}
 	});
 }
-jQuery(".adminkit-engroup input:checkbox").change(mtekk_admin_enable_group);
+jQuery(".adminkit-engroup input:checkbox.adminkit-enset-ctrl").change(mtekk_admin_enable_group);
 jQuery("input:checkbox.adminkit-enset-ctrl").change(mtekk_admin_enable_set);

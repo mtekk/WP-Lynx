@@ -1,5 +1,5 @@
 <?php
-/*  Copyright 2007-2016  John Havlik  (email : john.havlik@mtekk.us)
+/*  Copyright 2007-2017  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ if(!class_exists('mtekk_adminKit'))
  */
 class llynx_admin extends mtekk_adminKit
 {
-	const version = '1.2.0';
+	const version = '1.2.50';
 	protected $full_name = 'WP Lynx Settings';
 	protected $short_name = 'WP Lynx';
 	protected $access_level = 'manage_options';
@@ -307,16 +307,14 @@ class llynx_admin extends mtekk_adminKit
 		global $wp_taxonomies;
 		$this->security();
 		do_action($this->unique_prefix . '_settings_pre_messages', $this->opt);
-		//Display our messages
-		$this->messages();
 		$uploadDir = wp_upload_dir();
 		if(!isset($uploadDir['path']) || !is_writable($uploadDir['path']))
 		{
 			//Let the user know their directory is not writable
-			$this->message['error'][] = __('WordPress uploads directory is not writable, thumbnails will be disabled.', 'wp-lynx');
-			//Too late to use normal hook, directly display the message
-			$this->message();
+			$this->messages[] = new mtekk_adminKit_message(sprintf(esc_html_('WordPress uploads directory is not writable, thumbnails will be disabled.', 'wp-lynx')), 'error');
 		}
+		//Display our messages
+		$this->messages();
 		?>
 		<div class="wrap"><h2><?php _e('WP Lynx Settings', 'wp-lynx'); ?></h2>
 		<?php
