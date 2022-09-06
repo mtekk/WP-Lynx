@@ -3,7 +3,7 @@
 Plugin Name: WP Lynx
 Plugin URI: http://mtekk.us/code/wp-lynx/
 Description: Adds Facebook-esq extended link information to your WordPress pages and posts. For details on how to use this plugin visit <a href="http://mtekk.us/code/wp-lynx/">WP Lynx</a>. 
-Version: 1.2.0
+Version: 1.2.1
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
@@ -11,7 +11,7 @@ Text Domain: wp-lynx
 Domain Path: /languages/
 */
 /*  
-	Copyright 2010-2016  John Havlik  (email : john.havlik@mtekk.us)
+	Copyright 2010-2021  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@ Domain Path: /languages/
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-//Do a PHP version check, require 5.3 or newer
-if(version_compare(PHP_VERSION, '5.3.0', '<'))
+//Do a PHP version check, require 5.6 or newer
+if(version_compare(PHP_VERSION, '5.6.0', '<'))
 {
 	//Silently deactivate plugin, keeps admin usable
 	deactivate_plugins(plugin_basename(__FILE__), true);
@@ -40,9 +40,9 @@ if(!function_exists('mb_strlen'))
 	require_once(dirname(__FILE__) . '/includes/multibyte_supplicant.php');
 }
 //Include admin base class
-if(!class_exists('mtekk_adminKit'))
+if(!class_exists('\mtekk\adminKit\adminKit'))
 {
-	require_once(dirname(__FILE__) . '/includes/class.mtekk_adminkit.php');
+	require_once(dirname(__FILE__) . '/includes/adminKit/class-mtekk_adminkit.php');
 }
 //Include llynxScrape class
 if(!class_exists('llynxScrape'))
@@ -54,12 +54,13 @@ if(!class_exists('pdf_helpers'))
 {
 	require_once(dirname(__FILE__) . '/class.pdf_helpers.php');
 }
+use mtekk\adminKit\adminKit as adminKit;
 /**
  * The administrative interface class 
  */
 class linksLynx
 {
-	const version = '1.2.0';
+	const version = '1.2.1';
 	protected $name = 'WP Lynx';
 	protected $identifier = 'wp-lynx';
 	protected $unique_prefix = 'llynx';
@@ -566,6 +567,112 @@ class linksLynx
 	public function uninstall()
 	{
 		$this->admin->uninstall();
+	}
+	static function setup_setting_defaults(array &$settings)
+	{
+		//Hook for letting other plugins add in their default settings (has to go first to prevent other from overriding base settings)
+		$settings = apply_filters('llynx_settings_init', $settings);
+		$opt = array(
+				'Himage_template' => '', //???
+				'swthumbs_key' => ''
+		);
+		//Now on to our settings
+		$settings['bglobal_style'] = new setting\setting_bool(
+				'global_style',
+				true,
+				__('Default Style', 'wp-lynx'));
+		$settings['bshort_url'] = new setting\setting_bool(
+				'short_url',
+				false,
+				__('Shorten URL', 'wp-lynx'));
+		$settings['bog_only'] = new setting\setting_bool(
+				'og_only',
+				false,
+				__('Open Graph Only Mode', 'wp-lynx'));
+		$settings['Htemplate'] = new setting\setting_html(
+				'template',
+				'<div class="llynx_print">%image%<div class="llynx_text"><a title="Go to %title%" href="%url%">%title%</a><small>%url%</small><span>%description%</span></div></div>',
+				__('Lynx Print Template', 'wp-lynx'));
+		$settings['acache_max_x'] = new setting\setting_absint(
+				'cache_max_x',
+				100,
+				__('Maximum Image Width', 'wp-lynx'));
+		$settings['acache_max_y'] = new setting\setting_absint(
+				'cache_max_y',
+				100,
+				__('Maximum Image Height', 'wp-lynx'));
+		$settings['acache_quality'] = new setting\setting_absint(
+				'cache_quality',
+				80,
+				__('Cache Image Quality', 'wp-lynx'));
+		$settings['bcache_crop'] = new setting\setting_bool(
+				'cache_crop',
+				false,
+				__('Crop Image', 'wp-lynx'));
+		$settings['Scache_type'] = new setting\setting_enum(
+				'Scache_type',
+				'original',
+				__('Cached Image Format', 'wp-lynx'),
+				false,
+				false,
+				array('original', 'png', 'jpeg', 'gif'));
+		$settings['acurl_timeout'] = new setting\setting_absint(
+				'curl_timeout',
+				3,
+				__('Timeout', 'wp-lynx'));
+		$settings['acurl_max_redirects'] = new setting\setting_absint(
+				'curl_max_redirects',
+				3,
+				__('Max Redirects', 'wp-lynx'));
+		$settings['bcurl_embrowser'] = new setting\setting_bool(
+				'curl_embrowser',
+				false,
+				__('Emulate Browser', 'wp-lynx'));
+		$settings['Scurl_agent'] = new setting\setting_string(
+				'curl_agent',
+				'WP Links Bot',
+				__('Useragent', 'wp-lynx'));
+		$settings['bcurl_embrowser'] = new setting\setting_bool(
+				'curl_embrowser',
+				false,
+				__('Emulate Browser', 'wp-lynx'));
+		$settings['swthumbs_key'] = new setting\setting_string(
+				'wthumbs_key',
+				'',
+				__('API Key', 'wp-lynx'),
+				true);
+		$settings['bwthumbs_enable'] = new setting\setting_bool(
+				'wthumbs_enable',
+				false,
+				__('Enable Website Thumbnails', 'wp-lynx'));
+		$settings['aimg_min_x'] = new setting\setting_absint(
+				'img_min_x',
+				50,
+				__('Minimum Image Width', 'wp-lynx'));
+		$settings['aimg_min_y'] = new setting\setting_absint(
+				'img_min_y',
+				50,
+				__('Minimum Image Height', 'wp-lynx'));
+		$settings['aimg_max_count'] = new setting\setting_absint(
+				'img_max_count',
+				20,
+				__('Maximum Image Count', 'wp-lynx'));
+		$settings['aimg_max_range'] = new setting\setting_absint(
+				'img_max_range',
+				256,
+				__('Maximum Image Scrape Size', 'wp-lynx'));
+		$settings['ap_min_length'] = new setting\setting_absint(
+				'p_min_length',
+				120,
+				__('Minimum Paragraph Length', 'wp-lynx'));
+		$settings['ap_max_length'] = new setting\setting_absint(
+				'p_max_length',
+				180,
+				__('Maximum Paragraph Length', 'wp-lynx'));
+		$settings['ap_max_count'] = new setting\setting_absint(
+				'p_max_count',
+				5,
+				__('Minimum Paragraph Count', 'wp-lynx'));
 	}
 }
 //Let's make an instance of our object takes care of everything
