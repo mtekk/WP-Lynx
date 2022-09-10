@@ -28,12 +28,20 @@ Domain Path: /languages/
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 //Do a PHP version check, require 5.6 or newer
-if(version_compare(PHP_VERSION, '5.6.0', '<'))
+//Do a PHP version check, require 5.6 or newer
+if(version_compare(phpversion(), '5.6.0', '<'))
 {
-	//Silently deactivate plugin, keeps admin usable
-	deactivate_plugins(plugin_basename(__FILE__), true);
-	//Spit out die messages
-	wp_die(sprintf(__('Your PHP version is too old, please upgrade to a newer version. Your version is %s, this plugin requires %s', 'wp-lynx'), phpversion(), '5.3.0'));
+	//Only purpose of this function is to echo out the PHP version error
+	function llynx_phpold()
+	{
+		printf('<div class="notice notice-error"><p>' . esc_html__('Your PHP version is too old, please upgrade to a newer version. Your version is %1$s, WP Lynx requires %2$s', 'wp-lynx') . '</p></div>', phpversion(), '5.6.0');
+	}
+	//If we are in the admin, let's print a warning then return
+	if(is_admin())
+	{
+		add_action('admin_notices', 'llynx_phpold');
+	}
+	return;
 }
 if(!function_exists('mb_strlen'))
 {
@@ -54,7 +62,7 @@ if(!class_exists('pdf_helpers'))
 {
 	require_once(dirname(__FILE__) . '/class.pdf_helpers.php');
 }
-use mtekk\adminKit\adminKit as adminKit;
+use mtekk\adminKit\{adminKit, setting};
 /**
  * The administrative interface class 
  */
@@ -92,6 +100,7 @@ class linksLynx
 					'bwthumbs_enable' => false,
 					'swthumbs_key' => ''
 					);
+	protected $settings = array();
 	protected $template_tags = array(
 					'%url%',
 					'%short_url%',
@@ -115,7 +124,7 @@ class linksLynx
 		{
 			require_once(dirname(__FILE__) . '/class.llynx_admin.php');
 			//Instantiate our new admin object
-			$this->admin = new llynx_admin($this->opt, $this->plugin_basename, $this->template_tags);
+			$this->admin = new llynx_admin($this->opt, $this->plugin_basename, $this->template_tags, $this->settings);
 		}
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
 	}
@@ -128,8 +137,8 @@ class linksLynx
 	 */
 	function init()
 	{
+		wp_die('why oh why?');
 		//We're going to make sure we run the parent's version of this function as well
-		parent::init();
 		$this->llynx_scrape->opt = $this->opt;
 		add_action('media_upload_wp_lynx', array($this, 'media_upload'));
 		$this->allowed_html = wp_kses_allowed_html('post');
@@ -149,14 +158,13 @@ class linksLynx
 		wp_register_style('llynx_style', plugins_url('/wp_lynx_style' . $suffix . '.css', dirname(__FILE__) . '/wp_lynx_style' . $suffix . '.css'));
 		wp_register_style('llynx_media', plugins_url('/llynx_media' . $suffix . '.css', dirname(__FILE__) . '/llynx_media' . $suffix . '.css'));
 		wp_register_script('llynx_javascript', plugins_url('/wp_lynx' . $suffix . '.js', dirname(__FILE__) . '/wp_lynx' . $suffix . '.js'), array( 'media-views' ), $this::version, true);
+		linksLynx::setup_setting_defaults($this->settings);
 		//If we are not in the admin, load up our style (if told to)
 		if(!is_admin())
 		{
-			//Sync our options
-			$this->opt = mtekk_adminKit::parse_args(get_option('llynx_options'), $this->opt);
-			$this->llynx_scrape->opt = $this->opt;
+			$this->get_settings();
 			//Only print if enabled
-			if($this->opt['bglobal_style'])
+			if($this->settings['bglobal_style']->get_value())
 			{
 				wp_enqueue_style('llynx_style');
 			}
@@ -281,9 +289,7 @@ class linksLynx
 	}
 	function fetch_print()
 	{
-		//Sync our options
-		$this->opt = mtekk_adminKit::parse_args(get_option('llynx_options'), $this->opt);
-		$this->llynx_scrape->opt = $this->opt;
+		$this->get_settings();
 		//Grab the nonce and check
 		//$nonce = intval($_POST['nonce']);
 		//Clean up the URL
@@ -322,7 +328,7 @@ class linksLynx
 			return $thumbnail->writeImage($save_location);
 		}
 		//If we will be saving as jpeg
-		else if($this->opt['Scache_type'] == 'jpeg' || ($this->opt['Scache_type'] == 'original' && ($extension == 'jpg' || $extension == 'jpeg')))
+		else if($this->settings['Scache_type']->get_value() == 'jpeg' || ($this->settings['Scache_type']->get_value() == 'original' && ($extension == 'jpg' || $extension == 'jpeg')))
 		{
 			//Make sure we use a unique filename
 			$file_name = wp_unique_filename($directory['path'], $name . '.jpg');
@@ -332,7 +338,7 @@ class linksLynx
 			return imagejpeg($thumbnail, $save_location, $this->opt['acache_quality']);
 		}
 		//If we will be saving as png
-		else if($this->opt['Scache_type'] == 'png' || ($this->opt['Scache_type'] == 'original' && $extension == 'png'))
+		else if($this->settings['Scache_type']->get_value() == 'png' || ($this->settings['Scache_type']->get_value() == 'original' && $extension == 'png'))
 		{
 			//Make sure we use a unique filename
 			$file_name = wp_unique_filename($directory['path'], $name . '.png');
@@ -403,37 +409,37 @@ class linksLynx
 	{
 		$aspect_ratio = $width/$height;
 		//If we will be cropping the image we need to do some calculations
-		if($this->opt['bcache_crop'])
+		if($this->settings['bcache_crop']->get_value())
 		{
 			//If we are wider, hight is more important
 			if($width > $height)
 			{
-				$width = ceil($width - ($width * ($aspect_ratio - $this->opt['acache_max_x'] / $this->opt['acache_max_y'])));
+				$width = ceil($width - ($width * ($aspect_ratio - $this->settings['acache_max_x']->get_value() / $this->settings['acache_max_y']->get_value())));
 			}
 			//If we are taller, width is more important
 			else
 			{
-				$height = ceil($height - ($height * ($aspect_ratio - $this->opt['acache_max_x'] / $this->opt['acache_max_y'])));
+				$height = ceil($height - ($height * ($aspect_ratio - $this->settings['acache_max_x']->get_value() / $this->settings['acache_max_y']->get_value())));
 			}
 			//Out new height and widths are simple as we are cropping
-			$new_height = $this->opt['acache_max_y'];
-			$new_width = $this->opt['acache_max_x'];
+			$new_height = $this->settings['acache_max_y']->get_value();
+			$new_width = $this->settings['acache_max_x']->get_value();
 		}
 		//Otherwise we're just resizing
 		else
 		{
 			//If the destination ration is wider than the source we need to adjust accordingly
-			if($this->opt['acache_max_x']/$this->opt['acache_max_y'] > $aspect_ratio)
+			if($this->settings['acache_max_x']->get_value() / $this->settings['acache_max_y']->get_value() > $aspect_ratio)
 			{
 				//We are height limited, maintain aspect ratio
-				$new_width = $this->opt['acache_max_y'] * $aspect_ratio;
-				$new_height = $this->opt['acache_max_y'];
+				$new_width = $this->settings['acache_max_y']->get_value() * $aspect_ratio;
+				$new_height = $this->settings['acache_max_y']->get_value();
 			}
 			else
 			{
 				//We are width limited, maintain aspect ratio
-				$new_width = $this->opt['acache_max_x'];
-				$new_height = $this->opt['acache_max_x'] / $aspect_ratio;
+				$new_width = $this->settings['acache_max_x']->get_value();
+				$new_height = $this->settings['acache_max_x']->get_value() / $aspect_ratio;
 			}
 		}
 	}
@@ -572,10 +578,6 @@ class linksLynx
 	{
 		//Hook for letting other plugins add in their default settings (has to go first to prevent other from overriding base settings)
 		$settings = apply_filters('llynx_settings_init', $settings);
-		$opt = array(
-				'Himage_template' => '', //???
-				'swthumbs_key' => ''
-		);
 		//Now on to our settings
 		$settings['bglobal_style'] = new setting\setting_bool(
 				'global_style',
@@ -673,6 +675,18 @@ class linksLynx
 				'p_max_count',
 				5,
 				__('Minimum Paragraph Count', 'wp-lynx'));
+	}
+	/**
+	 * Function updates the breadcrumb_trail options array from the database in a semi intellegent manner
+	 *
+	 * @since  1.3.0
+	 */
+	private function get_settings()
+	{
+		//Convert our settings to opts
+		$opts = adminKit::settings_to_opts($this->settings);
+		//Grab the current settings for the current local site from the db
+		$this->llynx_scrape->opt = mtekk_adminKit::parse_args(get_option('llynx_options'), $opts);
 	}
 }
 //Let's make an instance of our object takes care of everything

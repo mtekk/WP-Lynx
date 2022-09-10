@@ -1,5 +1,6 @@
 <?php
-/*  Copyright 2007-2016  John Havlik  (email : john.havlik@mtekk.us)
+/*  
+	Copyright 2007-2022  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,13 +17,13 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 require_once(dirname(__FILE__) . '/includes/block_direct_access.php');
-//Do a PHP version check, require 5.3 or newer
-if(version_compare(phpversion(), '5.3.0', '<'))
+//Do a PHP version check, require 5.6 or newer
+if(version_compare(phpversion(), '5.6.0', '<'))
 {
 	//Only purpose of this function is to echo out the PHP version error
 	function llynx_phpold()
 	{
-		printf('<div class="error"><p>' . __('Your PHP version is too old, please upgrade to a newer version. Your version is %s, this plugin requires %s', 'wp-lynx') . '</p></div>', phpversion(), '5.3.0');
+		printf('<div class="notice notice-error"><p>' . __('Your PHP version is too old, please upgrade to a newer version. Your version is %s, this plugin requires %s', 'wp-lynx') . '</p></div>', phpversion(), '5.6.0');
 	}
 	//If we are in the admin, let's print a warning then return
 	if(is_admin())
@@ -32,17 +33,18 @@ if(version_compare(phpversion(), '5.3.0', '<'))
 	return;
 }
 //Include admin base class
-if(!class_exists('mtekk_adminKit'))
+if(!class_exists('\mtekk\adminKit\adminKit'))
 {
-	require_once(dirname(__FILE__) . '/includes/class.mtekk_adminkit.php');
+	require_once(dirname(__FILE__) . '/includes/adminKit/class-mtekk_adminkit.php');
 }
+use mtekk\adminKit\{adminKit, form, message, setting};
 /**
  * The administrative interface class 
  * 
  */
-class llynx_admin extends mtekk_adminKit
+class llynx_admin extends adminKit
 {
-	const version = '1.2.0';
+	const version = '1.3.0';
 	protected $full_name = 'WP Lynx Settings';
 	protected $short_name = 'WP Lynx';
 	protected $access_level = 'manage_options';
@@ -56,16 +58,56 @@ class llynx_admin extends mtekk_adminKit
 	 * @param bcn_breadcrumb_trail $breadcrumb_trail a breadcrumb trail object
 	 * @param string $basename The basename of the plugin
 	 */
-	function __construct($opts, $basename, $template_tags)
+	function __construct(array &$opts, $basename, $template_tags, array &$settings)
 	{
 		$this->plugin_basename = $basename;
 		//Grab default options that were passed in
-		$this->opt = $opts;
+		$this->settings =& $settings;
+		$this->opt =& $opts;
 		$this->template_tags = $template_tags;
 		add_action('admin_print_styles-post.php', array($this, 'admin_edit_page_styles'));
 		add_action('admin_print_styles-post-new.php', array($this, 'admin_edit_page_styles'));
 		//We're going to make sure we load the parent's constructor
 		parent::__construct();
+	}
+	/**
+	 * Loads opts array values into the local settings array
+	 *
+	 * @param array $opts The opts array
+	 */
+	function setting_merge($opts)
+	{
+		$unknown = array();
+		foreach($opts as $key => $value)
+		{
+			if(isset($this->settings[$key]) && $this->settings[$key] instanceof setting\setting)
+			{
+				$this->settings[$key]->set_value($this->settings[$key]->validate($value));
+			}
+			else if(isset($this->settings[$key]) && is_array($this->settings[$key]) && is_array($value))
+			{
+				foreach($value as $subkey => $subvalue)
+				{
+					if(isset($this->settings[$key][$subkey]) && $this->settings[$key][$subkey]instanceof setting\setting)
+					{
+						$this->settings[$key][$subkey]->set_value($this->settings[$key][$subkey]->validate($subvalue));
+					}
+				}
+			}
+			else
+			{
+				$unknown[] = $key;
+			}
+		}
+		//Add a message if we found some unknown settings while merging
+		if(count($unknown) > 0)
+		{
+			$this->messages[] = new message(
+					sprintf(__('Found %u unknown legacy settings: %s','wp-lynx'), count($unknown), implode(', ', $unknown)),
+					'warning',
+					true,
+					'llyn_unkonwn_legacy_settings');
+		}
 	}
 	/**
 	 * admin initialization callback function
@@ -83,6 +125,7 @@ class llynx_admin extends mtekk_adminKit
 		add_action('media_buttons', array($this, 'media_buttons'));
 		//We're going to make sure we run the parent's version of this function as well
 		parent::init();
+		$this->setting_merge($this->opt);
 	}
 	function admin_edit_page_styles()
 	{
@@ -330,30 +373,30 @@ class llynx_admin extends mtekk_adminKit
 			<?php settings_fields('llynx_options');?>
 			<div id="hasadmintabs">
 			<fieldset id="general" class="llynx_options">
-				<h3 class="tab-title" title="<?php _e('A collection of settings most likely to be modified are located under this tab.', 'wp-lynx');?>"><?php _e('General', 'wp-lynx'); ?></h3>
+				<legend class="screen-reader-text" data-title="<?php _e('A collection of settings most likely to be modified are located under this tab.', 'wp-lynx');?>"><?php _e('General', 'wp-lynx'); ?></legend>
 				<h3><?php _e('General', 'wp-lynx'); ?></h3>
 				<table class="form-table">
 					<?php
-						$this->input_check(__('Open Graph Only Mode', 'wp-lynx'), 'bog_only', __("For sites with Open Graph metadata, only fetch that data.", 'wp-lynx'));
-						$this->input_check(__('Shorten URL', 'wp-lynx'), 'bshort_url', __('Shorten URL using a URL shortening service such as tinyurl.com.', 'wp-lynx'));
-						$this->input_check(__('Default Style', 'wp-lynx'), 'bglobal_style', __('Enable the default Lynx Prints styling on your blog.', 'wp-lynx'));
+						$this->form->input_check($this->settings['bog_only'], __("For sites with Open Graph metadata, only fetch that data.", 'wp-lynx'));
+						$this->form->input_check($this->settings['bshort_url'], __('Shorten URL using a URL shortening service such as tinyurl.com.', 'wp-lynx'));
+						$this->form->input_check($this->settings['bglobal_style'], __('Enable the default Lynx Prints styling on your blog.', 'wp-lynx'));
 					?>
 				</table>
 			</fieldset>
 			<fieldset id="content" class="llynx_options">
-				<h3 class="tab-title" title="<?php _e('Settings related to how Lynx Prints will display.', 'wp-lynx');?>"><?php _e('Content', 'wp-lynx'); ?></h3>
+				<legend class="screen-reader-text" data-title="<?php _e('Settings related to how Lynx Prints will display.', 'wp-lynx');?>"><?php _e('Content', 'wp-lynx'); ?></legend>
 				<h3><?php _e('Content', 'wp-lynx'); ?></h3>
 				<table class="form-table">
 				<?php
-					$this->textbox(__('Lynx Print Template', 'wp-lynx'), 'Htemplate', 3, false, __('Available tags: ', 'wp-lynx') . implode(', ', $this->template_tags));
+					$this->form->textbox($this->settings['Htemplate'], 3, false, __('Available tags: ', 'wp-lynx') . implode(', ', $this->template_tags));
 				?>
 				</table>
 				<h3><?php _e('Images', 'wp-lynx'); ?></h3>
 				<table class="form-table">
 				<?php
-					$this->input_text(__('Maximum Image Width', 'wp-lynx'), 'acache_max_x', 'small-text', false, __('Maximum cached image width in pixels.', 'wp-lynx'));
-					$this->input_text(__('Maximum Image Height', 'wp-lynx'), 'acache_max_y', 'small-text', false, __('Maximum cached image height in pixels.', 'wp-lynx'));
-					$this->input_check(__('Crop Image', 'wp-lynx'), 'bcache_crop', __('Crop images in the cache to the above dimensions.', 'wp-lynx'));
+					$this->form->input_text($this->settings['acache_max_x'], 'small-text', false, __('Maximum cached image width in pixels.', 'wp-lynx'));
+					$this->form->input_text($this->settings['acache_max_y'], 'small-text', false, __('Maximum cached image height in pixels.', 'wp-lynx'));
+					$this->form->input_check($this->settings['bcache_crop'], __('Crop images in the cache to the above dimensions.', 'wp-lynx'));
 				?>
 					<tr valign="top">
 						<th scope="row">
@@ -361,52 +404,52 @@ class llynx_admin extends mtekk_adminKit
 						</th>
 						<td>
 							<?php
-								$this->input_radio('Scache_type', 'original', __('Same as source format', 'wp-lynx'));
-								$this->input_radio('Scache_type', 'png', __('PNG'));
-								$this->input_radio('Scache_type', 'jpeg', __('JPEG'));
-								$this->input_radio('Scache_type', 'gif', __('GIF'));
+								$this->form->input_radio($this->settings['Scache_type'], 'original', __('Same as source format', 'wp-lynx'));
+								$this->form->input_radio($this->settings['Scache_type'], 'png', __('PNG'));
+								$this->form->input_radio($this->settings['Scache_type'], 'jpeg', __('JPEG'));
+								$this->form->input_radio($this->settings['Scache_type'], 'gif', __('GIF'));
 							?>
 							<span class="setting-description"><?php _e('The image format to use in the local image cache.', 'wp-lynx'); ?></span>
 						</td>
 					</tr>
 					<?php
-						$this->input_text(__('Cache Image Quality', 'wp-lynx'), 'acache_quality', 'small-text', false, __('Image quality when cached images are saved as JPEG.', 'wp-lynx'));
+					$this->form->input_text($this->settings['acache_quality'], 'small-text', false, __('Image quality when cached images are saved as JPEG.', 'wp-lynx'));
 					?>
 				</table>
 			</fieldset>
 			<fieldset id="advanced" class="llynx_options">
-				<h3 class="tab-title" title="<?php _e('Advanced settings for the WP Lynx content scraping engine.', 'wp-lynx');?>"><?php _e('Advanced', 'wp-lynx'); ?></h3>
+				<legend class="screen-reader-text" data-title="<?php _e('Advanced settings for the WP Lynx content scraping engine.', 'wp-lynx');?>"><?php _e('Advanced', 'wp-lynx'); ?></legend>
 				<h3><?php _e('Advanced', 'wp-lynx'); ?></h3>
 				<table class="form-table">
 					<?php
-						$this->input_text(__('Timeout', 'wp-lynx'), 'acurl_timeout', 'small-text', false, __('Maximum time for scrape execution in seconds.', 'wp-lynx'));
-						$this->input_text(__('Max Redirects', 'wp-lynx'), 'acurl_max_redirects', 'small-text', false, __('Maximum number of redirects to follow while scraping a URL.', 'wp-lynx'));						
-						$this->input_text(__('Useragent', 'wp-lynx'), 'Scurl_agent', 'large-text', $this->opt['bcurl_embrowser'], __('Useragent to use during scrape execution.', 'wp-lynx'));
-						$this->input_check(__('Emulate Browser', 'wp-lynx'), 'bcurl_embrowser', __("Useragent will be exactly as the users's browser.", 'wp-lynx'));
+						$this->form->input_text($this->settings['acurl_timeout'], 'small-text', false, __('Maximum time for scrape execution in seconds.', 'wp-lynx'));
+						$this->form->input_text($this->settings['acurl_max_redirects'], 'small-text', false, __('Maximum number of redirects to follow while scraping a URL.', 'wp-lynx'));						
+						$this->form->input_text($this->settings['Scurl_agent'], 'large-text', $this->opt['bcurl_embrowser'], __('Useragent to use during scrape execution.', 'wp-lynx'));
+						$this->form->input_check($this->settings['bcurl_embrowser'], __("Useragent will be exactly as the users's browser.", 'wp-lynx'));
 					?>
 				</table>
 				<h3><?php _e('Thumbnails', 'wp-lynx'); ?></h3>
 				<table class="form-table">
 					<?php
-						$this->input_check(__('Enable Website Thumbnails', 'wp-lynx'), 'bwthumbs_enable', __('Enable generation of Website Thumbails via a 3rd party provider (snapito.com)', 'wp-lynx'));
-						$this->input_text(__('API Key', 'wp-lynx'), 'swthumbs_key', 'large-text', false, __('Your API key for the 3rd party thumbnail provider (snapito.com)', 'wp-lynx'));
+						$this->form->input_check($this->settings['bwthumbs_enable'], __('Enable generation of Website Thumbails via a 3rd party provider (snapito.com)', 'wp-lynx'));
+						$this->form->input_text($this->settings['swthumbs_key'], 'large-text', false, __('Your API key for the 3rd party thumbnail provider (snapito.com)', 'wp-lynx'));
 					?>
 				</table>
 				<h3><?php _e('Images', 'wp-lynx'); ?></h3>
 				<table class="form-table">
 					<?php
-						$this->input_text(__('Minimum Image Width', 'wp-lynx'), 'aimg_min_x', 'small-text', false, __('Minimum width of images to scrape in pixels.', 'wp-lynx'));
-						$this->input_text(__('Minimum Image Height', 'wp-lynx'), 'aimg_min_y', 'small-text', false, __('Minimum hieght of images to scrape in pixels.', 'wp-lynx'));
-						$this->input_text(__('Maximum Image Count', 'wp-lynx'), 'aimg_max_count', 'small-text', false, __('Maximum number of images to scrape.', 'wp-lynx'));
-						$this->input_text(__('Maximum Image Scrape Size', 'wp-lynx'), 'aimg_max_range', 'small-text', false, __('Maximum number of bytes to download when determining the dimensions of JPEG images.', 'wp-lynx'));
+						$this->form->input_text($this->settings['aimg_min_x'], 'small-text', false, __('Minimum width of images to scrape in pixels.', 'wp-lynx'));
+						$this->form->input_text($this->settings['aimg_min_y'], 'small-text', false, __('Minimum hieght of images to scrape in pixels.', 'wp-lynx'));
+						$this->form->input_text($this->settings['aimg_max_count'], 'small-text', false, __('Maximum number of images to scrape.', 'wp-lynx'));
+						$this->form->input_text($this->settings['aimg_max_range'], 'small-text', false, __('Maximum number of bytes to download when determining the dimensions of JPEG images.', 'wp-lynx'));
 					?>
 				</table>
 				<h3><?php _e('Text', 'wp-lynx'); ?></h3>
 				<table class="form-table">
 					<?php
-						$this->input_text(__('Minimum Paragraph Length', 'wp-lynx'), 'ap_min_length', 'small-text', false, __('Minimum paragraph length to be scraped (in characters).', 'wp-lynx'));
-						$this->input_text(__('Maximum Paragraph Length', 'wp-lynx'), 'ap_max_length', 'small-text', false, __('Maximum paragraph length before it is cutt off (in characters).', 'wp-lynx'));
-						$this->input_text(__('Minimum Paragraph Count', 'wp-lynx'), 'ap_max_count', 'small-text', false, __('Maximum number of paragraphs to scrape.', 'wp-lynx'));
+						$this->form->input_text($this->settings['ap_min_length'], 'small-text', false, __('Minimum paragraph length to be scraped (in characters).', 'wp-lynx'));
+						$this->form->input_text($this->settings['ap_max_length'], 'small-text', false, __('Maximum paragraph length before it is cutt off (in characters).', 'wp-lynx'));
+						$this->form->input_text($this->settings['ap_max_count'], 'small-text', false, __('Maximum number of paragraphs to scrape.', 'wp-lynx'));
 					?>
 				</table>
 			</fieldset>
