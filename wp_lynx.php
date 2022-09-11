@@ -128,22 +128,6 @@ class linksLynx
 		}
 		add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
 	}
-	/**
-	 * admin initialisation callback function
-	 * 
-	 * is bound to wpordpress action 'admin_init' on instantiation
-	 * 
-	 * @return void
-	 */
-	function init()
-	{
-		wp_die('why oh why?');
-		//We're going to make sure we run the parent's version of this function as well
-		$this->llynx_scrape->opt = $this->opt;
-		add_action('media_upload_wp_lynx', array($this, 'media_upload'));
-		$this->allowed_html = wp_kses_allowed_html('post');
-		wp_enqueue_script('llynx_javascript', plugins_url('/wp_lynx.js', dirname(__FILE__) . '/wp_lynx.js'), array('jquery'));
-	}
 	function wp_init()
 	{
 		if(defined('SCRIPT_DEBUG') && SCRIPT_DEBUG)
@@ -218,7 +202,7 @@ class linksLynx
 	function fetch_url()
 	{
 		//Sync our options
-		$this->opt = mtekk_adminKit::parse_args(get_option('llynx_options'), $this->opt);
+		$this->opt = adminKit::parse_args(get_option('llynx_options'), $this->opt);
 		//If we are emulating the user's browser, we should update our user agent accordingly
 		if($this->opt['bcurl_embrowser'])
 		{
@@ -686,7 +670,7 @@ class linksLynx
 		//Convert our settings to opts
 		$opts = adminKit::settings_to_opts($this->settings);
 		//Grab the current settings for the current local site from the db
-		$this->llynx_scrape->opt = mtekk_adminKit::parse_args(get_option('llynx_options'), $opts);
+		$this->llynx_scrape->opt = adminKit::parse_args(get_option('llynx_options'), $opts);
 	}
 }
 //Let's make an instance of our object takes care of everything
