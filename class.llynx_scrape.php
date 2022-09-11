@@ -1,6 +1,6 @@
 <?php
 /*  
-	Copyright 2010-2016  John Havlik  (email : john.havlik@mtekk.us)
+	Copyright 2010-2022  John Havlik  (email : john.havlik@mtekk.us)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ if(!class_exists('pdf_helpers'))
 }
 class llynxScrape
 {
-	const version = '1.1.2';
+	const version = '1.1.3';
 	public $opt = array(
 		'ap_max_count' => 5,
 		'ap_min_length' => 120,
@@ -56,7 +56,7 @@ class llynxScrape
 			$curlOpt = array(
 				CURLOPT_RETURNTRANSFER	=> true,		// Return web page
 				CURLOPT_HEADER			=> false,		// Don't return headers
-				CURLOPT_FOLLOWLOCATION	=> !ini_get('safe_mode'),		// Follow redirects, if not in safemode
+				CURLOPT_FOLLOWLOCATION	=> true,		// Follow redirects, if not in safemode
 				CURLOPT_ENCODING		=> $encoding,			// Handle all encodings
 				CURLOPT_USERAGENT		=> $this->opt['Scurl_agent'],		// Useragent
 				CURLOPT_AUTOREFERER		=> true,		// Set referer on redirect
