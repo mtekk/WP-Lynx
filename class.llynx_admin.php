@@ -221,6 +221,11 @@ class llynx_admin extends adminKit
 			{
 				$opts['acurl_max_redirects'] = 3;
 			}
+			//Upgrading to 1.3.0
+			if(version_compare($version, '1.3.0', '<'))
+			{
+				$opts['Ecache_type'] = $opts['Scache_type'];
+			}
 		}
 		//Save the passed in opts to the object's option array
 		$this->opt = $opts;
@@ -404,10 +409,10 @@ class llynx_admin extends adminKit
 						</th>
 						<td>
 							<?php
-								$this->form->input_radio($this->settings['Scache_type'], 'original', __('Same as source format', 'wp-lynx'));
-								$this->form->input_radio($this->settings['Scache_type'], 'png', __('PNG'));
-								$this->form->input_radio($this->settings['Scache_type'], 'jpeg', __('JPEG'));
-								$this->form->input_radio($this->settings['Scache_type'], 'gif', __('GIF'));
+								$this->form->input_radio($this->settings['Ecache_type'], 'original', __('Same as source format', 'wp-lynx'));
+								$this->form->input_radio($this->settings['Ecache_type'], 'png', __('PNG'));
+								$this->form->input_radio($this->settings['Ecache_type'], 'jpeg', __('JPEG'));
+								$this->form->input_radio($this->settings['Ecache_type'], 'gif', __('GIF'));
 							?>
 							<span class="setting-description"><?php _e('The image format to use in the local image cache.', 'wp-lynx'); ?></span>
 						</td>

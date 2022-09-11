@@ -88,7 +88,7 @@ class linksLynx
 					'bcurl_embrowser' => false,
 					'acurl_timeout' => 3,
 					'acurl_max_redirects' => 3,
-					'Scache_type' => 'original',
+					'Ecache_type' => 'original',
 					'acache_quality' => 80,
 					'acache_max_x' => 100,
 					'acache_max_y' => 100,
@@ -312,7 +312,7 @@ class linksLynx
 			return $thumbnail->writeImage($save_location);
 		}
 		//If we will be saving as jpeg
-		else if($this->settings['Scache_type']->get_value() == 'jpeg' || ($this->settings['Scache_type']->get_value() == 'original' && ($extension == 'jpg' || $extension == 'jpeg')))
+		else if($this->settings['Ecache_type']->get_value() == 'jpeg' || ($this->settings['Ecache_type']->get_value() == 'original' && ($extension == 'jpg' || $extension == 'jpeg')))
 		{
 			//Make sure we use a unique filename
 			$file_name = wp_unique_filename($directory['path'], $name . '.jpg');
@@ -322,7 +322,7 @@ class linksLynx
 			return imagejpeg($thumbnail, $save_location, $this->opt['acache_quality']);
 		}
 		//If we will be saving as png
-		else if($this->settings['Scache_type']->get_value() == 'png' || ($this->settings['Scache_type']->get_value() == 'original' && $extension == 'png'))
+		else if($this->settings['Ecache_type']->get_value() == 'png' || ($this->settings['Ecache_type']->get_value() == 'original' && $extension == 'png'))
 		{
 			//Make sure we use a unique filename
 			$file_name = wp_unique_filename($directory['path'], $name . '.png');
@@ -595,8 +595,8 @@ class linksLynx
 				'cache_crop',
 				false,
 				__('Crop Image', 'wp-lynx'));
-		$settings['Scache_type'] = new setting\setting_enum(
-				'Scache_type',
+		$settings['Ecache_type'] = new setting\setting_enum(
+				'cache_type',
 				'original',
 				__('Cached Image Format', 'wp-lynx'),
 				false,
