@@ -3,7 +3,7 @@
 Plugin Name: WP Lynx
 Plugin URI: http://mtekk.us/code/wp-lynx/
 Description: Adds Facebook-esq extended link information to your WordPress pages and posts. For details on how to use this plugin visit <a href="http://mtekk.us/code/wp-lynx/">WP Lynx</a>. 
-Version: 1.2.1
+Version: 1.2.99
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
@@ -68,7 +68,7 @@ use mtekk\adminKit\{adminKit, setting};
  */
 class linksLynx
 {
-	const version = '1.2.1';
+	const version = '1.2.99';
 	protected $name = 'WP Lynx';
 	protected $identifier = 'wp-lynx';
 	protected $unique_prefix = 'llynx';
@@ -671,6 +671,28 @@ class linksLynx
 		$opts = adminKit::settings_to_opts($this->settings);
 		//Grab the current settings for the current local site from the db
 		$this->llynx_scrape->opt = adminKit::parse_args(get_option('llynx_options'), $opts);
+		//FIXME: Temporary until we move to saving as settings instead of opts in adminKit 3
+		foreach($this->llynx_scrape->opt as $key => $value)
+		{
+			if(isset($this->settings[$key]) && $this->settings[$key] instanceof setting\setting)
+			{
+				$this->settings[$key]->set_value($this->settings[$key]->validate($value));
+			}
+			else if(isset($this->settings[$key]) && is_array($this->settings[$key]) && is_array($value))
+			{
+				foreach($value as $subkey => $subvalue)
+				{
+					if(isset($this->settings[$key][$subkey]) && $this->settings[$key][$subkey]instanceof setting\setting)
+					{
+						$this->settings[$key][$subkey]->set_value($this->settings[$key][$subkey]->validate($subvalue));
+					}
+				}
+			}
+			else
+			{
+				$unknown[] = $key;
+			}
+		}
 	}
 }
 //Let's make an instance of our object takes care of everything
