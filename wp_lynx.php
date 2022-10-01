@@ -545,7 +545,8 @@ class linksLynx
 						if(is_array($stat) && isset($stat['mode']))
 						{
 							$perms = $stat['mode'] & 0007777;
-							$perms = $perms & 0000666;
+							//Should only be writable by owner, read by owner, group, and everyone
+							$perms = $perms & 0000644;
 							@chmod($imgLoc, $perms);
 						}
 						//Assemble the image and link it, if it exists
