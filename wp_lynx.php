@@ -542,9 +542,12 @@ class linksLynx
 						$imgURL = $uploadDir['url'] . '/' . $fileName;
 						//Verify we have the correct permissions of new file
 						$stat = @stat(dirname($imgLoc));
-						$perms = $stat['mode'] & 0007777;
-						$perms = $perms & 0000666;
-						@chmod($imgLoc, $perms);
+						if(is_array($stat) && isset($stat['mode']))
+						{
+							$perms = $stat['mode'] & 0007777;
+							$perms = $perms & 0000666;
+							@chmod($imgLoc, $perms);
+						}
 						//Assemble the image and link it, if it exists
 						$values['image'] = sprintf('<a title="Go to %1$s" href="%2$s"><img alt="%1$s" src="%3$s" width="%4$s" height="%5$s" /></a>', esc_attr($values['title']), $values['short_url'], $imgURL, $new_width, $new_height);
 					}
