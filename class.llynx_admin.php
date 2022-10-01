@@ -225,6 +225,8 @@ class llynx_admin extends adminKit
 			if(version_compare($version, '1.3.0', '<'))
 			{
 				$opts['Ecache_type'] = $opts['Scache_type'];
+				unset($opts['Scache_type']);
+				unset($opts['Himage_template']);
 			}
 		}
 		//Save the passed in opts to the object's option array
