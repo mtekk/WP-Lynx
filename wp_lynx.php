@@ -3,7 +3,7 @@
 Plugin Name: WP Lynx
 Plugin URI: http://mtekk.us/code/wp-lynx/
 Description: Adds Facebook-esq extended link information to your WordPress pages and posts. For details on how to use this plugin visit <a href="http://mtekk.us/code/wp-lynx/">WP Lynx</a>. 
-Version: 1.2.99
+Version: 1.3.0
 Author: John Havlik
 Author URI: http://mtekk.us/
 License: GPL2
@@ -68,7 +68,7 @@ use mtekk\adminKit\{adminKit, setting};
  */
 class linksLynx
 {
-	const version = '1.2.99';
+	const version = '1.3.0';
 	protected $name = 'WP Lynx';
 	protected $identifier = 'wp-lynx';
 	protected $unique_prefix = 'llynx';
@@ -95,7 +95,6 @@ class linksLynx
 					'bcache_crop' => false,
 					'bshort_url' => false,
 					'Htemplate' => '<div class="llynx_print">%image%<div class="llynx_text"><a title="Go to %title%" href="%url%">%title%</a><small>%url%</small><span>%description%</span></div></div>',
-					'Himage_template' => '',
 					'bog_only' => false,
 					'bwthumbs_enable' => false,
 					'swthumbs_key' => ''
